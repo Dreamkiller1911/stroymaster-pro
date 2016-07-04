@@ -30,14 +30,12 @@ function Start(prop) {
                         var c = _this.queue[i].ctrl;
                         var a = _this.queue[i].act;
                         var p = _this.queue[i].prop;
-
                         if (_this.ctrls.hasOwnProperty(c) === false) {
                             includeJSCtrl(c, a, p);
                         } else {
                             if (_this.queue[i].statusC === 'load') {
                                 if (_this.ctrls[c].status === 'ready') {
                                     if (p) {
-
                                         if ('properties' in _this.ctrls[c].obj === false) {
                                             Object.defineProperty(_this.ctrls[c].obj, 'properties', {
                                                 value: new Object(),
@@ -55,8 +53,6 @@ function Start(prop) {
                                 }
                             }
                         }
-
-
                     }
                 } else {
                     clearInterval(iLoadTimer);

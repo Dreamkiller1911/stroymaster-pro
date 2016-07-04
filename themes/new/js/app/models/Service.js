@@ -20,7 +20,6 @@ function Service(){
                         $(this).fancybox([]);
                     });
                     _this.owner.init('Comment', 'start');
-
                 });
             }
         });
