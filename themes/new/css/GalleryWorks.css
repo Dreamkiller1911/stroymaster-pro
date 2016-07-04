@@ -1,0 +1,21 @@
+#gallery-works div
+{
+
+}
+#gallery-works p
+{
+    font-weight: 900;
+    font-size: 12pt;
+    color: white;
+    text-shadow: 1px 1px 2px black, 0px 0px 4px black;
+}
+#gallery-works a
+{
+    display: inline-block;
+    cursor: pointer;
+    margin: 3px 5px 10px 3px;
+}
+#gallery-works img
+{
+    box-shadow: 2px 2px 4px black;
+}
