@@ -34,6 +34,7 @@ function Service(){
               var newData = document.createElement('div');
               newData.innerHTML = data.data.join('');
               place.appendChild(newData);
+              _this.owner.init('Service', 'indexLoad', {Id:data.nextId});
               _this.statusLoadIndex = true;
               console.log(_this.owner)
           }

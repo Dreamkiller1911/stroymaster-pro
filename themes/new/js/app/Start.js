@@ -124,7 +124,6 @@ function Start(prop) {
             value: 'load',
             writable: true
         });
-
         script.onload = function () {
             var fullCtrl = scriptName + 'Controller';
             window[fullCtrl.toString()].prototype = DefaultController;
@@ -133,25 +132,9 @@ function Start(prop) {
                     writable: true
                 }
             );
-
-            /*if (p != undefined) {
-             Object.defineProperty(_this.ctrls[scriptName]['obj'], 'properties', {
-             value: new Object(),
-             writable: true,
-             enumerable: true,
-             configurable: true
-             });
-             Object.defineProperty(_this.ctrls[scriptName]['obj']['properties'], a, {
-             value: p,
-             enumerable: true,
-             configurable: true,
-             writable: true
-             })
-             }*/
             _this.ctrls[scriptName].status = 'ready';
 
         };
-
         script.src = _this.paths.ctrls + scriptName + 'Controller.js?' + Math.random();
         script.type = 'text/javascript';
         document.getElementsByTagName('head')[0].appendChild(script);
