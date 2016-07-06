@@ -53,36 +53,6 @@ class ServicesController extends Controller
         ));
     }
 
-    /*public function actionCreate()
-    {
-        $cs=Yii::app()->clientScript;
-        $cs->registerScriptFile('/assets/multifile-master/jQuery.MultiFile.min.js');
-        $cs->registerCssFile('/assets/myCss/services.css');
-        $cs->registerScriptFile('/assets/new/js/resume.js');
-        $cs->registerScriptFile('/assets/js/myScript.js');
-        $cs->registerScriptFile(Yii::app()->request->baseUrl . '/js/serviceAjaxImgUpload.js');
-
-        $model=new Services;
-
-        // Uncomment the following line if AJAX validation is needed
-        // $this->performAjaxValidation($model);
-
-        if(isset($_POST['Services']))
-        {
-            if($model->id == null){
-                echo 'Модель не существует';
-                $model->attributes=$_POST['Services'];
-            }
-            $model->attributes=$_POST['Services'];
-            if($model->save())
-                $this->redirect(array('view','id'=>$model->id));
-        }
-
-        $this->render('create',array(
-            'model'=>$model,
-        ));
-    }*/
-
     public function actionUpdate()
     {
         if (!Yii::app()->user->isGuest) {
@@ -90,9 +60,9 @@ class ServicesController extends Controller
             $l = $this->loadModel();
             $model = $l ? $l : new Services();
 
-            $cs = parent::init();
+            /*$cs = parent::init();
             $cs->registerCssFile('/assets/myCss/services.css');
-            $cs->registerScriptFile(Yii::app()->theme->baseUrl . '/js/mylibrary/Services.js', CClientScript::POS_END);
+            $cs->registerScriptFile(Yii::app()->theme->baseUrl . '/js/mylibrary/Services.js', CClientScript::POS_END);*/
 
             if (isset($_POST['Services'])) {
 

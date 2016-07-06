@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?php echo $this->pageTitle ?></title>
-    <link href="/assets/new/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="/assets/new/css/main.css" rel="stylesheet">
-    <link href="/assets/new/css/form.css" rel="stylesheet">
+    <link href="<?php echo Yii::app()->theme->baseUrl?>/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="<?php echo Yii::app()->theme->baseUrl?>/css/main.css" rel="stylesheet">
+    <link href="<?php echo Yii::app()->theme->baseUrl?>/css/form.css" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
@@ -109,7 +109,7 @@
     </div>
 </div>
 
-<script src="/assets/new/js/main.js"></script>
-<script src="/assets/new/bootstrap/js/bootstrap.js"></script>
+<script src="<?php echo Yii::app()->theme->baseUrl?>/js/main.js"></script>
+<script src="<?php echo Yii::app()->theme->baseUrl?>/bootstrap/js/bootstrap.js"></script>
 </body>
 </html>

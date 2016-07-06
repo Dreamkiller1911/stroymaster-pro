@@ -15,19 +15,10 @@
     <div class="carousel-inner" role="listbox">
         <?php $i=0; foreach($data as $key => $val):?>
             <div class="carousel-item item <?php echo $i == 0 ? 'active': '' ?>">
-                <img src="<?php echo $val['url']?>" alt="First slide">
+                <img src="<?php echo Yii::app()->request->baseUrl . '/img/toSlider/' .  $val['file_name']?>" alt="First slide">
             </div>
             <?php $i++?>
         <?php endforeach?>
-        <!--<div class="carousel-item active">
-            <img data-src="..." alt="First slide">
-        </div>
-        <div class="carousel-item">
-            <img data-src="..." alt="Second slide">
-        </div>
-        <div class="carousel-item">
-            <img data-src="..." alt="Third slide">
-        </div>-->
     </div>
     <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
         <span class="icon-prev" aria-hidden="true"></span>

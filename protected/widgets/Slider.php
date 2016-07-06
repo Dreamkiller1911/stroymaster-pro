@@ -11,7 +11,7 @@ class Slider extends CWidget
     public function init()
     {
         $cs = Yii::app()->clientScript;
-        $cs->registerScriptFile('/assets/new/js/slider.js');
+        $cs->registerScriptFile(Yii::app()->theme->baseUrl . '/js/slider.js');
 
         $data = $this->getData();
         $this->render('slider', array('data' => $data));

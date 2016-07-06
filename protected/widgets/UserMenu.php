@@ -21,10 +21,9 @@ class UserMenu extends CWidget
     }
     protected function registerClientScript()
     {
-        $asset = new CAssetManager();
-        $path = '/assets/userMenu/';
+
         $cs = Yii::app()->clientScript;
-        $cs->registerCssFile($path . 'main.css');
+        $cs->registerCssFile(Yii::app()->theme->baseUrl . 'userMenu.css');
     }
 
     protected function createMenu()

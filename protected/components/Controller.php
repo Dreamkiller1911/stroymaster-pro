@@ -22,10 +22,8 @@ class Controller extends CController
 	public $breadcrumbs=array();
 	public function init()
 	{
-		$path = '/assets/userMenu/';
 		$cs = Yii::app()->clientScript;
 		$cs->registerCoreScript('jquery');
-		$cs->registerCssFile($path . 'main.css');
 		$cs->registerScriptFile(Yii::app()->theme->baseUrl . '/js/mylibrary/Proto.js');
 		$cs->registerScriptFile(Yii::app()->theme->baseUrl . '/js/mylibrary/UserAuth.js');
 		$cs->registerScriptFile(Yii::app()->theme->baseUrl . '/js/UserAuthController.js');
