@@ -11,11 +11,13 @@ class ServicesController extends Controller
             'postOnly + delete', // we only allow deletion via POST request
         );
     }
+
     public function init()
     {
         $cs = parent::init();
         return $cs;
     }
+
     public function actions()
     {
         return array(
@@ -25,6 +27,7 @@ class ServicesController extends Controller
             ),
         );
     }
+
     public function accessRules()
     {
         return array(/*
@@ -55,42 +58,42 @@ class ServicesController extends Controller
 
     public function actionUpdate()
     {
-        if (!Yii::app()->user->isGuest) {
-
-            $l = $this->loadModel();
-            $model = $l ? $l : new Services();
-
-
-            $this->init()->registerCssFile(Yii::app()->theme->baseUrl . '/css/services.css');
-            $this->init()->registerScriptFile(Yii::app()->theme->baseUrl . '/js/mylibrary/services.js', CClientScript::POS_END);
-
-            if (isset($_POST['Services'])) {
-
-                if (isset($_POST['ajax']) && $_POST['ajax'] === 'update') {
-                    $model->attributes = $_POST['Services'];
-                    if ($model->validate()) {
-                        $model->save();
-                        echo json_encode(array('complete' => true, 'message' => '<h5>Данные сохранены</h5>'));
-                        Yii::app()->end();
-                    } else {
-//						echo json_encode(array('message' => '<h5>Ошибка сохранения, попробуйте позже</h5>'));
-                        Yii::app()->end();
-                    }
-                }
-                $model->attributes = $_POST['Services'];
-                if ($model->save()) {
-                    $this->redirect(Yii::app()->request->requestUri);
-                    Yii::app()->end();
-                }
-            } else {
-                $this->render('update', array(
-                    'model' => $model,
-                ));
-            }
-        } else {
+        if (Yii::app()->user->isGuest) {
+            /** Если пользователь не авторизован, он будет перенаправлен на главную страницу */
             $this->redirect('/');
             Yii::app()->end();
         }
+        $l = $this->loadModel();
+        $model = $l ? $l : new Services();
+
+        $this->init()->registerCssFile(Yii::app()->theme->baseUrl . '/css/services.css');
+        $this->init()->registerScriptFile(Yii::app()->theme->baseUrl . '/js/mylibrary/services.js', CClientScript::POS_END);
+        $this->init()->registerScript('crv_crud', 'start.init(\'Service\', \'crud\')', CClientScript::POS_READY);
+
+        if (isset($_POST['Services'])) {
+
+            if (isset($_POST['ajax']) && $_POST['ajax'] === 'update') {
+                $model->attributes = $_POST['Services'];
+                if ($model->validate()) {
+                    $model->save();
+                    echo json_encode(array('complete' => true, 'message' => '<h5>Данные сохранены</h5>'));
+                    Yii::app()->end();
+                } else {
+						echo json_encode(array('message' => '<h5>Ошибка сохранения, попробуйте позже</h5>'));
+                    Yii::app()->end();
+                }
+            }
+            $model->attributes = $_POST['Services'];
+            if ($model->save()) {
+                $this->redirect(Yii::app()->request->requestUri);
+                Yii::app()->end();
+            }
+        } else {
+            $this->render('update', array(
+                'model' => $model,
+            ));
+        }
+
     }
 
     public function actionDelete($id)
@@ -104,30 +107,30 @@ class ServicesController extends Controller
 
     public function actionIndex()
     {
-        if(isset($_POST['ajax']) && $_POST['ajax'] === 'load'){
+        if (isset($_POST['ajax']) && $_POST['ajax'] === 'load') {
             $id = $this->getThreeService($_POST['id']);
             $model = Services::model()->findAll('id=' . implode(' XOR id=', $id['popId']));
             $data = array();
-            foreach($model as $service){
-                $data[] = $this->renderPartial('_view', array('service'=>$service), true);
+            foreach ($model as $service) {
+                $data[] = $this->renderPartial('_view', array('service' => $service), true);
             }
-            echo json_encode(array('nextId'=>$id['oldArr'], 'data'=>$data, 'complete'=>true));
+            echo json_encode(array('nextId' => $id['oldArr'], 'data' => $data, 'complete' => true));
             Yii::app()->end();
         }
         $criteria = new CDbCriteria(array(
-            'select'=>'id',
+            'select' => 'id',
             'condition' => 'status=1',
         ));
         $dataId = Services::model()->findAll($criteria);
         $data = array();
-        foreach ($dataId as $key){
+        foreach ($dataId as $key) {
             array_push($data, $key->id);
         }
         $id = $this->getThreeService($data);
         $model = Services::model()->findAll('id=' . implode(' XOR id=', $id['popId']));
         $this->render('index', array(
             'model' => $model,
-            'id'=>$id
+            'id' => $id
         ));
     }
 
@@ -179,7 +182,6 @@ class ServicesController extends Controller
         $data = array();
         if (isset($_POST['id'])) {
             $service = Services::model()->findByPk($_POST['id']);
-
 
 
             $user = $service->idUser;
@@ -236,14 +238,16 @@ class ServicesController extends Controller
         }
 
     }
-    public function getThreeService($arr){
+
+    public function getThreeService($arr)
+    {
         $c = count($arr);
         $tmpArr = array();
-        for ($i = 0; $i < 3; $i ++){
+        for ($i = 0; $i < 3; $i++) {
             shuffle($arr);
             array_push($tmpArr, array_pop($arr));
         }
 
-        return array('popId'=>$tmpArr, 'oldArr'=>$arr);
+        return array('popId' => $tmpArr, 'oldArr' => $arr);
     }
 }

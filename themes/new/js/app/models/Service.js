@@ -3,6 +3,8 @@
  */
 function Service(){
     var _this = this;
+    this.properties = ['note', 'description'];
+    this.prefix = 'srv_';
     this.statusLoadIndex = true;
 
     this.viewFromId = function (id) {
@@ -24,7 +26,7 @@ function Service(){
             }
         });
     };
-    this.loadScroll = function(place, idList){
+    this.loadScroll = function (place, idList){
       _this.ajax({
           type: "POST",
           url: "/services/index/",
@@ -39,5 +41,9 @@ function Service(){
               console.log(_this.owner)
           }
       });
-    }
+    };
+    this.save = function (){
+        _this.getProperty();
+        console.log(_this)
+    };
 }

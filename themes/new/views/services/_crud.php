@@ -25,8 +25,13 @@ $form = $this->beginWidget('CActiveForm', array(
 
                     <div class="row">
                         <?php echo $form->labelEx($model, 'note'); ?>
-                        <?php echo $form->textField($model, 'note', array('size' => 50, 'maxlength' => 300, 'class' => 'form-control')); ?>
-                        <?php echo $form->error($model, 'note'); ?>
+                        <?php echo $form->textField($model, 'note', array(
+                            'size' => 50,
+                            'maxlength' => 300,
+                            'class' => 'form-control',
+                            'StartModel'=>'srv_note'
+                        )); ?>
+                        <?php echo $form->error($model, 'note',array()); ?>
                         <div></div>
                     </div>
 
@@ -39,7 +44,7 @@ $form = $this->beginWidget('CActiveForm', array(
 
                     <div class="row- ">
                         <div class="col-xs-4">
-                        <button type="submit" name="sendServices" class="btn btn-default">Сохранить</button>
+                        <button StartCtrl="Service_crud" type="submit" name="sendServices" class="btn btn-default">Сохранить</button>
                         </div>
                         <div class="col-xs-8 servicesError">
                         </div>

@@ -40,6 +40,16 @@ function ServiceController() {
                 return true;
             }
         }
+    };
+    this.crud = function (){
+        var act = _this.getControls();
+        act[0].onclick = function (){
+            window.event.preventDefault();
+            _this.startModel('Service', function (model){
+                model.getProperty();
+                console.log(model.p)
+            });
+        }
     }
 
 
