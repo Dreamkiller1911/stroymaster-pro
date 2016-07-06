@@ -1,0 +1,108 @@
+.services textarea[name*="description"]
+{
+    resize: vertical;
+}
+
+
+.view
+{
+    display:block;
+    float: left;
+    width: 350px;
+    height: 300px;
+    background: #bafaff;
+    border: 2px solid gray;
+}
+.view .note
+{
+    display: block;
+    padding: 5px 5px 0 10px ;
+    height: 45px;
+    background: #fcefa1;
+}
+.view .description
+{
+    display: block;
+    color: black;
+    border: 1px solid lightslategray;
+    height: 180px;
+}
+.view .img
+{
+    display: block;
+    float: left;
+
+}
+.labelUser
+{
+    display: inline-block;
+    width: 150px;
+    border-bottom: 1px solid darkgray;
+}
+#imgList
+{
+    padding: 10px;
+
+
+}
+#imgList .myIMGBlock
+{
+    background: none;
+    margin: 5px 20px 5px 20px;
+    font-size: 10pt;
+    transition: background 800ms ease-in-out;
+    -o-transition: background 800ms ease-in-out;
+    -webkit-transition: background 800ms ease-in-out;
+    -moz-transition: background 800ms ease-in-out;
+}
+#imgList .myIMGBlock:hover
+{
+    background: white;
+    box-shadow: 1px 1px 3px black;
+    transition: background 500ms ease-in-out;
+    -o-transition: background 500ms ease-in-out;
+    -webkit-transition: background 500ms ease-in-out;
+    -moz-transition: background 500ms ease-in-out;
+
+}
+#imgList .myIMGBlock .imgS
+{
+    vertical-align: baseline;
+    padding: 10px;
+}
+#imgList .myIMGBlock .imgS img
+{
+    box-shadow: 1px 1px 2px black;
+    margin: 0;
+}
+#imgList .myIMGBlock .imgS img:hover
+{
+    box-shadow: 2px 2px 4px black;
+
+
+}
+#imgList .myIMGBlock .param
+{
+    padding-right: 30px;
+}
+#imgList .myIMGBlock .param div
+{
+    display: block;
+    margin-bottom: 15px
+
+}
+#imgList .myIMGBlock .param div input
+{
+    display: inline;
+}
+
+#imgList .myIMGBlock .showSave
+{
+    color: green;
+    font-size: 14pt;
+    text-shadow: 0 0 20px green;
+    margin-left: 25px;
+    font-weight: bold;
+    text-transform: uppercase;
+
+}
