@@ -60,9 +60,9 @@ class ServicesController extends Controller
             $l = $this->loadModel();
             $model = $l ? $l : new Services();
 
-            /*$cs = parent::init();
-            $cs->registerCssFile('/assets/myCss/services.css');
-            $cs->registerScriptFile(Yii::app()->theme->baseUrl . '/js/mylibrary/Services.js', CClientScript::POS_END);*/
+
+            $this->init()->registerCssFile(Yii::app()->theme->baseUrl . '/css/services.css');
+            $this->init()->registerScriptFile(Yii::app()->theme->baseUrl . '/js/mylibrary/services.js', CClientScript::POS_END);
 
             if (isset($_POST['Services'])) {
 

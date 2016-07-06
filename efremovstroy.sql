@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.0.10.10
+-- version 4.4.15.7
 -- http://www.phpmyadmin.net
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Июл 06 2016 г., 13:33
--- Версия сервера: 5.5.45
--- Версия PHP: 5.5.28
+-- Время создания: Июл 06 2016 г., 17:03
+-- Версия сервера: 5.5.50
+-- Версия PHP: 5.3.29
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -14,7 +14,7 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
 -- База данных: `efremovstroy`
@@ -27,7 +27,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE IF NOT EXISTS `tbl_advt` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `id_user` int(3) NOT NULL,
   `header` text,
   `address` varchar(300) DEFAULT NULL,
@@ -37,10 +37,8 @@ CREATE TABLE IF NOT EXISTS `tbl_advt` (
   `date_create` datetime NOT NULL,
   `date_update` datetime DEFAULT NULL,
   `date_activate` datetime DEFAULT NULL,
-  `date_end` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id` (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=30 ;
+  `date_end` datetime DEFAULT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `tbl_advt`
@@ -58,12 +56,11 @@ INSERT INTO `tbl_advt` (`id`, `id_user`, `header`, `address`, `phone`, `alt_phon
 --
 
 CREATE TABLE IF NOT EXISTS `tbl_checkPhone` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL,
   `init` int(2) NOT NULL DEFAULT '0',
   `phone` bigint(20) NOT NULL,
-  `code` int(6) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  `code` int(6) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -72,17 +69,15 @@ CREATE TABLE IF NOT EXISTS `tbl_checkPhone` (
 --
 
 CREATE TABLE IF NOT EXISTS `tbl_comment` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `content` text COLLATE utf8_unicode_ci NOT NULL,
   `status` int(11) NOT NULL,
   `create_time` int(11) DEFAULT NULL,
   `author` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
   `email` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
   `url` varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `post_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `FK_comment_post` (`post_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=3 ;
+  `post_id` int(11) NOT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Дамп данных таблицы `tbl_comment`
@@ -99,18 +94,15 @@ INSERT INTO `tbl_comment` (`id`, `content`, `status`, `create_time`, `author`, `
 --
 
 CREATE TABLE IF NOT EXISTS `tbl_comments` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL,
   `user_id` int(10) DEFAULT NULL,
   `service_id` int(10) NOT NULL,
   `first_name` varchar(100) DEFAULT NULL,
   `email` varchar(150) DEFAULT NULL,
   `date_create` datetime NOT NULL,
   `last_update` int(15) NOT NULL,
-  `text` text NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `FK_tbl_comments_tbl_user` (`user_id`),
-  KEY `FK_tbl_comments_tbl_services` (`service_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=89 ;
+  `text` text NOT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=89 DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `tbl_comments`
@@ -164,23 +156,11 @@ INSERT INTO `tbl_comments` (`id`, `user_id`, `service_id`, `first_name`, `email`
 --
 
 CREATE TABLE IF NOT EXISTS `tbl_img_advt` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL,
   `advt_id` int(11) NOT NULL,
   `url` text NOT NULL,
-  `simple_url` varchar(300) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id` (`id`),
-  KEY `FK_tbl_img_advt_tbl_advt` (`advt_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
-
---
--- Дамп данных таблицы `tbl_img_advt`
---
-
-INSERT INTO `tbl_img_advt` (`id`, `advt_id`, `url`, `simple_url`) VALUES
-(3, 26, '/assets/d2d71e36/83/IMG_572bb1024978e.jpeg', '/assets/d2d71e36/83/prev/IMG_572bb1024978e.jpeg'),
-(5, 28, '/assets/444c0563/83/IMG_5738bdd0029e5.jpeg', '/assets/444c0563/83/prev/IMG_5738bdd0029e5.jpeg'),
-(6, 29, '/assets/444c0563/87/IMG_57421e762ed14.jpeg', '/assets/444c0563/87/prev/IMG_57421e762ed14.jpeg');
+  `simple_url` varchar(300) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -189,65 +169,12 @@ INSERT INTO `tbl_img_advt` (`id`, `advt_id`, `url`, `simple_url`) VALUES
 --
 
 CREATE TABLE IF NOT EXISTS `tbl_img_services` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL,
   `id_service` int(5) NOT NULL,
   `url` varchar(100) NOT NULL,
   `simple_url` text NOT NULL,
-  `description` varchar(300) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id` (`id`),
-  KEY `FK_tbl_img_services_tbl_services` (`id_service`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=49 ;
-
---
--- Дамп данных таблицы `tbl_img_services`
---
-
-INSERT INTO `tbl_img_services` (`id`, `id_service`, `url`, `simple_url`, `description`) VALUES
-(1, 1, '/assets/112110ed/7/IMG_572d0123bee26.jpeg', '/assets/112110ed/7/prev/IMG_572d0123bee26.jpeg', '1'),
-(2, 1, '/assets/112110ed/7/IMG_572d0123d7cca.jpeg', '/assets/112110ed/7/prev/IMG_572d0123d7cca.jpeg', 'Евро-зал'),
-(3, 1, '/assets/112110ed/7/IMG_572d0123e648c.jpeg', '/assets/112110ed/7/prev/IMG_572d0123e648c.jpeg', '3'),
-(4, 1, '/assets/112110ed/7/IMG_572d0123ecab2.jpeg', '/assets/112110ed/7/prev/IMG_572d0123ecab2.jpeg', 'Балкон'),
-(9, 2, '/assets/8cf4579e/8/IMG_573e34bf55a6f.jpeg', '/assets/8cf4579e/8/prev/IMG_573e34bf55a6f.jpeg', NULL),
-(10, 2, '/assets/8cf4579e/8/IMG_573e34bf65bd5.jpeg', '/assets/8cf4579e/8/prev/IMG_573e34bf65bd5.jpeg', NULL),
-(11, 2, '/assets/8cf4579e/8/IMG_573e34bf82277.jpeg', '/assets/8cf4579e/8/prev/IMG_573e34bf82277.jpeg', NULL),
-(12, 2, '/assets/8cf4579e/8/IMG_573e34bf8937c.jpeg', '/assets/8cf4579e/8/prev/IMG_573e34bf8937c.jpeg', NULL),
-(13, 2, '/assets/8cf4579e/8/IMG_573e34bf92dc5.jpeg', '/assets/8cf4579e/8/prev/IMG_573e34bf92dc5.jpeg', NULL),
-(14, 3, '/assets/8cf4579e/48/IMG_574065a8b5af2.jpeg', '/assets/8cf4579e/48/prev/IMG_574065a8b5af2.jpeg', NULL),
-(15, 3, '/assets/8cf4579e/48/IMG_574065a8bf0e0.jpeg', '/assets/8cf4579e/48/prev/IMG_574065a8bf0e0.jpeg', NULL),
-(16, 3, '/assets/8cf4579e/48/IMG_574065a8c9c25.jpeg', '/assets/8cf4579e/48/prev/IMG_574065a8c9c25.jpeg', NULL),
-(17, 3, '/assets/8cf4579e/48/IMG_574065a8d5f14.jpeg', '/assets/8cf4579e/48/prev/IMG_574065a8d5f14.jpeg', NULL),
-(18, 3, '/assets/8cf4579e/48/IMG_574065a8db3c5.jpeg', '/assets/8cf4579e/48/prev/IMG_574065a8db3c5.jpeg', NULL),
-(19, 6, '/assets/8cf4579e/49/IMG_57406705a97e8.jpeg', '/assets/8cf4579e/49/prev/IMG_57406705a97e8.jpeg', NULL),
-(20, 6, '/assets/8cf4579e/49/IMG_57406705b8eec.jpeg', '/assets/8cf4579e/49/prev/IMG_57406705b8eec.jpeg', NULL),
-(21, 6, '/assets/8cf4579e/49/IMG_57406705c4a47.jpeg', '/assets/8cf4579e/49/prev/IMG_57406705c4a47.jpeg', NULL),
-(22, 6, '/assets/8cf4579e/49/IMG_57406705d346d.jpeg', '/assets/8cf4579e/49/prev/IMG_57406705d346d.jpeg', NULL),
-(23, 6, '/assets/8cf4579e/49/IMG_57406705e4d6a.jpeg', '/assets/8cf4579e/49/prev/IMG_57406705e4d6a.jpeg', NULL),
-(24, 7, '/assets/8cf4579e/56/IMG_574067ebd7aff.jpeg', '/assets/8cf4579e/56/prev/IMG_574067ebd7aff.jpeg', NULL),
-(25, 7, '/assets/8cf4579e/56/IMG_574067ebe6be9.jpeg', '/assets/8cf4579e/56/prev/IMG_574067ebe6be9.jpeg', NULL),
-(26, 7, '/assets/8cf4579e/56/IMG_574067ebec8fc.jpeg', '/assets/8cf4579e/56/prev/IMG_574067ebec8fc.jpeg', NULL),
-(27, 7, '/assets/8cf4579e/56/IMG_574067ec03182.jpeg', '/assets/8cf4579e/56/prev/IMG_574067ec03182.jpeg', NULL),
-(28, 7, '/assets/8cf4579e/56/IMG_574067ec0a28b.jpeg', '/assets/8cf4579e/56/prev/IMG_574067ec0a28b.jpeg', NULL),
-(29, 8, '/assets/8cf4579e/59/IMG_5741de86562c3.jpeg', '/assets/8cf4579e/59/prev/IMG_5741de86562c3.jpeg', NULL),
-(30, 8, '/assets/8cf4579e/59/IMG_5741de865cdf6.jpeg', '/assets/8cf4579e/59/prev/IMG_5741de865cdf6.jpeg', NULL),
-(31, 8, '/assets/8cf4579e/59/IMG_5741de866a30a.jpeg', '/assets/8cf4579e/59/prev/IMG_5741de866a30a.jpeg', NULL),
-(32, 8, '/assets/8cf4579e/59/IMG_5741de8673d7d.jpeg', '/assets/8cf4579e/59/prev/IMG_5741de8673d7d.jpeg', NULL),
-(33, 8, '/assets/8cf4579e/59/IMG_5741de8688197.jpeg', '/assets/8cf4579e/59/prev/IMG_5741de8688197.jpeg', NULL),
-(34, 9, '/assets/8cf4579e/62/IMG_5741df04b0781.jpeg', '/assets/8cf4579e/62/prev/IMG_5741df04b0781.jpeg', NULL),
-(35, 9, '/assets/8cf4579e/62/IMG_5741df04b5d6b.jpeg', '/assets/8cf4579e/62/prev/IMG_5741df04b5d6b.jpeg', NULL),
-(36, 9, '/assets/8cf4579e/62/IMG_5741df04dea06.jpeg', '/assets/8cf4579e/62/prev/IMG_5741df04dea06.jpeg', NULL),
-(37, 9, '/assets/8cf4579e/62/IMG_5741df04ecf58.jpeg', '/assets/8cf4579e/62/prev/IMG_5741df04ecf58.jpeg', NULL),
-(38, 9, '/assets/8cf4579e/62/IMG_5741df04f3adf.jpeg', '/assets/8cf4579e/62/prev/IMG_5741df04f3adf.jpeg', NULL),
-(39, 5, '/assets/8cf4579e/63/IMG_5741df87b7be5.jpeg', '/assets/8cf4579e/63/prev/IMG_5741df87b7be5.jpeg', NULL),
-(40, 5, '/assets/8cf4579e/63/IMG_5741df87c3161.jpeg', '/assets/8cf4579e/63/prev/IMG_5741df87c3161.jpeg', NULL),
-(41, 5, '/assets/8cf4579e/63/IMG_5741df87cf9a0.jpeg', '/assets/8cf4579e/63/prev/IMG_5741df87cf9a0.jpeg', NULL),
-(42, 5, '/assets/8cf4579e/63/IMG_5741df87d856a.jpeg', '/assets/8cf4579e/63/prev/IMG_5741df87d856a.jpeg', NULL),
-(43, 5, '/assets/8cf4579e/63/IMG_5741df87e52c6.jpeg', '/assets/8cf4579e/63/prev/IMG_5741df87e52c6.jpeg', NULL),
-(44, 10, '/assets/8cf4579e/65/IMG_5741e00e08348.jpeg', '/assets/8cf4579e/65/prev/IMG_5741e00e08348.jpeg', NULL),
-(45, 10, '/assets/8cf4579e/65/IMG_5741e00e16012.jpeg', '/assets/8cf4579e/65/prev/IMG_5741e00e16012.jpeg', NULL),
-(46, 10, '/assets/8cf4579e/65/IMG_5741e00e24ae9.jpeg', '/assets/8cf4579e/65/prev/IMG_5741e00e24ae9.jpeg', NULL),
-(47, 10, '/assets/8cf4579e/65/IMG_5741e00e2d545.jpeg', '/assets/8cf4579e/65/prev/IMG_5741e00e2d545.jpeg', NULL),
-(48, 10, '/assets/8cf4579e/65/IMG_5741e00e4b540.jpeg', '/assets/8cf4579e/65/prev/IMG_5741e00e4b540.jpeg', NULL);
+  `description` varchar(300) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -256,14 +183,13 @@ INSERT INTO `tbl_img_services` (`id`, `id_service`, `url`, `simple_url`, `descri
 --
 
 CREATE TABLE IF NOT EXISTS `tbl_lookup` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `name` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
   `code` int(11) NOT NULL,
   `type` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
   `position` int(11) NOT NULL,
-  `price` int(10) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=18 ;
+  `price` int(10) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Дамп данных таблицы `tbl_lookup`
@@ -295,18 +221,15 @@ INSERT INTO `tbl_lookup` (`id`, `name`, `code`, `type`, `position`, `price`) VAL
 --
 
 CREATE TABLE IF NOT EXISTS `tbl_orders` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL,
   `id_user` int(10) NOT NULL,
   `text` text NOT NULL,
   `date_create` datetime NOT NULL,
   `date_start` date NOT NULL,
   `date_complition` date NOT NULL,
   `date_end` date NOT NULL,
-  `status` int(1) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id` (`id`),
-  KEY `FK_tbl_orders_tbl_user` (`id_user`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=24 ;
+  `status` int(1) NOT NULL DEFAULT '1'
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `tbl_orders`
@@ -343,17 +266,15 @@ INSERT INTO `tbl_orders` (`id`, `id_user`, `text`, `date_create`, `date_start`, 
 --
 
 CREATE TABLE IF NOT EXISTS `tbl_post` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `title` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
   `content` text COLLATE utf8_unicode_ci NOT NULL,
   `tags` text COLLATE utf8_unicode_ci,
   `status` int(11) NOT NULL,
   `create_time` int(11) DEFAULT NULL,
   `update_time` int(11) DEFAULT NULL,
-  `author_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `FK_post_author` (`author_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=3 ;
+  `author_id` int(11) NOT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Дамп данных таблицы `tbl_post`
@@ -370,7 +291,7 @@ INSERT INTO `tbl_post` (`id`, `title`, `content`, `tags`, `status`, `create_time
 --
 
 CREATE TABLE IF NOT EXISTS `tbl_request` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL,
   `date_create` bigint(20) DEFAULT '0',
   `name` varchar(300) DEFAULT NULL,
   `type` int(3) NOT NULL,
@@ -382,12 +303,8 @@ CREATE TABLE IF NOT EXISTS `tbl_request` (
   `negative` int(1) DEFAULT '0',
   `description_n` text,
   `positive` int(11) NOT NULL DEFAULT '0',
-  `date_processing` bigint(20) DEFAULT '0',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id` (`id`),
-  KEY `FK_tbl_request_tbl_user` (`id_user`),
-  KEY `FK_tbl_request_tbl_services` (`id_service`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=58 ;
+  `date_processing` bigint(20) DEFAULT '0'
+) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `tbl_request`
@@ -456,7 +373,7 @@ INSERT INTO `tbl_request` (`id`, `date_create`, `name`, `type`, `time`, `summ`, 
 --
 
 CREATE TABLE IF NOT EXISTS `tbl_services` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `id_user` int(5) NOT NULL,
   `note` varchar(300) NOT NULL,
   `description` text NOT NULL,
@@ -466,27 +383,24 @@ CREATE TABLE IF NOT EXISTS `tbl_services` (
   `views` int(4) DEFAULT '0',
   `img_limit` int(2) NOT NULL DEFAULT '5',
   `img_time_end` date NOT NULL,
-  `end_time` date NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id` (`id`),
-  KEY `FK_tbl_services_tbl_user` (`id_user`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
+  `end_time` date NOT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `tbl_services`
 --
 
 INSERT INTO `tbl_services` (`id`, `id_user`, `note`, `description`, `date_create`, `last_update`, `status`, `views`, `img_limit`, `img_time_end`, `end_time`) VALUES
-(1, 7, 'Электрик, наружное освещение, бытовая техника.', 'Являюсь электромонтажником с допуском до 1000 В.\nУстраняю неисправности, меняю проводки, устанавливаю люстры, бра, светильники, светодиодные линии и т.д. Замена трансформаторов, сборка электрощитов, установка датчиков движения, розеток, выключателей и многое другое. Делал художественные работы по электрике в художественной галерее в центре столицы, устанавливаю генераторы и стабилизаторы. Консультация.', '2016-05-06', '2016-05-20', 1, 76, 10, '0000-00-00', '2016-05-31'),
-(2, 8, 'Ремонт и отделка квартир - молдаване', 'Бригада профессиональных строителей - молдаван выполнит работы по ремонту и отделке квартир недорого, качественно и в срок. Под ключ и отдельные виды работ. Мы работаем в Москве 12 лет. Обратившись к нам Вы сэкономите на посредниках.', '2016-05-20', '2016-05-22', 1, 44, 10, '2016-12-18', '2016-10-18'),
-(3, 48, 'Ремонт ванной панелями (пластик)', 'овременный и качественный ремонт ванной комнаты и санузла за 3 дня! \nВыполню качественный ремонт ванной комнаты и санузла ПВХ панелями (пластиком), так же все виды электромонтажных и сантехнических работ.\n\nПодготовлю вашу квартиру под сдачу или сделаю капитальный ремонт.\n\nБлагодаря современным технологиям ПВХ панели стали достаточно плотными и качественными для того что бы их применять в ванных комнатах, не переживая за их повреждение и потерю эстетического вида долгие годы!!!\n\nВы можете получить консультацию по тел...,но все же чтобы узнать точную сумму стоимости ремонта нужно провести замер.\nВыезд на замер бесплатный!!!\nПринимаю звонки с 8-00 по 23-00; 7 дней в неделю.\nДоговор,гарантия на год.\nЗвоните, пишите!!', '2016-05-20', '2016-05-21', 1, 44, 5, '0000-00-00', '2016-11-17'),
-(4, 81, 'qwe', 'qwe', '2016-05-20', '2016-05-20', 0, 44, 5, '0000-00-00', '0000-00-00'),
-(5, 63, 'Электрик. Электромонтаж под ключ. Качественно', 'Профессиональный электрик, выполню качественно .недорого и в короткие сроки все виды электромонтажных работ. \nЯ электрик,москвич, с большим опытом более 19 лет, имеются подтверждающие документы (допуск, высшее профильное образование,действующее удостоверение,аттестация).\nВыполню следующий перечень работ:\nМонтаж электропроводки в новостройке,в квартире под ключ\nМонтаж электропроводки в доме,коттедже под ключ,\nЗамена электропроводки (полная или частичная)\nДиагностика и ремонт электропроводки,\nСрочный выезд электрика,поиск и устранение неполадок,\nСборка и монтаж электрощита,\nУстановка ,монтаж и замена светильников, люстр, бра,\nМонтаж,замена,перенос розеток, выключателей\nШтробление стен, потолка\nУстановка различных электроприборов,\nСлаботочные работы,\nПусконаладочные работы\nМонтаж контура защитного заземления , и многое другое.\nРаботаю Профессионально и Быстро:\n1-к квартира под ключ (2-3 дня)\n2-к квартира под ключ (3-4 дня)\n3-к квартира под ключ (4-5 дней)\nИспользую только профессиональный инструмент и оборудование,работу выполняю сам, без посредников.\nРуководствуюсь стандартами ПУЭ, ГОСТ. Окажу бесплатную помощь в расчете,закупке и доставке материала на объект.\nРаботы выполняю на совесть! Качественно, быстро и недорого.\nНе беру авансов и предоплаты, оплата по факту выполненной работы.Звоните и интересуйтесь. отвечу на все ваши вопросы.\nРаботы выполняю по всей Москве и области, без выходных с 8.00 до 24.00', '2016-05-20', '2016-05-22', 1, 44, 5, '0000-00-00', '2017-02-16'),
-(6, 49, 'Ремонт квартир комнат косметический ремонт', 'Все виды работ. Так же выполняем работы по электрике, сантехнике. Выезд по Москве и московской области.\nВыполняем:\nкосметический ремонт - от 1000р. за м2\nчерновой - от 1500р. за м2\n"под ключ" - от 3500р. за м2\nРаботаем вдвоем с напарником, при необходимости подключаем нужное количество людей.\nРаботы выполняем качественно и в максимально сжатые сроки. Оказываем помощь в выборе и приобретении стройматериалов. Возможна доставка материалов нашими силами. Все условия обсуждаются при встрече.', '2016-05-21', '2016-05-21', 1, 44, 5, '0000-00-00', '2016-07-20'),
-(7, 56, 'Ремонт под ключ', 'Отделка помещений, квартир под ключ, ванна под ключ. Услуги сантехника, плотника, электрика .Так же выполним частичный и косметический ремонт.Мастер на час.', '2016-05-21', '2016-05-21', 1, 44, 5, '0000-00-00', '2016-06-20'),
-(8, 59, 'Строительство, ремонт под ключ', 'Все виды ремонтно-строительных услуг.\nКатеджи, дачи, квартиры и тп.\nЭлектрика.\nРазводка воды.\nМонтаж, демонтаж любых сложностей.\nМонтаж сантехники и водонагревательных приборов.\nРассматриваем любые виды работ, любой сложности.\nЕсть бригады славянской внешности (украинцы, молдоване).\nКачество работ гарантируем.\nДоговорные обязательства.\nПриемлемые цены.', '2016-05-22', '2016-05-22', 1, 42, 5, '0000-00-00', '2016-09-19'),
-(9, 62, 'Ремонт квартир', 'Провожу ремонтные работы квартир, офисов, различных помещений- полностью под ключ или частично . Опыт работы более 12 лет . Россиянин, качество работы, порядочность гарантирую. Цены договорные, ниже рыночных...', '2016-05-22', '2016-05-22', 1, 42, 5, '0000-00-00', '2016-06-21'),
-(10, 65, 'Сантехник', 'Частный мастер САНТЕХНИК (русский ) ,помогу с мелким бытовым ремонтом в доме, квартире НЕ ДОРОГО.\n-ЗАМЕНА ВОДОСЧЁТЧИКОВ (в квартирах)\n-УСТАНОВКА ВОДОСЧЕТЧИКОВ (в квартирах)\n- Всевозможные сантехнические работы .\n- Разводка в новых квартирах и новостройках\n-Демонтаж старой разводки и установка новой\n-Укладка труб полипропилен\n-Укладка труб ПВХ канализации\n-Установка гребенок с подключением,кранов от протечек ,счетчиков и фильтров\n- Бесплатный осмотр в день заказа.\n-Работы выполняются по Москве и Московской области в доступности транспортом,а так же все Дмитровское направление до поселка Вербилки.\n- Вопросы по работе и оплате , вы можете задать по телефону. \nЦены договорные.', '2016-05-22', '2016-05-22', 1, 42, 5, '0000-00-00', '2016-10-19');
+(1, 7, 'Электрик, наружное освещение, бытовая техника.', 'Являюсь электромонтажником с допуском до 1000 В.\r\nУстраняю неисправности, меняю проводки, устанавливаю люстры, бра, светильники, светодиодные линии и т.д. Замена трансформаторов, сборка электрощитов, установка датчиков движения, розеток, выключателей и многое другое. Делал художественные работы по электрике в художественной галерее в центре столицы, устанавливаю генераторы и стабилизаторы. Консультация.', '2016-05-06', '2016-07-06', 1, 77, 10, '0000-00-00', '2016-05-31'),
+(2, 8, 'Ремонт и отделка квартир - молдаване', 'Бригада профессиональных строителей - молдаван выполнит работы по ремонту и отделке квартир недорого, качественно и в срок. Под ключ и отдельные виды работ. Мы работаем в Москве 12 лет. Обратившись к нам Вы сэкономите на посредниках.', '2016-05-20', '2016-05-22', 1, 45, 10, '2016-12-18', '2016-10-18'),
+(3, 48, 'Ремонт ванной панелями (пластик)', 'овременный и качественный ремонт ванной комнаты и санузла за 3 дня! \nВыполню качественный ремонт ванной комнаты и санузла ПВХ панелями (пластиком), так же все виды электромонтажных и сантехнических работ.\n\nПодготовлю вашу квартиру под сдачу или сделаю капитальный ремонт.\n\nБлагодаря современным технологиям ПВХ панели стали достаточно плотными и качественными для того что бы их применять в ванных комнатах, не переживая за их повреждение и потерю эстетического вида долгие годы!!!\n\nВы можете получить консультацию по тел...,но все же чтобы узнать точную сумму стоимости ремонта нужно провести замер.\nВыезд на замер бесплатный!!!\nПринимаю звонки с 8-00 по 23-00; 7 дней в неделю.\nДоговор,гарантия на год.\nЗвоните, пишите!!', '2016-05-20', '2016-05-21', 1, 45, 5, '0000-00-00', '2016-11-17'),
+(4, 81, 'qwe', 'qwe', '2016-05-20', '2016-05-20', 0, 45, 5, '0000-00-00', '0000-00-00'),
+(5, 63, 'Электрик. Электромонтаж под ключ. Качественно', 'Профессиональный электрик, выполню качественно .недорого и в короткие сроки все виды электромонтажных работ. \nЯ электрик,москвич, с большим опытом более 19 лет, имеются подтверждающие документы (допуск, высшее профильное образование,действующее удостоверение,аттестация).\nВыполню следующий перечень работ:\nМонтаж электропроводки в новостройке,в квартире под ключ\nМонтаж электропроводки в доме,коттедже под ключ,\nЗамена электропроводки (полная или частичная)\nДиагностика и ремонт электропроводки,\nСрочный выезд электрика,поиск и устранение неполадок,\nСборка и монтаж электрощита,\nУстановка ,монтаж и замена светильников, люстр, бра,\nМонтаж,замена,перенос розеток, выключателей\nШтробление стен, потолка\nУстановка различных электроприборов,\nСлаботочные работы,\nПусконаладочные работы\nМонтаж контура защитного заземления , и многое другое.\nРаботаю Профессионально и Быстро:\n1-к квартира под ключ (2-3 дня)\n2-к квартира под ключ (3-4 дня)\n3-к квартира под ключ (4-5 дней)\nИспользую только профессиональный инструмент и оборудование,работу выполняю сам, без посредников.\nРуководствуюсь стандартами ПУЭ, ГОСТ. Окажу бесплатную помощь в расчете,закупке и доставке материала на объект.\nРаботы выполняю на совесть! Качественно, быстро и недорого.\nНе беру авансов и предоплаты, оплата по факту выполненной работы.Звоните и интересуйтесь. отвечу на все ваши вопросы.\nРаботы выполняю по всей Москве и области, без выходных с 8.00 до 24.00', '2016-05-20', '2016-05-22', 1, 45, 5, '0000-00-00', '2017-02-16'),
+(6, 49, 'Ремонт квартир комнат косметический ремонт', 'Все виды работ. Так же выполняем работы по электрике, сантехнике. Выезд по Москве и московской области.\nВыполняем:\nкосметический ремонт - от 1000р. за м2\nчерновой - от 1500р. за м2\n"под ключ" - от 3500р. за м2\nРаботаем вдвоем с напарником, при необходимости подключаем нужное количество людей.\nРаботы выполняем качественно и в максимально сжатые сроки. Оказываем помощь в выборе и приобретении стройматериалов. Возможна доставка материалов нашими силами. Все условия обсуждаются при встрече.', '2016-05-21', '2016-05-21', 1, 45, 5, '0000-00-00', '2016-07-20'),
+(7, 56, 'Ремонт под ключ', 'Отделка помещений, квартир под ключ, ванна под ключ. Услуги сантехника, плотника, электрика .Так же выполним частичный и косметический ремонт.Мастер на час.', '2016-05-21', '2016-05-21', 1, 45, 5, '0000-00-00', '2016-06-20'),
+(8, 59, 'Строительство, ремонт под ключ', 'Все виды ремонтно-строительных услуг.\nКатеджи, дачи, квартиры и тп.\nЭлектрика.\nРазводка воды.\nМонтаж, демонтаж любых сложностей.\nМонтаж сантехники и водонагревательных приборов.\nРассматриваем любые виды работ, любой сложности.\nЕсть бригады славянской внешности (украинцы, молдоване).\nКачество работ гарантируем.\nДоговорные обязательства.\nПриемлемые цены.', '2016-05-22', '2016-05-22', 1, 43, 5, '0000-00-00', '2016-09-19'),
+(9, 62, 'Ремонт квартир', 'Провожу ремонтные работы квартир, офисов, различных помещений- полностью под ключ или частично . Опыт работы более 12 лет . Россиянин, качество работы, порядочность гарантирую. Цены договорные, ниже рыночных...', '2016-05-22', '2016-05-22', 1, 43, 5, '0000-00-00', '2016-06-21'),
+(10, 65, 'Сантехник', 'Частный мастер САНТЕХНИК (русский ) ,помогу с мелким бытовым ремонтом в доме, квартире НЕ ДОРОГО.\n-ЗАМЕНА ВОДОСЧЁТЧИКОВ (в квартирах)\n-УСТАНОВКА ВОДОСЧЕТЧИКОВ (в квартирах)\n- Всевозможные сантехнические работы .\n- Разводка в новых квартирах и новостройках\n-Демонтаж старой разводки и установка новой\n-Укладка труб полипропилен\n-Укладка труб ПВХ канализации\n-Установка гребенок с подключением,кранов от протечек ,счетчиков и фильтров\n- Бесплатный осмотр в день заказа.\n-Работы выполняются по Москве и Московской области в доступности транспортом,а так же все Дмитровское направление до поселка Вербилки.\n- Вопросы по работе и оплате , вы можете задать по телефону. \nЦены договорные.', '2016-05-22', '2016-05-22', 1, 43, 5, '0000-00-00', '2016-10-19');
 
 -- --------------------------------------------------------
 
@@ -495,21 +409,19 @@ INSERT INTO `tbl_services` (`id`, `id_user`, `note`, `description`, `date_create
 --
 
 CREATE TABLE IF NOT EXISTS `tbl_slider` (
-  `id` int(5) NOT NULL AUTO_INCREMENT,
-  `url` text NOT NULL,
-  `description` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id` (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+  `id` int(5) NOT NULL,
+  `file_name` text NOT NULL,
+  `description` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `tbl_slider`
 --
 
-INSERT INTO `tbl_slider` (`id`, `url`, `description`) VALUES
-(1, '/assets/new/images/slider/slide1.jpg', NULL),
-(2, '/assets/new/images/slider/slide2.jpg', NULL),
-(3, '/assets/new/images/slider/slide3.jpg', NULL);
+INSERT INTO `tbl_slider` (`id`, `file_name`, `description`) VALUES
+(1, 'slide1.jpg', NULL),
+(2, 'slide2.jpg', NULL),
+(3, 'slide3.jpg', NULL);
 
 -- --------------------------------------------------------
 
@@ -518,11 +430,10 @@ INSERT INTO `tbl_slider` (`id`, `url`, `description`) VALUES
 --
 
 CREATE TABLE IF NOT EXISTS `tbl_tag` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `name` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
-  `frequency` int(11) DEFAULT '1',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4 ;
+  `frequency` int(11) DEFAULT '1'
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Дамп данных таблицы `tbl_tag`
@@ -540,7 +451,7 @@ INSERT INTO `tbl_tag` (`id`, `name`, `frequency`) VALUES
 --
 
 CREATE TABLE IF NOT EXISTS `tbl_user` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `date_registration` date NOT NULL,
   `first_name` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
   `second_name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
@@ -554,10 +465,8 @@ CREATE TABLE IF NOT EXISTS `tbl_user` (
   `sms_notification` int(1) NOT NULL DEFAULT '0',
   `sms_notification_date` date DEFAULT NULL,
   `phone_read` int(1) NOT NULL DEFAULT '0',
-  `phone_read_date` date DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `FK_tbl_user_tbl_user_class` (`class`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=95 ;
+  `phone_read_date` date DEFAULT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=95 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Дамп данных таблицы `tbl_user`
@@ -607,8 +516,7 @@ INSERT INTO `tbl_user` (`id`, `date_registration`, `first_name`, `second_name`, 
 
 CREATE TABLE IF NOT EXISTS `tbl_user_class` (
   `owner_id` int(10) NOT NULL,
-  `description` varchar(50) NOT NULL,
-  PRIMARY KEY (`owner_id`)
+  `description` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -621,6 +529,192 @@ INSERT INTO `tbl_user_class` (`owner_id`, `description`) VALUES
 (2, 'Заказчик'),
 (3, 'Администратор');
 
+--
+-- Индексы сохранённых таблиц
+--
+
+--
+-- Индексы таблицы `tbl_advt`
+--
+ALTER TABLE `tbl_advt`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `id` (`id`);
+
+--
+-- Индексы таблицы `tbl_checkPhone`
+--
+ALTER TABLE `tbl_checkPhone`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `tbl_comment`
+--
+ALTER TABLE `tbl_comment`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FK_comment_post` (`post_id`);
+
+--
+-- Индексы таблицы `tbl_comments`
+--
+ALTER TABLE `tbl_comments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FK_tbl_comments_tbl_user` (`user_id`),
+  ADD KEY `FK_tbl_comments_tbl_services` (`service_id`);
+
+--
+-- Индексы таблицы `tbl_img_advt`
+--
+ALTER TABLE `tbl_img_advt`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `id` (`id`),
+  ADD KEY `FK_tbl_img_advt_tbl_advt` (`advt_id`);
+
+--
+-- Индексы таблицы `tbl_img_services`
+--
+ALTER TABLE `tbl_img_services`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `id` (`id`),
+  ADD KEY `FK_tbl_img_services_tbl_services` (`id_service`);
+
+--
+-- Индексы таблицы `tbl_lookup`
+--
+ALTER TABLE `tbl_lookup`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `tbl_orders`
+--
+ALTER TABLE `tbl_orders`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `id` (`id`),
+  ADD KEY `FK_tbl_orders_tbl_user` (`id_user`);
+
+--
+-- Индексы таблицы `tbl_post`
+--
+ALTER TABLE `tbl_post`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FK_post_author` (`author_id`);
+
+--
+-- Индексы таблицы `tbl_request`
+--
+ALTER TABLE `tbl_request`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `id` (`id`),
+  ADD KEY `FK_tbl_request_tbl_user` (`id_user`),
+  ADD KEY `FK_tbl_request_tbl_services` (`id_service`);
+
+--
+-- Индексы таблицы `tbl_services`
+--
+ALTER TABLE `tbl_services`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `id` (`id`),
+  ADD KEY `FK_tbl_services_tbl_user` (`id_user`);
+
+--
+-- Индексы таблицы `tbl_slider`
+--
+ALTER TABLE `tbl_slider`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `id` (`id`);
+
+--
+-- Индексы таблицы `tbl_tag`
+--
+ALTER TABLE `tbl_tag`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `tbl_user`
+--
+ALTER TABLE `tbl_user`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FK_tbl_user_tbl_user_class` (`class`);
+
+--
+-- Индексы таблицы `tbl_user_class`
+--
+ALTER TABLE `tbl_user_class`
+  ADD PRIMARY KEY (`owner_id`);
+
+--
+-- AUTO_INCREMENT для сохранённых таблиц
+--
+
+--
+-- AUTO_INCREMENT для таблицы `tbl_advt`
+--
+ALTER TABLE `tbl_advt`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=30;
+--
+-- AUTO_INCREMENT для таблицы `tbl_checkPhone`
+--
+ALTER TABLE `tbl_checkPhone`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT для таблицы `tbl_comment`
+--
+ALTER TABLE `tbl_comment`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
+--
+-- AUTO_INCREMENT для таблицы `tbl_comments`
+--
+ALTER TABLE `tbl_comments`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=89;
+--
+-- AUTO_INCREMENT для таблицы `tbl_img_advt`
+--
+ALTER TABLE `tbl_img_advt`
+  MODIFY `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT для таблицы `tbl_img_services`
+--
+ALTER TABLE `tbl_img_services`
+  MODIFY `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT для таблицы `tbl_lookup`
+--
+ALTER TABLE `tbl_lookup`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=18;
+--
+-- AUTO_INCREMENT для таблицы `tbl_orders`
+--
+ALTER TABLE `tbl_orders`
+  MODIFY `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=24;
+--
+-- AUTO_INCREMENT для таблицы `tbl_post`
+--
+ALTER TABLE `tbl_post`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
+--
+-- AUTO_INCREMENT для таблицы `tbl_request`
+--
+ALTER TABLE `tbl_request`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=58;
+--
+-- AUTO_INCREMENT для таблицы `tbl_services`
+--
+ALTER TABLE `tbl_services`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=11;
+--
+-- AUTO_INCREMENT для таблицы `tbl_slider`
+--
+ALTER TABLE `tbl_slider`
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
+--
+-- AUTO_INCREMENT для таблицы `tbl_tag`
+--
+ALTER TABLE `tbl_tag`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
+--
+-- AUTO_INCREMENT для таблицы `tbl_user`
+--
+ALTER TABLE `tbl_user`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=95;
 --
 -- Ограничения внешнего ключа сохраненных таблиц
 --

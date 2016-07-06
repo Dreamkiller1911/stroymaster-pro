@@ -1,0 +1,30 @@
+#content
+{
+    border: 2px solid orangered;
+}
+#snake
+{
+    border: 2px solid black;
+}
+.cell, .snakeBody, .foodCell, .deadSnake
+{
+    display: block;
+    float: left;
+    border-top: 1px solid grey;
+    border-left: 1px solid grey;
+    height: 19px;
+    width: 19px;
+}
+.snakeBody
+{
+    background: green;
+}
+
+.foodCell
+{
+    background: saddlebrown;
+}
+.deadSnake
+{
+    background: red;
+}

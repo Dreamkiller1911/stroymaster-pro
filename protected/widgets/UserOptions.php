@@ -11,13 +11,12 @@ class UserOptions extends CWidget
     public $model;
     public $file = 'options';
     private $options;
-    protected $cs;
     public function init()
     {
 
-        $this->cs = Yii::app()->clientScript;
 
-        $this->cs->registerScriptFile(Yii::app()->theme->baseUrl . '/js/mylibrary/userOptions.js', CClientScript::POS_HEAD);
+
+        $this->owner->init()->registerScriptFile(Yii::app()->theme->baseUrl . '/js/mylibrary/userOptions.js', CClientScript::POS_HEAD);
 
         $options = $this->generateOptions();
         $this->render($this->file, array('model'=>$this->model, 'opt'=>$this->options));
@@ -32,7 +31,9 @@ class UserOptions extends CWidget
         switch($this->model->class){
             case User::MASTER:
                 $this->options['Title'] = 'Опции';
-                $this->regScript();
+                $this->owner->init()->registerScript(User::MASTER, '
+                    var opt = new userOptions;
+                ', CClientScript::POS_BEGIN);
                 switch($user->Service->status){
                     case Services::STATUS_ACTIVE:
                         $this->options['data']['status'] =array(
@@ -122,8 +123,11 @@ class UserOptions extends CWidget
                 }
 
                 break;
-            case User::ADMIN:
-                $this->regScript();
+/*            case User::ADMIN:
+                $this->owner->init()->registerScript(User::ADMIN, '
+                    var opt = new userOptions;
+                ', CClientScript::POS_BEGIN);
+
                 $this->options['data']['status'] =array(
                     'text' => 'Заявки на оплату резюме',
                     'amount'=>Request::model()->resume()->count(),
@@ -154,7 +158,7 @@ class UserOptions extends CWidget
                     'active'=>Request::model()->advt()->count() > 0 ? '' : 'disabled',
                     'click'=>"opt.getData(" . json_encode([Request::TYPE_ADVT_ACTIVATE, Request::TYPE_ADVT_EXTEND]) . ")",
                 );
-                break;
+                break;*/
             case User::VENDOR:
                     if(isset($_POST['ajax']) && $_POST['ajax'] === 'getOptions'){
                         $advtModel = Advertising::model()->findByPk($_POST['id_advt']);
@@ -209,12 +213,7 @@ class UserOptions extends CWidget
 
         }
     }
-    protected function regScript(){
-        $this->cs->registerScript(User::ADMIN, '
-                    var opt = new userOptions;
-                ', CClientScript::POS_BEGIN);
-        return true;
-    }
+
 
 
 }

@@ -30,7 +30,7 @@ class FileCommander extends CComponent
 
 
 
-        $a = $commander->pathParams;//Параметры кончной папки
+        $a = $commander->pathParams;//Параметры конечной папки
         $b = $commander->fileParams;//Параметры начальной папки и файлов
 
         if($commander->imgResize($a, $b)) {

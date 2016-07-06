@@ -17,12 +17,12 @@ class UserController extends Controller
     public function actionIndex()
     {
 
-        $cs = $this->init();
+        /*$cs = $this->init();
         $cs->registerScriptFile(Yii::app()->theme->baseUrl . '/js/mylibrary/Comments.js');
         $cs->registerScript('commentsInit',
             'var com = new Comments(\'#comment\');' .
             'com.init()'
-        );
+        );*/
 
         $user = $this->loadUser();
         $model = new Comments();
@@ -56,12 +56,12 @@ class UserController extends Controller
         if ($user->class != User::CLIENT) {
             $this->render('index', array('user' => $user, 'model' => $model));
         } else {
-            $cs->registerScript('orders',
+            /*$cs->registerScript('orders',
                 'var orders = new orders();' .
                 'orders.edit();' .
                 'orders.save();' .
                 'orders.statusComplete();', CClientScript::POS_END
-            );
+            );*/
             $this->render('client', array('user' => $user));
         }
     }

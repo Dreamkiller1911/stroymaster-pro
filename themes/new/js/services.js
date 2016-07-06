@@ -1,7 +1,7 @@
 /**
  * Created by tazeb on 03.04.2016.
  */
-function aervices(bt) {
+function services(bt) {
     var _this = this;
     this.service = bt;
     this.id;

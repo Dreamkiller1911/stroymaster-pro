@@ -99,7 +99,7 @@ function Start(prop) {
     this.loadModel = function (modelName, bodyScript) {
         if (modelName === undefined || modelName.length === 0) {
 
-        } else if (findModelByName(modelName)) {
+        } else if (findModelByName(modelName) && _this.models[modelName].status === 'ready') {
             bodyScript(_this.models[modelName].obj);
             return true;
         } else {
