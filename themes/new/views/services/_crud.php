@@ -1,11 +1,4 @@
 <?php
-
-
-$this->init()->registerScript('servicesInit',
-    'var services = new Services(\'.col-xs-12.services\');' .
-    'services.Init();'
-);
-
 $form = $this->beginWidget('CActiveForm', array(
     'id' => 'services-form',
     'enableAjaxValidation' => false,
@@ -31,15 +24,19 @@ $form = $this->beginWidget('CActiveForm', array(
                             'class' => 'form-control',
                             'StartModel'=>'srv_note'
                         )); ?>
-                        <?php echo $form->error($model, 'note',array()); ?>
-                        <div></div>
+                        <?php echo $form->error($model, 'note'); ?>
+                        <div StartModel="srv_error_note"></div>
                     </div>
 
                     <div class="row">
                         <?php echo $form->labelEx($model, 'description'); ?>
-                        <?php echo CHtml::activeTextArea($model, 'description', array('rows' => '8', 'class' => 'form-control')) ?>
+                        <?php echo CHtml::activeTextArea($model, 'description', array(
+                            'rows' => '8',
+                            'class' => 'form-control',
+                            'StartModel'=>'srv_description'
+                        )) ?>
                         <?php echo $form->error($model, 'description'); ?>
-                        <div></div>
+                        <div StartModel="srv_error_description"></div>
                     </div>
 
                     <div class="row- ">

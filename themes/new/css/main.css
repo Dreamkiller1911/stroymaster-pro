@@ -746,3 +746,8 @@ body:before
 {
     white-space: pre-wrap;
 }
+
+.errorMessage
+{
+    color: red;
+}

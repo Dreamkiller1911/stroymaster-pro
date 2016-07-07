@@ -38,12 +38,31 @@ function Service(){
               place.appendChild(newData);
               _this.owner.init('Service', 'indexLoad', {Id:data.nextId});
               _this.statusLoadIndex = true;
-              console.log(_this.owner)
           }
       });
     };
     this.save = function (){
-        _this.getProperty();
-        console.log(_this)
+        _this.ajax({
+            type: "POST",
+            url: "",
+            data: {'Services':_this.p.allOptionsTo('Ajax'), ajax: 'update'},
+            dataType: 'json',
+            success: function(data){
+                if(data.complete === true){
+
+                }else {
+                    _this.errors().showAll({
+                        dataError: data,
+                        showMethod: function(text, label){
+                            label.style.color = 'blue';
+                            label.innerHTML = text.toString();
+                        },
+                        hideMethod: function(label){
+                            label.innerHTML  = ''
+                        }
+                    })
+                }
+            }
+        });
     };
 }

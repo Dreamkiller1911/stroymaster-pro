@@ -47,7 +47,7 @@ function ServiceController() {
             window.event.preventDefault();
             _this.startModel('Service', function (model){
                 model.getProperty();
-                console.log(model.p)
+                model.save();
             });
         }
     }

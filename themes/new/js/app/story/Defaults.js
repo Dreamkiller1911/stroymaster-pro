@@ -30,21 +30,20 @@ var DefaultModel = {
     prefix: undefined,
     p: new Object(),
     P: undefined,
-    errors: function (prop) {
-        if (typeof this.errors.loaded) {
-            var errors = new Errors(this);
-            if (errors) {
-                delete this.errors;
-                Object.defineProperty(this, 'errors', {
-                    value: function () {
-                        return new Errors(this)
-                    },
-                    writable: true,
-                    configurable: true,
-                    enumerable: true
-                });
-                return this.errors()
+    errors: function () {
+        if (this.errors.loaded === undefined) {
+            delete this.errors;
+            Object.defineProperty(this, 'errors', {
+                value: new Errors(this),
+                writable: true,
+                configurable: true,
+                enumerable: true
+            });
+            var _this = this;
+            return function(_this){
+                return _this.errors();
             }
+
         } else {
             return this.errors;
         }
@@ -147,6 +146,34 @@ var DefaultModel = {
             }
         }
         this.P = this.p;
+        if ('model' in this.p === false) {
+            Object.defineProperty(this.p, 'model', {
+                value: this
+            });
+        }
+        if ('allOptionsTo' in this.p === false) {
+            Object.defineProperty(this.p, 'allOptionsTo', {
+                value: function (type) {
+                    switch (type) {
+                        default:
+                            if (this.model.properties.length > 0) {
+                                var optModel = this.model.properties;
+                                var tmpData = new Object();
+                                for (var p in optModel) {
+                                    if (this.hasOwnProperty(optModel[p])) {
+                                        tmpData[optModel[p]] = this[optModel[p]].value;
+                                    }
+                                }
+                            }
+                            break;
+                    }
+
+                    return tmpData;
+                }
+            });
+        }
+
+
     }
 };
 
@@ -189,28 +216,39 @@ function Errors(owner) {
     var _this = this;
     this.owner = owner;
     this.loaded = true;
-    this.dataElements = undefined;
     this.propError = {
         dataError: undefined,
         errorPattern: undefined,
-        showMethod: undefined
+        showMethod: function (text, label) {
+            label.style.color = 'red';
+            label.innerHTML = text.toString();
+        },
+        hideMethod: function (label) {
+            label.innerHTML = '';
+        }
     };
     this.showAll = function (prop) {
         setNewProperties(prop);
         searchElements();
-       if(_this.dataElements === undefined){
-           return true;
-       }
-        console.log(_this)
-        for(var i in _this.dataElements){
-            _this.propError.showMethod(_this.dataElements[i].text[0], _this.dataElements[i].label)
-            //_this.dataElements[i].label.innerHTML = _this.dataElements[i].text[0]
+        /*if (_this.dataElements === undefined) {
+            return true;
+        }*/
+        console.log(_this.dataElements);
+        for (var i in _this.dataElements) {
+            var text = _this.dataElements[i].text[0];
+            var label = _this.dataElements[i].label;
+            if ('startError' in label.attributes) {
+
+            } else {
+                _this.propError.showMethod(text, label);
+            }
+
         }
     };
     var setNewProperties = function (prop) {
         for (var p in prop) {
             if (_this.propError.hasOwnProperty(p.toString()) === false) {
-                console.warn('Не существующее свойство "' + p.toString() + '" в методе "showErrors" объекта модели "' + this.modelName + '"')
+                console.warn('Не существующее свойство "' + p.toString() + '" в методе "showErrors" объекта модели "' + _this.owner.modelName + '"')
             }
         }
         if (typeof prop.dataError === 'object') {
@@ -228,14 +266,27 @@ function Errors(owner) {
         for (var i in _this.owner.properties) {
             for (var p in _this.propError.dataError) {
                 var patt = new RegExp(_this.owner.properties[i].toString());
+
                 if (patt.test(p)) {
-                    if(_this.dataElements === undefined){
-                        _this.dataElements = {};
+                    if('dataElements' in _this === false && typeof _this.dataElements != 'object'){
+                        console.log(1);
+                        Object.defineProperty(_this, 'dataElements', {
+                            value: new Object(),
+                            enumerable: true,
+                            writable: true,
+                            configurable: true
+
+                        })
                     }
-                    Object.defineProperty(_this.dataElements, _this.owner.properties[i].toString(), {
-                        value: {},
-                        enumerable: true
-                    });
+
+                        Object.defineProperty(_this.dataElements, _this.owner.properties[i].toString(), {
+                            value: {},
+                            enumerable: true,
+                            writable: true,
+                            configurable: true
+                        });
+
+
                     var tmpPat = '[startmodel="' + _this.owner.prefix + 'error_' + _this.owner.properties[i] + '"]';
                     var elem = document.querySelector(tmpPat.toString());
                     if (elem) {
@@ -288,4 +339,5 @@ function Errors(owner) {
             }
         }
     }
+
 }

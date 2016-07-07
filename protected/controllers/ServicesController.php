@@ -67,19 +67,18 @@ class ServicesController extends Controller
         $model = $l ? $l : new Services();
 
         $this->init()->registerCssFile(Yii::app()->theme->baseUrl . '/css/services.css');
-        $this->init()->registerScriptFile(Yii::app()->theme->baseUrl . '/js/mylibrary/services.js', CClientScript::POS_END);
         $this->init()->registerScript('crv_crud', 'start.init(\'Service\', \'crud\')', CClientScript::POS_READY);
 
         if (isset($_POST['Services'])) {
-
             if (isset($_POST['ajax']) && $_POST['ajax'] === 'update') {
                 $model->attributes = $_POST['Services'];
+
                 if ($model->validate()) {
-                    $model->save();
+//                    $model->save();
                     echo json_encode(array('complete' => true, 'message' => '<h5>Данные сохранены</h5>'));
                     Yii::app()->end();
                 } else {
-						echo json_encode(array('message' => '<h5>Ошибка сохранения, попробуйте позже</h5>'));
+                    echo CActiveForm::validate($model);
                     Yii::app()->end();
                 }
             }
