@@ -31,21 +31,13 @@ var DefaultModel = {
     p: new Object(),
     P: undefined,
     errors: function () {
-        if (this.errors.loaded === undefined) {
-            delete this.errors;
-            Object.defineProperty(this, 'errors', {
-                value: new Errors(this),
-                writable: true,
-                configurable: true,
-                enumerable: true
-            });
-            var _this = this;
-            return function(_this){
-                return _this.errors();
-            }
-
+        if ('e' in this) {
+            return this.e;
         } else {
-            return this.errors;
+            Object.defineProperty(this, 'e', {
+                value: new Errors(this)
+            });
+            return this.e;
         }
 
     },
@@ -219,7 +211,7 @@ function Errors(owner) {
     this.propError = {
         dataError: undefined,
         errorPattern: undefined,
-        showMethod: function (text, label) {
+        showMethod: function (text, label, input) {
             label.style.color = 'red';
             label.innerHTML = text.toString();
         },
@@ -230,17 +222,15 @@ function Errors(owner) {
     this.showAll = function (prop) {
         setNewProperties(prop);
         searchElements();
-        /*if (_this.dataElements === undefined) {
-            return true;
-        }*/
-        console.log(_this.dataElements);
         for (var i in _this.dataElements) {
             var text = _this.dataElements[i].text[0];
             var label = _this.dataElements[i].label;
-            if ('startError' in label.attributes) {
+            var input = _this.dataElements[i].input;
+            if(this.propError.dataError.hasOwnProperty(this.dataElements[i].key)){
+                _this.propError.showMethod(text, label, input);
 
-            } else {
-                _this.propError.showMethod(text, label);
+            }else{
+                _this.propError.hideMethod(label);
             }
 
         }
@@ -268,23 +258,21 @@ function Errors(owner) {
                 var patt = new RegExp(_this.owner.properties[i].toString());
 
                 if (patt.test(p)) {
-                    if('dataElements' in _this === false && typeof _this.dataElements != 'object'){
-                        console.log(1);
+                    if ('dataElements' in _this === false && typeof _this.dataElements != 'object') {
                         Object.defineProperty(_this, 'dataElements', {
                             value: new Object(),
                             enumerable: true,
                             writable: true,
                             configurable: true
-
                         })
                     }
 
-                        Object.defineProperty(_this.dataElements, _this.owner.properties[i].toString(), {
-                            value: {},
-                            enumerable: true,
-                            writable: true,
-                            configurable: true
-                        });
+                    Object.defineProperty(_this.dataElements, _this.owner.properties[i].toString(), {
+                        value: {},
+                        enumerable: true,
+                        writable: true,
+                        configurable: true
+                    });
 
 
                     var tmpPat = '[startmodel="' + _this.owner.prefix + 'error_' + _this.owner.properties[i] + '"]';
@@ -299,6 +287,9 @@ function Errors(owner) {
                             },
                             'text': {
                                 value: _this.propError.dataError[p]
+                            },
+                            'key':{
+                                value: p
                             }
                         });
                     } else {
@@ -315,6 +306,7 @@ function Errors(owner) {
                                     var patternError = _this.propError.errorPattern[tagName].replace(new RegExp('{{prop}}'), _this.owner.properties[i]);
                                     elem = document.getElementById(patternError.toString());
                                     if (elem) {
+                                        console.log(1)
                                         Object.defineProperties(_this.dataElements[_this.owner.properties[i]], {
                                             'label': {
                                                 value: elem
@@ -324,6 +316,9 @@ function Errors(owner) {
                                             },
                                             'text': {
                                                 value: _this.propError.dataError[p]
+                                            },
+                                            'key':{
+                                                value: p
                                             }
                                         })
                                     } else {

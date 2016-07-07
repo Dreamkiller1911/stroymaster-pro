@@ -51,10 +51,12 @@ function Comment() {
                         dataError: data,
                         errorPattern: {ID: 'Comments_{{prop}}_em_'},
                         showMethod: function(text, label){
-                            var sp = '<span></span>';
                             $(label).css('opacity', 0).html(text).animate({'opacity': 1}, 1000)
 
-                       }
+                       },
+                        hideMethod: function(label){
+                            label.innerHTML  = ''
+                        }
                     });
 
                 } else {

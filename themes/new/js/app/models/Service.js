@@ -49,12 +49,12 @@ function Service(){
             dataType: 'json',
             success: function(data){
                 if(data.complete === true){
-
+                    _this.errors().showAll();
                 }else {
                     _this.errors().showAll({
                         dataError: data,
                         showMethod: function(text, label){
-                            label.style.color = 'blue';
+                            label.style.color = 'green';
                             label.innerHTML = text.toString();
                         },
                         hideMethod: function(label){

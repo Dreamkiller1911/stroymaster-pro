@@ -100,7 +100,6 @@ function Start(prop) {
         if (modelName === undefined || modelName.length === 0) {
 
         } else if (findModelByName(modelName) && _this.models[modelName].status === 'ready') {
-            console.log(_this.models[modelName].obj);
             bodyScript(_this.models[modelName].obj);
             return true;
         } else {
