@@ -27,8 +27,11 @@ function CommentController(){
             })
         }
     };
-    this.start = function(){
+    this.load = function(){
         var ctrl = _this.getControls();
+        if(!ctrl){
+            return false;
+        }
         ctrl[0].onclick = function(){
             _this.startModel('Comment', function(model){
                 model.getProperty();

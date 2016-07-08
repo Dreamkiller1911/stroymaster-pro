@@ -20,7 +20,9 @@ var DefaultController =
         return ctrl;
     },
     startModel: function (modelName, bodyScript) {
-        this.owner.loadModel(modelName, bodyScript);
+        mN = modelName;
+        bS = bodyScript || false;
+        this.start.loadModel(mN, bS, this.ctrlName);
     }
 
 };
@@ -204,9 +206,9 @@ function progress() {
  *      самой модели. _error_ - добавляется автоматически, без него не будет найден DOM элемент. propertyName - имя свойства,
  *      для которого ищется поле для вывода ошибки
  * **/
-function Errors(owner) {
+function Errors(obj) {
     var _this = this;
-    this.owner = owner;
+    this.owner = obj;
     this.loaded = true;
     this.propError = {
         dataError: undefined,
@@ -219,14 +221,17 @@ function Errors(owner) {
             label.innerHTML = '';
         }
     };
+
+
     this.showAll = function (prop) {
         setNewProperties(prop);
         searchElements();
+        console.log(_this.propError.dataError)
         for (var i in _this.dataElements) {
             var text = _this.dataElements[i].text[0];
             var label = _this.dataElements[i].label;
             var input = _this.dataElements[i].input;
-            if(this.propError.dataError.hasOwnProperty(this.dataElements[i].key)){
+            if(_this.propError.dataError.hasOwnProperty(this.dataElements[i].key)){
                 _this.propError.showMethod(text, label, input);
 
             }else{
@@ -236,6 +241,10 @@ function Errors(owner) {
         }
     };
     var setNewProperties = function (prop) {
+        if(prop === undefined){
+            _this.propError.dataError = {};
+            return false;
+        }
         for (var p in prop) {
             if (_this.propError.hasOwnProperty(p.toString()) === false) {
                 console.warn('Не существующее свойство "' + p.toString() + '" в методе "showErrors" объекта модели "' + _this.owner.modelName + '"')
@@ -294,7 +303,7 @@ function Errors(owner) {
                         });
                     } else {
                         if (_this.propError.errorPattern === undefined) {
-                            if (_this.owner.owner.debugMode) {
+                            if (_this.owner.start.debugMode) {
                                 console.error('Не найден DOM элемент для "' + p + '", по "StartModel=' + _this.owner.prefix + 'error_' +
                                     _this.owner.properties[i] + ' и не указано свойство errorPattern" для метода "showAll"')
                             }
@@ -306,7 +315,6 @@ function Errors(owner) {
                                     var patternError = _this.propError.errorPattern[tagName].replace(new RegExp('{{prop}}'), _this.owner.properties[i]);
                                     elem = document.getElementById(patternError.toString());
                                     if (elem) {
-                                        console.log(1)
                                         Object.defineProperties(_this.dataElements[_this.owner.properties[i]], {
                                             'label': {
                                                 value: elem
@@ -322,7 +330,7 @@ function Errors(owner) {
                                             }
                                         })
                                     } else {
-                                        if (_this.owner.owner.debugMode) {
+                                        if (_this.owner.start.debugMode) {
                                             console.warn('Не найден дом элемент с ID="' + patternError + '". Вывод ошибки для "' +
                                                 p + '" не возможен')
                                         }

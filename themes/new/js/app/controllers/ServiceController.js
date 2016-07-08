@@ -3,6 +3,7 @@
  */
 function ServiceController() {
     var _this = this;
+    this.statusLoadIndex = true;
 
     this.viewModal = function () {
         var ctrl = _this.getControls();
@@ -18,12 +19,12 @@ function ServiceController() {
     this.indexLoad = function () {
         var serviceBody = document.querySelector('[rel="services"]');
         window.onscroll = function () {
-            if (getPosition(serviceBody)) {
+            if (getPosition(serviceBody) && _this.statusLoadIndex) {
+                _this.statusLoadIndex = false;
                 _this.startModel('Service', function (model) {
-                    if(model.statusLoadIndex){
-                        model.loadScroll(serviceBody, _this.properties[_this.actName].Id);
-                        model.statusLoadIndex = false;
-                    }
+                    model.loadScroll(serviceBody, _this.properties.indexLoad.Id);
+                    model.statusLoadIndex = false;
+
 
                 })
             }
@@ -39,13 +40,14 @@ function ServiceController() {
             if ((rect.bottom - docMarginTop) > posCenter && rect.bottom < posBottom) {
                 return true;
             }
+            return false;
         }
     };
-    this.crud = function (){
+    this.crud = function () {
         var act = _this.getControls();
-        act[0].onclick = function (){
+        act[0].onclick = function () {
             window.event.preventDefault();
-            _this.startModel('Service', function (model){
+            _this.startModel('Service', function (model) {
                 model.getProperty();
                 model.save();
             });

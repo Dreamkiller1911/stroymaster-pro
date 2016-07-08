@@ -5,7 +5,6 @@ function Service(){
     var _this = this;
     this.properties = ['note', 'description'];
     this.prefix = 'srv_';
-    this.statusLoadIndex = true;
 
     this.viewFromId = function (id) {
         _this.ajax({
@@ -21,7 +20,7 @@ function Service(){
                     img.each(function(){
                         $(this).fancybox([]);
                     });
-                    _this.owner.init('Comment', 'start');
+                    _this.start.init('Comment', 'load');
                 });
             }
         });
@@ -35,9 +34,15 @@ function Service(){
           success: function (data) {
               var newData = document.createElement('div');
               newData.innerHTML = data.data.join('');
-              place.appendChild(newData);
-              _this.owner.init('Service', 'indexLoad', {Id:data.nextId});
-              _this.statusLoadIndex = true;
+              if(place.appendChild(newData)){
+                  if(data.nextId.length > 0){
+                      _this.ctrl.statusLoadIndex = true;
+                      _this.start.init('Service', 'indexLoad', {Id:data.nextId});
+                  }
+                  _this.start.init('Service', 'viewModal');
+              }
+
+
           }
       });
     };
@@ -55,7 +60,7 @@ function Service(){
                         dataError: data,
                         showMethod: function(text, label){
                             label.style.color = 'green';
-                            label.innerHTML = text.toString();
+                            label.innerHTML = text;
                         },
                         hideMethod: function(label){
                             label.innerHTML  = ''

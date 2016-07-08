@@ -41,7 +41,7 @@
         ))?>
 
         <div class="row">
-            <button startCtrl="com_start" class="btn btn-default" id="sendComment" type="button"><?php echo Yii::app()->user->id === $user->id ? 'Ответить': 'Отправить'?><?php ?></button>
+            <button startCtrl="com_load" class="btn btn-default" id="sendComment" type="button"><?php echo Yii::app()->user->id === $user->id ? 'Ответить': 'Отправить'?><?php ?></button>
             <div class="label" rel="error"></div>
         </div>
     </div>
