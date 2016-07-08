@@ -41,9 +41,9 @@ $form = $this->beginWidget('CActiveForm', array(
 
                     <div class="row- ">
                         <div class="col-xs-4">
-                        <button StartCtrl="Service_crud" type="submit" name="sendServices" class="btn btn-default">Сохранить</button>
+                        <button StartCtrl="Service_crud" type="button" name="sendServices" class="btn btn-default">Сохранить</button>
                         </div>
-                        <div class="col-xs-8 servicesError">
+                        <div StartModel="srv_msg_save" class="col-xs-8 servicesError">
                         </div>
                     </div>
 
@@ -67,7 +67,7 @@ $form = $this->beginWidget('CActiveForm', array(
             <div class="row">
                 <div class="col-xs-5">
                 <label class="form-control btn btn-default">Загрузить фотографии <span class="text-info glyphicon glyphicon-download-alt"></span>
-                <input style="opacity: 0; position: fixed"  type="file" name="imgUpload" multiple>
+                <input StartCtrl="imgSrv_upload" style="opacity: 0; position: fixed"  type="file" name="imgUpload" multiple>
                 </label>
                 </div>
 

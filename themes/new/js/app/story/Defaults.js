@@ -43,6 +43,9 @@ var DefaultModel = {
         }
 
     },
+    message: function(msg, to){
+
+    },
     beforeAjax: function (data) {
     },
     progress: function (prop) {
@@ -171,6 +174,9 @@ var DefaultModel = {
     }
 };
 
+
+
+
 function progress() {
     var _this = this;
 
@@ -226,7 +232,6 @@ function Errors(obj) {
     this.showAll = function (prop) {
         setNewProperties(prop);
         searchElements();
-        console.log(_this.propError.dataError)
         for (var i in _this.dataElements) {
             var text = _this.dataElements[i].text[0];
             var label = _this.dataElements[i].label;
@@ -343,4 +348,15 @@ function Errors(obj) {
         }
     }
 
+}
+function Messages(obj){
+    var _this = this;
+    this.obj = obj;
+
+    this.showOne = function(prop){
+        var labelName = _this.obj.prefix + 'msg_' + prop.label
+        var label = document.querySelector('[StartModel="'+ labelName +'"]')
+        label.innerHTML = prop.text;
+
+    }
 }

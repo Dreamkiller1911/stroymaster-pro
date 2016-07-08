@@ -5,6 +5,7 @@ function Service(){
     var _this = this;
     this.properties = ['note', 'description'];
     this.prefix = 'srv_';
+    this.labels = [];
 
     this.viewFromId = function (id) {
         _this.ajax({
@@ -55,6 +56,11 @@ function Service(){
             success: function(data){
                 if(data.complete === true){
                     _this.errors().showAll();
+
+                    _this.messages().showOne({
+                        label: 'save',
+                        text: 'Все ОК'
+                    });
                 }else {
                     _this.errors().showAll({
                         dataError: data,

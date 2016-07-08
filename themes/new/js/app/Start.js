@@ -45,7 +45,7 @@ function Start(prop) {
                                                     value: new Object(),
                                                 });
                                             }
-                                            if(_this.ctrls[c.toString()].obj.properties.hasOwnProperty(a.toString())){
+                                            if (_this.ctrls[c.toString()].obj.properties.hasOwnProperty(a.toString())) {
                                                 delete _this.ctrls[c.toString()].obj.properties[a.toString()]
                                             }
                                             Object.defineProperty(_this.ctrls[c].obj['properties'], a, {
@@ -54,9 +54,9 @@ function Start(prop) {
                                                 configurable: true
                                             });
                                         }
-                                        if(_this.loadAct(c, a, p)){
+                                        if (_this.loadAct(c, a, p)) {
                                             _this.queue[i].statusC = 'ready';
-                                        }else {
+                                        } else {
                                             _this.queue[i].statusC = 'error';
                                             throw new Error('Метод объекта уже обявлен и не является функцией');
                                         }
@@ -101,26 +101,26 @@ function Start(prop) {
         if (_this.ctrls.hasOwnProperty(ctrl)) {
             var ctrlN = _this.ctrls[ctrl.toString()].obj;
             /*if (p) {
-                if ('properties' in ctrlN === false) {
-                    Object.defineProperty(ctrlN, 'properties', {
-                        value: new Object(),
-                    });
-                }
-                if(ctrlN.properties.hasOwnProperty(act.toString())){
-                    delete ctrlN.properties[act.toString()]
-                }
-                Object.defineProperty(ctrlN['properties'], act, {
-                    value: p,
-                    writable: true,
-                    configurable: true
-                });
+             if ('properties' in ctrlN === false) {
+             Object.defineProperty(ctrlN, 'properties', {
+             value: new Object(),
+             });
+             }
+             if(ctrlN.properties.hasOwnProperty(act.toString())){
+             delete ctrlN.properties[act.toString()]
+             }
+             Object.defineProperty(ctrlN['properties'], act, {
+             value: p,
+             writable: true,
+             configurable: true
+             });
 
-            }*/
+             }*/
             if (ctrlN.hasOwnProperty(act.toString())) {
                 ctrlN.ctrlName = ctrl;
                 ctrlN.actName = act;
                 ctrlN.start = _this;
-                if(ctrlN[act] instanceof Function === false){
+                if (ctrlN[act] instanceof Function === false) {
                     return false;
                 }
                 ctrlN[act]();
@@ -136,13 +136,49 @@ function Start(prop) {
 
     this.loadModel = function (modelName, bodyScript, ctrl) {
         var ctrl = findCtrlByName(ctrl);
+        var addProperty = function (model) {
+            Object.defineProperties(model, {
+                    'ctrl': {
+                        value: ctrl
+                    },
+
+                }
+            );
+            if (('messages' in model && Object.getOwnPropertyDescriptor(model, 'messages').writable) || 'messages' in model === false) {
+                Object.defineProperty(model, 'messages', {
+                    value: function () {
+                        if ('m' in model) {
+                            return model.m;
+                        } else {
+                            Object.defineProperty(model, 'm', {
+                                value: new Messages(model)
+                            });
+                            return model.m;
+                        }
+                    },
+
+
+                })
+            }
+            /*if(model.hasOwnProperty('messages') && this.m instanceof Messages){
+             model.messages();
+             }else {
+             console.log(this.m);
+
+             Object.defineProperty(model, 'messages', {
+             value: function(){
+             model.m = new Messages();
+             console.log(model.m)
+             }
+             });
+             model.messages();
+
+             }*/
+        };
         if (modelName === undefined || modelName.length === 0) {
 
         } else if (findModelByName(modelName) && _this.models[modelName].status === 'ready') {
-            Object.defineProperty(_this.models[modelName].obj, ctrl, {
-                value: ctrl,
-                enumerable: true
-            });
+            addProperty(_this.models[modelName].obj);
             bodyScript(_this.models[modelName].obj);
             return true;
         } else {
@@ -153,10 +189,7 @@ function Start(prop) {
             _this.models[modelName].timer = setInterval(function () {
                 if (_this.models[modelName].status === 'ready') {
                     clearInterval(_this.models[modelName].timer);
-                    Object.defineProperty(_this.models[modelName].obj, 'ctrl', {
-                        value: ctrl,
-                        enumerable: true
-                    });
+                    addProperty(_this.models[modelName].obj);
                     bodyScript(_this.models[modelName].obj);
                     return true;
                 }
@@ -220,13 +253,15 @@ function Start(prop) {
             return true;
         }
     };
-    var findCtrlByName = function (name){
-        if(name === undefined || name === ''){
+    var findCtrlByName = function (name) {
+        if (name === undefined || name === '') {
             return false;
         }
-        if(_this.ctrls.hasOwnProperty(name.toString())){
+        if (_this.ctrls.hasOwnProperty(name.toString())) {
             return _this.ctrls[name.toString()].obj;
-        }else {return false}
+        } else {
+            return false
+        }
     }
 }
 
