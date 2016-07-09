@@ -134,7 +134,7 @@ function Start(prop) {
         }
     };
 
-    this.loadModel = function (modelName, bodyScript, ctrl) {
+    this.loadModel = function (modelName, bodyScript, ctrl, prop) {
         var ctrl = findCtrlByName(ctrl);
         var addProperty = function (model) {
             Object.defineProperties(model, {
@@ -190,7 +190,7 @@ function Start(prop) {
                 if (_this.models[modelName].status === 'ready') {
                     clearInterval(_this.models[modelName].timer);
                     addProperty(_this.models[modelName].obj);
-                    bodyScript(_this.models[modelName].obj);
+                    bodyScript(_this.models[modelName].obj, prop);
                     return true;
                 }
             }, 100)

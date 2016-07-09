@@ -20,18 +20,22 @@ var DefaultController =
         return ctrl;
     },
     startModel: function (modelName, bodyScript) {
-        mN = modelName;
-        bS = bodyScript || false;
-        this.start.loadModel(mN, bS, this.ctrlName);
+        if(typeof arguments[arguments.length-1] === 'object'){
+            var prop = arguments[arguments.length-1];
+        }
+        var mN = modelName;
+        var bS = bodyScript || false;
+        this.start.loadModel(mN, bS, this.ctrlName, prop);
     }
 
 };
 
 var DefaultModel = {
+    _self: this,
     modelName: undefined,
     prefix: undefined,
-    p: new Object(),
-    P: undefined,
+    /*p: new Object(),
+    P: undefined,*/
     errors: function () {
         if ('e' in this) {
             return this.e;
@@ -128,21 +132,36 @@ var DefaultModel = {
         ajax.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
         ajax.send(prop.data);
     },
+    /**
+     * @var getProperty Ищет в структуре DOM элементы, указанные в модели в свойстве properties
+     * @returns {boolean}
+     */
     getProperty: function () {
+        if('p' in this == false){
+            Object.defineProperty(this, 'p', {
+                value: new Object(),
+
+            });
+        }
         if (this.prefix === undefined) this.prefix = this.modelName + '_';
         if (this.properties === undefined) {
             return false;
         }
         for (var i = 0; i < this.properties.length; i++) {
+
             var tmpElement = document.querySelector('[StartModel="' + this.prefix + this.properties[i] + '"]');
             if (tmpElement) {
                 Object.defineProperty(this.p, this.properties[i], {
                     writable: true,
                     value: tmpElement
                 })
+            }else{
+                if(this.start.debugMode){
+                    console.warn('Не наден DOM елемент с селектором [StartModel="' + this.prefix + this.properties[i] +
+                        '"]", для модели "' + this.modelName + '"')
+                }
             }
-        }
-        this.P = this.p;
+        }this.P = this.p;
         if ('model' in this.p === false) {
             Object.defineProperty(this.p, 'model', {
                 value: this
@@ -154,11 +173,17 @@ var DefaultModel = {
                     switch (type) {
                         default:
                             if (this.model.properties.length > 0) {
+
                                 var optModel = this.model.properties;
                                 var tmpData = new Object();
-                                for (var p in optModel) {
-                                    if (this.hasOwnProperty(optModel[p])) {
-                                        tmpData[optModel[p]] = this[optModel[p]].value;
+                                for (var prop in optModel) {
+                                    var t = this[optModel[prop]];
+                                    switch (t.localName){
+                                        case 'input':
+                                            console.log(t.type);
+                                    }
+                                    if (this.hasOwnProperty(optModel[prop])) {
+                                        tmpData[optModel[prop]] = this[optModel[prop]].value;
                                     }
                                 }
                             }

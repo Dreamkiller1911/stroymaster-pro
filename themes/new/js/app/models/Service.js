@@ -65,7 +65,7 @@ function Service(){
                     _this.errors().showAll({
                         dataError: data,
                         showMethod: function(text, label){
-                            label.style.color = 'green';
+                            label.style.color = 'red';
                             label.innerHTML = text;
                         },
                         hideMethod: function(label){

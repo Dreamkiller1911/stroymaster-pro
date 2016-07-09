@@ -67,7 +67,7 @@ $form = $this->beginWidget('CActiveForm', array(
             <div class="row">
                 <div class="col-xs-5">
                 <label class="form-control btn btn-default">Загрузить фотографии <span class="text-info glyphicon glyphicon-download-alt"></span>
-                <input StartCtrl="imgSrv_upload" style="opacity: 0; position: fixed"  type="file" name="imgUpload" multiple>
+                <input StartCtrl="imgSrv_upload" StartModel="imgSrv_file"  style="opacity: 0; position: fixed"  type="file" name="imgUpload" multiple>
                 </label>
                 </div>
 
