@@ -20,8 +20,8 @@ var DefaultController =
         return ctrl;
     },
     startModel: function (modelName, bodyScript) {
-        if(typeof arguments[arguments.length-1] === 'object'){
-            var prop = arguments[arguments.length-1];
+        if (typeof arguments[arguments.length - 1] === 'object') {
+            var prop = arguments[arguments.length - 1];
         }
         var mN = modelName;
         var bS = bodyScript || false;
@@ -35,7 +35,7 @@ var DefaultModel = {
     modelName: undefined,
     prefix: undefined,
     /*p: new Object(),
-    P: undefined,*/
+     P: undefined,*/
     errors: function () {
         if ('e' in this) {
             return this.e;
@@ -47,7 +47,7 @@ var DefaultModel = {
         }
 
     },
-    message: function(msg, to){
+    message: function (msg, to) {
 
     },
     beforeAjax: function (data) {
@@ -68,6 +68,7 @@ var DefaultModel = {
                 data: '',
                 async: true,
                 dataType: 'html',
+                dataEncode: true,
                 success: function () {
                     return false;
                 },
@@ -75,15 +76,19 @@ var DefaultModel = {
                 }
             }
             ;
-
         for (var par in property) {
             if (prop.hasOwnProperty(par)) {
                 switch (par) {
                     case 'data':
                         var params = [];
                         var eachData = function (dObject, prefix) {
-                            for (var name in dObject) {
-                                if (dObject.hasOwnProperty(name)) {
+                            if (dObject instanceof FormData) {
+                                if (property.dataEncode === undefined) {
+                                    prop.dataEncode = false;
+                                }
+                                return dObject;
+                            } else {
+                                for (var name in dObject) {
                                     var key = prefix ? prefix + '[' + name + ']' : name;
                                     var value = dObject[name];
                                     if (typeof value === 'object') {
@@ -92,8 +97,8 @@ var DefaultModel = {
                                         params.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
                                     }
                                 }
+                                return params.join('&');
                             }
-                            return params.join('&');
                         };
                         prop.data = eachData(property[par]);
                         break;
@@ -129,7 +134,9 @@ var DefaultModel = {
             prop.data = null;
         }
         ajax.open(prop.type, prop.url, prop.async);
-        ajax.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        if (prop.dataEncode) {
+            ajax.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        }
         ajax.send(prop.data);
     },
     /**
@@ -137,7 +144,7 @@ var DefaultModel = {
      * @returns {boolean}
      */
     getProperty: function () {
-        if('p' in this == false){
+        if ('p' in this == false) {
             Object.defineProperty(this, 'p', {
                 value: new Object(),
 
@@ -155,41 +162,61 @@ var DefaultModel = {
                     writable: true,
                     value: tmpElement
                 })
-            }else{
-                if(this.start.debugMode){
+            } else {
+                if (this.start.debugMode) {
                     console.warn('Не наден DOM елемент с селектором [StartModel="' + this.prefix + this.properties[i] +
                         '"]", для модели "' + this.modelName + '"')
                 }
             }
-        }this.P = this.p;
+        }
+        this.P = this.p;
         if ('model' in this.p === false) {
             Object.defineProperty(this.p, 'model', {
                 value: this
             });
         }
-        if ('allOptionsTo' in this.p === false) {
-            Object.defineProperty(this.p, 'allOptionsTo', {
+        if ('allPropertiesTo' in this.p === false) {
+            Object.defineProperty(this.p, 'allPropertiesTo', {
                 value: function (type) {
+                    var optModel = this.model.properties;
+
+                    for (var prop in optModel) {
+                        var t = this[optModel[prop]];
+                        switch (t.localName) {
+                            case 'input':
+                                if (t.type === 'file') {
+                                    getFilesData(optModel)
+                                    break;
+                                }
+                        }
+                    }
+
                     switch (type) {
                         default:
                             if (this.model.properties.length > 0) {
 
-                                var optModel = this.model.properties;
                                 var tmpData = new Object();
+
+
                                 for (var prop in optModel) {
                                     var t = this[optModel[prop]];
-                                    switch (t.localName){
+                                    switch (t.localName) {
                                         case 'input':
-                                            console.log(t.type);
+                                            if (t.type === 'file') {
+                                                getFilesData(optModel)
+                                                break;
+                                            }
+                                            break;
+                                        default:
+                                            if (this.hasOwnProperty(optModel[prop])) {
+                                                tmpData[optModel[prop]] = this[optModel[prop]].value;
+                                            }
                                     }
-                                    if (this.hasOwnProperty(optModel[prop])) {
-                                        tmpData[optModel[prop]] = this[optModel[prop]].value;
-                                    }
+
                                 }
                             }
                             break;
                     }
-
                     return tmpData;
                 }
             });
@@ -198,8 +225,6 @@ var DefaultModel = {
 
     }
 };
-
-
 
 
 function progress() {
@@ -261,17 +286,17 @@ function Errors(obj) {
             var text = _this.dataElements[i].text[0];
             var label = _this.dataElements[i].label;
             var input = _this.dataElements[i].input;
-            if(_this.propError.dataError.hasOwnProperty(this.dataElements[i].key)){
+            if (_this.propError.dataError.hasOwnProperty(this.dataElements[i].key)) {
                 _this.propError.showMethod(text, label, input);
 
-            }else{
+            } else {
                 _this.propError.hideMethod(label);
             }
 
         }
     };
     var setNewProperties = function (prop) {
-        if(prop === undefined){
+        if (prop === undefined) {
             _this.propError.dataError = {};
             return false;
         }
@@ -327,7 +352,7 @@ function Errors(obj) {
                             'text': {
                                 value: _this.propError.dataError[p]
                             },
-                            'key':{
+                            'key': {
                                 value: p
                             }
                         });
@@ -355,7 +380,7 @@ function Errors(obj) {
                                             'text': {
                                                 value: _this.propError.dataError[p]
                                             },
-                                            'key':{
+                                            'key': {
                                                 value: p
                                             }
                                         })
@@ -374,13 +399,13 @@ function Errors(obj) {
     }
 
 }
-function Messages(obj){
+function Messages(obj) {
     var _this = this;
     this.obj = obj;
 
-    this.showOne = function(prop){
+    this.showOne = function (prop) {
         var labelName = _this.obj.prefix + 'msg_' + prop.label
-        var label = document.querySelector('[StartModel="'+ labelName +'"]')
+        var label = document.querySelector('[StartModel="' + labelName + '"]')
         label.innerHTML = prop.text;
 
     }

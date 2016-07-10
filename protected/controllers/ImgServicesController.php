@@ -44,6 +44,11 @@ class ImgServicesController extends Controller
             echo json_encode($e->getMessage());
         }
     }
+    public function actionSaveAll(){
+        var_dump($_POST);
+        var_dump($_FILES);
+        var_dump($_GET);
+    }
 
     public function actionDelete()
     {

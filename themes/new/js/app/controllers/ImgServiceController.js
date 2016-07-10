@@ -12,7 +12,7 @@ function ImgServiceController(){
         ctrl[0].onchange = function(){
             window.event.preventDefault();
             _this.startModel('ImgService', function(model){
-                model.countImgToPage();
+                model.addAll();
             });
 
         }

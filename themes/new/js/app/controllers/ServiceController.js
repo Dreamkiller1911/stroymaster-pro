@@ -17,19 +17,6 @@ function ServiceController() {
         }
     };
     this.indexLoad = function () {
-        var serviceBody = document.querySelector('[rel="services"]');
-        window.onscroll = function () {
-            if (getPosition(serviceBody) && _this.statusLoadIndex) {
-                _this.statusLoadIndex = false;
-                _this.startModel('Service', function (model) {
-                    model.loadScroll(serviceBody, _this.properties.indexLoad.Id);
-                    model.statusLoadIndex = false;
-
-
-                })
-            }
-
-        };
         var getPosition = function (elem) {
             var rect = elem.getBoundingClientRect();
             var docMarginTop = getComputedStyle(document.body).marginTop.replace(new RegExp('[a-z]+', 'i'), '');
@@ -42,6 +29,30 @@ function ServiceController() {
             }
             return false;
         }
+            var serviceBody = document.querySelector('[rel="services"]');
+            if (getPosition(serviceBody) && _this.statusLoadIndex) {
+                _this.statusLoadIndex = false;
+                _this.startModel('Service', function (model) {
+                    model.loadScroll(serviceBody, _this.properties.indexLoad.Id);
+                    model.statusLoadIndex = false;
+
+
+                })
+            }
+            window.onscroll = function () {
+                if (getPosition(serviceBody) && _this.statusLoadIndex) {
+                    _this.statusLoadIndex = false;
+                    _this.startModel('Service', function (model) {
+                        model.loadScroll(serviceBody, _this.properties.indexLoad.Id);
+                        model.statusLoadIndex = false;
+
+
+                    })
+                }
+
+            };
+
+
     };
     this.crud = function () {
         var act = _this.getControls();

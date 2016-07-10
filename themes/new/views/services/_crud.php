@@ -64,10 +64,11 @@ $form = $this->beginWidget('CActiveForm', array(
             Размер фотографии не долже превышать 5Мб</h4>
             </div>
         </div>
+    <form typeof="multipart/form data">
             <div class="row">
                 <div class="col-xs-5">
                 <label class="form-control btn btn-default">Загрузить фотографии <span class="text-info glyphicon glyphicon-download-alt"></span>
-                <input StartCtrl="imgSrv_upload" StartModel="imgSrv_file"  style="opacity: 0; position: fixed"  type="file" name="imgUpload" multiple>
+                <input StartCtrl="imgSrv_upload" StartModel="imgSrv_file"  style="opacity: 0; position: fixed"  type="file" name="file[imgUpload]" multiple>
                 </label>
                 </div>
 
@@ -77,7 +78,7 @@ $form = $this->beginWidget('CActiveForm', array(
                     </span>
                     </div>
             </div>
-
+    </form>
 </div>
     <?php $this->endWidget(); ?>
 </div>
