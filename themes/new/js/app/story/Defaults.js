@@ -140,10 +140,10 @@ var DefaultModel = {
         ajax.send(prop.data);
     },
     /**
-     * @var getProperty Ищет в структуре DOM элементы, указанные в модели в свойстве properties
+     * @var getProperties Ищет в структуре DOM элементы, указанные в модели в свойстве properties
      * @returns {boolean}
      */
-    getProperty: function () {
+    getProperties: function () {
         if ('p' in this == false) {
             Object.defineProperty(this, 'p', {
                 value: new Object(),
@@ -217,6 +217,34 @@ var DefaultModel = {
                     return tmpData;
                 }
             });
+        }
+        return this.p;
+    },
+    getProperty: function(prop){
+        if ('p' in this == false) {
+            Object.defineProperty(this, 'p', {
+                value: new Object(),
+
+            });
+        }
+        if (this.prefix === undefined) this.prefix = this.modelName + '_';
+        if (this.properties === undefined) {
+            return false;
+        }
+
+        var tmpElement = document.querySelector('[StartModel="' + this.prefix + prop + '"]');
+        if (tmpElement) {
+            Object.defineProperty(this.p, prop, {
+                writable: true,
+                value: tmpElement
+            })
+            return this.p[prop];
+        } else {
+            if (this.start.debugMode) {
+                console.warn('Не наден DOM елемент с селектором [StartModel="' + this.prefix + prop +
+                    '"]", для модели "' + this.modelName + '"')
+            }
+            return false;
         }
     }
 };

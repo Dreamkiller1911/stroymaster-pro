@@ -54,7 +54,9 @@ $form = $this->beginWidget('CActiveForm', array(
 
 
     <div class="row" id="imgList">
+        <div class="col-sm-push-12">
         <?php $this->renderPartial('_imgList', array('model' => $model)) ?>
+        </div>
     </div>
 
 <div class="row col-xs-8 col-xs-offset-2" id="addAllImg">
@@ -69,14 +71,14 @@ $form = $this->beginWidget('CActiveForm', array(
                 <div class="col-xs-5">
                     <input type="hidden" StartModel="imgSrv_description" value="test сообщения">
                 <label class="form-control btn btn-default">Загрузить фотографии <span class="text-info glyphicon glyphicon-download-alt"></span>
-                <input StartCtrl="imgSrv_upload" StartModel="imgSrvF_file"  style="opacity: 0; position: fixed"  type="file" name="saveAllImg[]" multiple>
+                <input StartCtrl="imgSrv_uploadAll" StartModel="imgSrvF_file"  style="opacity: 0; position: fixed"  type="file" name="saveAllImg[]" multiple>
 
                 </label>
                 </div>
 
                 <div class="col-xs-7">
                     <span class="form-control">Доступно фотографий -
-                    <span class="badge" id="numOst"><?php print_r($model->img_limit - count($model->imgServices)) ?>
+                    <span StartModel="imgSrvF_numOst" class="badge" id="numOst"><?php print_r($model->img_limit - count($model->imgServices)) ?>
                     </span>
                     </div>
             </div>

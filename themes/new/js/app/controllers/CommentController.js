@@ -34,7 +34,7 @@ function CommentController(){
         }
         ctrl[0].onclick = function(){
             _this.startModel('Comment', function(model){
-                model.getProperty();
+                model.getProperties();
                 model.saveForm();
 
             })

@@ -67,7 +67,9 @@ class ServicesController extends Controller
         $model = $l ? $l : new Services();
 
         $this->init()->registerCssFile(Yii::app()->theme->baseUrl . '/css/services.css');
-        $this->init()->registerScript('crv_crud', 'start.init({\'Service\': \'crud\', \'ImgService\': \'upload\'})', CClientScript::POS_READY);
+        $this->init()->registerScript('crv_crud', 'start.init({
+        \'Service\': \'crud\',
+         \'ImgService\': [\'uploadAll\', \'delete\']})', CClientScript::POS_READY);
 
         if (isset($_POST['Services'])) {
             if (isset($_POST['ajax']) && $_POST['ajax'] === 'update') {

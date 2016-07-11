@@ -26,7 +26,32 @@ class ImgServicesController extends Controller
         }
         try {
             if (isset($_FILES['saveAllImg'])) {
-                if(!User::issetService()){
+                if (!User::issetService()) {
+                    throw new Exception("<h4>Для добавления фотографий, сохраните свое резюме</h4>");
+                }
+                $id_service = Services::idOfUser();
+                var_dump($id_service);
+                die;
+                $img = ImgServices::addMyImg($_FILES['saveAllImg'], $id_service);
+                $arg = array('complete' => true, 'imgBalance' => User::getMyImgLimit(true));
+                foreach ($img as $key) {
+                    $model['ImgServices'] = ImgServices::model()->findByPk($key->id);
+                    $arg['img'][] = $this->renderFile(Yii::app()->theme->baseUrl . '/views/services/_imgList.php', array(
+                        'model' => $model
+                    ), true);
+                }
+                echo json_encode($arg);
+            } else throw new Exception("<h4>Вы не выбрали файл</h4>");
+        } catch (Exception $e) {
+            echo json_encode($e->getMessage());
+        }
+    }
+
+    public function actionSaveAll()
+    {
+        try {
+            if (isset($_FILES['saveAllImg'])) {
+                if (!User::issetService()) {
                     throw new Exception("<h4>Для добавления фотографий, сохраните свое резюме</h4>");
                 }
                 $id_service = Services::idOfUser();
@@ -44,10 +69,24 @@ class ImgServicesController extends Controller
             echo json_encode($e->getMessage());
         }
     }
-    public function actionSaveAll(){
-        var_dump($_POST);
-        var_dump($_FILES);
-        var_dump($_GET);
+
+    public function actionSaveOne()
+    {
+        if (isset($_FILES['OneImg'])) {
+            var_dump($_FILES);
+            die;
+            /*try {
+                $img = ImgServices::updateOneImg($_POST, $_FILES['OneImg']);
+                $data['complete'] = true;
+                $data['message'] = 'Сохранено';
+                $data['content'] = $this->renderPartial('updateImg', array('img' => $img), true);
+                echo json_encode($data);
+                Yii::app()->end();
+            } catch (Exception $e) {
+                echo json_encode(array('message' => $e->getMessage()));
+                Yii::app()->end();
+            }*/
+        }
     }
 
     public function actionDelete()

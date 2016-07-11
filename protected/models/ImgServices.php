@@ -158,8 +158,15 @@ class ImgServices extends CActiveRecord
 
 	public static function addMyImg($file = array(), $id_service){
 		$lFile = count($file['error']);
-		$assets = new MyAssetManager();
-		$assets->setUserPathOrUrl('ImgServices');
+		$path = Yii::getPathOfAlias('webroot') . '/img/toMasters/' . $id_service . '/';
+		$url = '/img/toMasters/' . $id_service . '/';
+		if(!file_exists($path)){
+			mkdir($path);
+		}
+		if(!file_exists($path . 'simple_url/')){
+			mkdir($path . 'prev/');
+		}
+
 		$lastAddImg = array();
 		if(!settype($id_service, 'int')) {
 			throw new Exception("Проблема с загрузкой изображения, попробуйте позже");
@@ -179,7 +186,7 @@ class ImgServices extends CActiveRecord
 					};
 
 					$dataImg = FileCommander::copyFile(
-							array('url' => $assets->userUrl, 'path' => $assets->userPath),
+							array('url' => $url, 'path' => $path),
 							array('url'=>$file['tmp_name'][$k], 'type'=>$file['type'][$k]));
 					$img = new ImgServices();
 					$img->id_service = $id_service;

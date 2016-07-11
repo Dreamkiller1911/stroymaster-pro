@@ -59,7 +59,7 @@ function ServiceController() {
         act[0].onclick = function () {
             window.event.preventDefault();
             _this.startModel('Service', function (model) {
-                model.getProperty();
+                model.getProperties();
                 model.save();
             });
         }
