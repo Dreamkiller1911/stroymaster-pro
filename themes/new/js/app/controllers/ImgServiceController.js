@@ -8,10 +8,11 @@ function ImgServiceController(){
     this.upload = function(){
 
         var ctrl = _this.getControls();
+        if(!ctrl) return false;
 
         ctrl[0].onchange = function(){
             window.event.preventDefault();
-            _this.startModel('ImgService', function(model){
+            _this.startModel('ImgServiceForm', function(model){
                 model.addAll();
             });
 

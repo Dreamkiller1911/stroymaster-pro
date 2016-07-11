@@ -51,7 +51,7 @@ function Service(){
         _this.ajax({
             type: "POST",
             url: "",
-            data: {'Services':_this.p.allOptionsTo('Ajax'), ajax: 'update'},
+            data: {'Services':_this.p.allPropertiesTo('Ajax'), ajax: 'update'},
             dataType: 'json',
             success: function(data){
                 if(data.complete === true){

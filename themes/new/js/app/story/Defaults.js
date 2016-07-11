@@ -179,50 +179,45 @@ var DefaultModel = {
             Object.defineProperty(this.p, 'allPropertiesTo', {
                 value: function (type) {
                     var optModel = this.model.properties;
-
-                    for (var prop in optModel) {
-                        var t = this[optModel[prop]];
-                        switch (t.localName) {
-                            case 'input':
-                                if (t.type === 'file') {
-                                    getFilesData(optModel)
-                                    break;
-                                }
-                        }
-                    }
-
+                    var tmpData = new Object();
+                    var fileData = new FormData();
+                    var triger = false;
                     switch (type) {
                         default:
-                            if (this.model.properties.length > 0) {
-
-                                var tmpData = new Object();
-
-
-                                for (var prop in optModel) {
-                                    var t = this[optModel[prop]];
-                                    switch (t.localName) {
-                                        case 'input':
-                                            if (t.type === 'file') {
-                                                getFilesData(optModel)
-                                                break;
+                            for (var prop in optModel) {
+                                var opt = this[optModel[prop]];
+                                if(!opt)break;
+                                switch (opt.localName) {
+                                    case 'input':
+                                        if (opt.type === 'file') {
+                                            triger = true;
+                                            for (var i = 0; i < opt.files.length; i++) {
+                                                fileData.append(opt.name, opt.files[i]);
                                             }
+
                                             break;
-                                        default:
-                                            if (this.hasOwnProperty(optModel[prop])) {
-                                                tmpData[optModel[prop]] = this[optModel[prop]].value;
-                                            }
-                                    }
-
+                                        }else {
+                                            tmpData[optModel[prop]] = this[optModel[prop]].value;
+                                        }
+                                        break;
+                                    default:
+                                        if (this.hasOwnProperty(optModel[prop])) {
+                                            tmpData[optModel[prop]] = this[optModel[prop]].value;
+                                        }
                                 }
                             }
                             break;
+                    }
+                    if (triger) {
+                        for(var d in tmpData){
+                            fileData.append(d, tmpData[d]);
+                        }
+                        return fileData;
                     }
                     return tmpData;
                 }
             });
         }
-
-
     }
 };
 

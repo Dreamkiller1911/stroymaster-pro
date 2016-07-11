@@ -67,8 +67,10 @@ $form = $this->beginWidget('CActiveForm', array(
     <form typeof="multipart/form data">
             <div class="row">
                 <div class="col-xs-5">
+                    <input type="hidden" StartModel="imgSrv_description" value="test сообщения">
                 <label class="form-control btn btn-default">Загрузить фотографии <span class="text-info glyphicon glyphicon-download-alt"></span>
-                <input StartCtrl="imgSrv_upload" StartModel="imgSrv_file"  style="opacity: 0; position: fixed"  type="file" name="file[imgUpload]" multiple>
+                <input StartCtrl="imgSrv_upload" StartModel="imgSrvF_file"  style="opacity: 0; position: fixed"  type="file" name="saveAllImg[]" multiple>
+
                 </label>
                 </div>
 
