@@ -19,8 +19,8 @@
                         <?php foreach ($service->imgServices as $k): ?>
                             <a class="link_normal" title="<?php echo $k->description ?>"
                                rel="gallery<?php echo $service->id ?>"
-                               href="<?php echo $k->url ?>">
-                                <img src="<?php echo $k->simple_url ?>" height="50px">
+                               href="<?php echo Yii::app()->request->getBaseUrl(true) .  $k->url ?>">
+                                <img src="<?php echo Yii::app()->request->getBaseUrl(true) . $k->simple_url ?>" height="50px">
                             </a>
                         <?php endforeach; ?>
                     </div>
