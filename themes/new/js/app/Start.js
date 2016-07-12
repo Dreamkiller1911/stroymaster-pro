@@ -133,7 +133,26 @@ function Start(prop) {
                 + _this.paths.ctrls + ctrl + 'Controller.js\'');
         }
     };
+    this.loadActView = function(fileName, view){
+        if(_this.views.hasOwnProperty(fileName)  === false || _this.views[fileName].hasOwnProperty('obj') === false){
+            if(_this.debugMode){
+                throw new Error('Файл представления ' + fileName + 'View.js, не был подключен или не существует');
+            }
+            return false;
+        }
+        var obj = _this.views[fileName].obj;
+        var method = 'view' + view;
+        if(obj.hasOwnProperty(method) === false){
+            if(_this.debugMode){
+                throw new Error('В представлении ' + fileName + 'View() не найден метод View' + view + ', путь до файла \r\n' +
+                    _this.paths.views + fileName + 'View.js')
+            }
+            return false;
+        }
+        obj[method]();
 
+
+    };
     this.loadModel = function (modelName, bodyScript, ctrl, prop) {
         var ctrl = findCtrlByName(ctrl);
         var addProperty = function (model) {
@@ -196,6 +215,49 @@ function Start(prop) {
             }, 100)
         }
     };
+    this.includeJsView = function (fileName, view) {
+        var pathView = this.paths.views + fileName + 'View.js?' + Math.random();
+        var script = document.createElement('script');
+        var head = document.getElementsByTagName('head');
+
+        script.onload = function(){
+            var fullName = fileName.toString() + 'View';
+            Object.defineProperty(_this.views, fileName, {
+                value: new Object(),
+                enumerable: true
+            } );
+            window[fullName.toString()].prototype = DefaultView;
+            Object.defineProperty(_this.views[fileName], 'obj', {
+                value: new window[fullName.toString()](),
+                enumerable: true
+            } );
+
+
+            Object.defineProperties(_this.views[fileName].obj, {
+                'components' : {
+                    value: new Array,
+                    writable: true,
+                    enumerable: true
+                },
+                'nameFunction':{
+                    value: view,
+                    writable: true,
+
+                },
+               'start': {
+                   value: _this
+               },
+                'ctrl' : {
+                    value: _this.ctrls[fileName].obj
+                }
+            });
+
+            _this.loadActView(fileName, view)
+
+        };
+        script.src = pathView;
+        head[0].appendChild(script);
+    }
 
     var includeJSCtrl = function (scriptName, a, p) {
         _this.ctrls[scriptName] = new Object();

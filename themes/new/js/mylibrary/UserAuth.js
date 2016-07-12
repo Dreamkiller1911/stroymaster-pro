@@ -24,6 +24,7 @@ function UserAuth(){
         }
         var id, c;
         if(myId == undefined) {
+            console.dir(document);
             var target = $(event.target);//Получаем кнопку нажатую в данный момент
             id = $(target).attr('id');//Получаем id кнопки
         }else{

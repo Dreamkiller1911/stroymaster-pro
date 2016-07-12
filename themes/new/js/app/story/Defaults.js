@@ -26,12 +26,19 @@ var DefaultController =
         var mN = modelName;
         var bS = bodyScript || false;
         this.start.loadModel(mN, bS, this.ctrlName, prop);
-    }
+    },
+    render: function (fileName) {
+        if(this.start.views.hasOwnProperty(this.ctrlName)){
+            this.start.loadActView(this.ctrlName, fileName);
+        }else{
 
+            this.start.includeJsView(this.ctrlName, fileName);
+        }
+    }
 };
 
+
 var DefaultModel = {
-    _self: this,
     modelName: undefined,
     prefix: undefined,
     /*p: new Object(),
@@ -186,7 +193,7 @@ var DefaultModel = {
                         default:
                             for (var prop in optModel) {
                                 var opt = this[optModel[prop]];
-                                if(!opt)break;
+                                if (!opt)break;
                                 switch (opt.localName) {
                                     case 'input':
                                         if (opt.type === 'file') {
@@ -196,7 +203,7 @@ var DefaultModel = {
                                             }
 
                                             break;
-                                        }else {
+                                        } else {
                                             tmpData[optModel[prop]] = this[optModel[prop]].value;
                                         }
                                         break;
@@ -209,7 +216,7 @@ var DefaultModel = {
                             break;
                     }
                     if (triger) {
-                        for(var d in tmpData){
+                        for (var d in tmpData) {
                             fileData.append(d, tmpData[d]);
                         }
                         return fileData;
@@ -220,7 +227,7 @@ var DefaultModel = {
         }
         return this.p;
     },
-    getProperty: function(prop){
+    getProperty: function (prop) {
         if ('p' in this == false) {
             Object.defineProperty(this, 'p', {
                 value: new Object(),
@@ -246,6 +253,19 @@ var DefaultModel = {
             }
             return false;
         }
+    }
+
+};
+
+var DefaultView = {
+    prefix: undefined,
+
+    write: function(body){
+        if(body === undefined || body === '') return false;
+        this.components.push(body);
+        console.log(this.components.length);
+
+        return this
     }
 };
 

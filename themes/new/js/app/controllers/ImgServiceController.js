@@ -48,7 +48,7 @@ function ImgServiceController() {
 
         for(var i = 0; i < ctrl.length; i++){
             ctrl[i].onclick = function(){
-                console.log(this.id);
+                _this.render('ImgEdit')
             }
         }
     }
