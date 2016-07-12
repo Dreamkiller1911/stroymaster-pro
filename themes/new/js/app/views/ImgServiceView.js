@@ -8,14 +8,14 @@ function ImgServiceView() {
 
 
     this.viewImgEdit = function(){
-
         _this.write(
             '<div class="modal">Тестовый див для генерации представления </div>'
         );
-        console.log(_this);
+    };
 
-
-
-
+    this.viewTest = function () {
+        _this.write(
+            '<div class="test"></div>'
+        )
     }
 }

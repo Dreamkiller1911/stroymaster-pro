@@ -29,10 +29,10 @@ var DefaultController =
     },
     render: function (fileName) {
         if(this.start.views.hasOwnProperty(this.ctrlName)){
-            this.start.loadActView(this.ctrlName, fileName);
+            return this.start.loadActView(this.ctrlName, fileName);
         }else{
 
-            this.start.includeJsView(this.ctrlName, fileName);
+            this.start.includeJSView(this.ctrlName, fileName);
         }
     }
 };
@@ -263,11 +263,16 @@ var DefaultView = {
     write: function(body){
         if(body === undefined || body === '') return false;
         this.components.push(body);
-        console.log(this.components.length);
-
         return this
+    },
+    create: function(){
+
     }
 };
+var Logistic = {
+    
+}
+console.log(DefaultController.prototype = Logistic);
 
 
 function progress() {
