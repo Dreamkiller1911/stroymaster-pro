@@ -156,8 +156,6 @@ function Start(prop) {
             obj.components = new Array;
             return data;
         }
-
-
     };
     this.loadModel = function (modelName, bodyScript, ctrl, prop) {
         var ctrl = findCtrlByName(ctrl);
@@ -166,7 +164,6 @@ function Start(prop) {
                     'ctrl': {
                         value: ctrl
                     },
-
                 }
             );
             if (('messages' in model && Object.getOwnPropertyDescriptor(model, 'messages').writable) || 'messages' in model === false) {
@@ -181,8 +178,6 @@ function Start(prop) {
                             return model.m;
                         }
                     },
-
-
                 })
             }
             /*if(model.hasOwnProperty('messages') && this.m instanceof Messages){
@@ -232,13 +227,22 @@ function Start(prop) {
         });
         script.onload = function () {
             var fullCtrl = scriptName + 'Controller';
+            var o = _this.ctrls[scriptName];
+            DefaultController.prototype = Logistic;
+
+            cloningObject(DefaultController, Logistic);
             window[fullCtrl.toString()].prototype = DefaultController;
-            Object.defineProperty(_this.ctrls[scriptName], 'obj', {
+
+
+            Object.defineProperty(o, 'obj', {
                     value: new window[fullCtrl.toString()](),
                     writable: true
                 }
             );
-            _this.ctrls[scriptName].status = 'ready';
+            Object.defineProperty(o.obj, 'queue', {
+                value: new Array,
+            });
+            o.status = 'ready';
 
         };
         script.src = _this.paths.ctrls + scriptName + 'Controller.js?' + Math.random();
@@ -317,7 +321,7 @@ function Start(prop) {
         });
         script.src = pathView;
         head[0].appendChild(script);
-    }
+    };
 
     var findModelByName = function (modelName) {
         if (_this.models.hasOwnProperty(modelName)) {
@@ -332,6 +336,13 @@ function Start(prop) {
             return _this.ctrls[name.toString()].obj;
         } else {
             return false
+        }
+    };
+
+    var cloningObject = function(a, b){
+        for (var i in b){
+            if(a.hasOwnProperty(i) || i in a) break;
+            a[i] = b[i];
         }
     }
 }

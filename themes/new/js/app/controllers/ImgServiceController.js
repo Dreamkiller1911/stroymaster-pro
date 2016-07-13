@@ -3,7 +3,10 @@
  */
 function ImgServiceController() {
     var _this = this;
-    this.prefix = 'imgSrv_';
+    this.prefix = 'imgSrv_'
+    this.testIf = 0;
+    this.testThen = 0;
+    this.testElse = 0;
 
     this.init = function(){
 
@@ -30,7 +33,6 @@ function ImgServiceController() {
             }
         });
 
-
         ctrl[0].onchange = function () {
 
 
@@ -48,8 +50,21 @@ function ImgServiceController() {
 
         for(var i = 0; i < ctrl.length; i++){
             ctrl[i].onclick = function(){
-                var a = _this.render('ImgEdit');
-                console.log(a);
+                _this.if(function(){
+                    setTimeout(function(){
+                        console.log(123);
+                        return '{true}';
+                    }, 1000)
+                }
+                ).then(
+                    function(){
+                        alert(123);
+                    }
+                ).else(
+                    function(){
+                        alert('Не вышло');
+                    }
+                ).end();
             }
         }
     }

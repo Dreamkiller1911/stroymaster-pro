@@ -58,10 +58,15 @@ function ServiceController() {
         var act = _this.getControls();
         act[0].onclick = function () {
             window.event.preventDefault();
-            _this.startModel('Service', function (model) {
-                model.getProperties();
-                model.save();
-            });
+            _this.if(function(){
+                console.log(this)
+                this.startModel('Service', function (model) {
+                    model.getProperties();
+                    model.save();
+                });
+            }).then(function(){
+                alert('Данные сохранены')
+            }).end()
         }
     }
 

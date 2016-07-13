@@ -1,6 +1,7 @@
 /**
  * Created by tazeb on 14.06.2016.
  */
+
 var DefaultController =
 {
     ctrlName: undefined,
@@ -28,9 +29,9 @@ var DefaultController =
         this.start.loadModel(mN, bS, this.ctrlName, prop);
     },
     render: function (fileName) {
-        if(this.start.views.hasOwnProperty(this.ctrlName)){
+        if (this.start.views.hasOwnProperty(this.ctrlName)) {
             return this.start.loadActView(this.ctrlName, fileName);
-        }else{
+        } else {
 
             this.start.includeJSView(this.ctrlName, fileName);
         }
@@ -260,19 +261,76 @@ var DefaultModel = {
 var DefaultView = {
     prefix: undefined,
 
-    write: function(body){
-        if(body === undefined || body === '') return false;
+    write: function (body) {
+        if (body === undefined || body === '') return false;
         this.components.push(body);
         return this
     },
-    create: function(){
+    create: function () {
 
     }
 };
 var Logistic = {
+    if: function (body) {
+        this.queue.push({'if': body, 'statusIF': false});
+        /*var t = this.testIf += 1;
+         console.log('if-' + t);*/
+        return this;
+    },
+    then: function (body) {
+        this.queue[this.queue.length - 1].then = body;
+        this.queue[this.queue.length - 1].statusTHEN = false;
+        console.log();
+        /* var t = this.testThen += 1;
+         console.log('then-' + t);*/
+        return this;
+    },
+    else: function (body) {
+        this.queue[this.queue.length - 1].else = body;
+        this.queue[this.queue.length - 1].statusELSE = false;
+        console.log();
+        /*var t = this.testElse += 1;
+         console.log('else-' + t);*/
+        return this;
+    },
+    end: function () {
+        var _this = this;
+        var q = this.queue;
+        console.log(q);
+        var si = setInterval(function () {
+            for (var i = 0; i < q.length; i++) {
+                if (q[i].hasOwnProperty('statusIF') && q[i].statusIF === false) {
+                    q[i].statusIF = 'load';
+                    var data = String(q[i]['if']);
+                    data = data.replace(/function\s{1}\(\)\{/i, '');
+                    var p = 0;
+                    do {
+                        var x = data.indexOf('}', p);
+                        if (x === -1) {
+                            var a = data.slice(0, p - 2);
+                            var b = data.slice(p);
+                            data = a.concat(' ', b);
+                        }
+                        ;
+                        p = x + 1;
+                    } while (x != -1)
+                    var pFunc = 'return \'{true}\'';
+                    data = data.replace(new RegExp(pFunc, 'i'), 'startIfComplete.statusIF=true;');
+                    console.log(data);
+                    q[i]['if'] = new Function('startIfComplete', data).bind(_this);
+                    q[i]['if'](q[i]);
+                    console.dir(_this.queue);
+
+                } else if (q[i].statusIF === 'load') {
+                }else if(q[i].statusIF){
+                    console.log(q[i]['then']());
+                    clearInterval(si);
+                }
+            }
+        }, 100)
+    }
 
 }
-console.log(DefaultController.prototype = Logistic);
 
 
 function progress() {
