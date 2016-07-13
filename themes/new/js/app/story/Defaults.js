@@ -270,7 +270,7 @@ var DefaultView = {
     }
 };
 var Logistic = {
-    
+
 }
 console.log(DefaultController.prototype = Logistic);
 
