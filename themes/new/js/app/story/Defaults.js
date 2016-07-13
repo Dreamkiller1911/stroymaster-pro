@@ -1,6 +1,7 @@
 /**
  * Created by tazeb on 14.06.2016.
  */
+
 var DefaultController =
 {
     ctrlName: undefined,
@@ -270,9 +271,50 @@ var DefaultView = {
     }
 };
 var Logistic = {
+    if: function(body){
+        this.queue.push({'if':body, 'statusIF': false});
+        /*var t = this.testIf += 1;
+        console.log('if-' + t);*/
+        return this;
+    },
+    then: function(body){
+        this.queue[this.queue.length-1].then = body;
+        this.queue[this.queue.length-1].statusTHEN = false;
+        console.log();
+       /* var t = this.testThen += 1;
+        console.log('then-' + t);*/
+        return this;
+    },
+    else: function(body){
+        this.queue[this.queue.length-1].else = body;
+        this.queue[this.queue.length-1].statusELSE = false;
+        console.log();
+        /*var t = this.testElse += 1;
+        console.log('else-' + t);*/
+        return this;
+    },
+    end: function(){
+        var q = this.queue;
+        console.log(q);
+        for (var i = 0; i < q.length; i++){
+            if(q[i].hasOwnProperty('statusIF') && q[i].statusIF === false){
+                var data = String(q[i]['if']);
+                console.log(data)
+                var pFunc = '{';
+                var i=0;
+                do {
+                    var x = data.indexOf(pFunc,i);
+                    i=x+1;
+                    alert(x)
+                } while (x!=-1)
+
+                console.log(data.search(new RegExp(pFunc, 'gim')));
+            }
+        }
+    }
     
 }
-console.log(DefaultController.prototype = Logistic);
+
 
 
 function progress() {
