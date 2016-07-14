@@ -5,6 +5,9 @@ function ServiceController() {
     var _this = this;
     this.statusLoadIndex = true;
 
+    this.tester = function () {
+    };
+
     this.viewModal = function () {
         var ctrl = _this.getControls();
         for (var i = 0; i < ctrl.length; i++) {
@@ -61,12 +64,12 @@ function ServiceController() {
             _this.if(function(){
 
                 var a = function(){
-                    123
-                }
-                console.log(this);
+                };
+
                 this.startModel('Service', function (model) {
                     model.getProperties();
                     model.save();
+
                     return '{true}';
                 });
             }).then(function(){

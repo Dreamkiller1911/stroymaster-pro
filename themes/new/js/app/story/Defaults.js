@@ -305,17 +305,24 @@ var Logistic = {
             }
             var res;
             while(res = reg.function.exec(f)){
-                console.log(reg.object.exec(res[1])[1]);
+                if(window.hasOwnProperty(reg.object.exec(res[1])[1])) continue;
+                if(reg.object.exec(res[1])[1] === 'function') continue;
+                if(reg.object.exec(res[1])[1] === 'this' && _this.__proto__.hasOwnProperty(reg.method.exec(res[1])[1])) continue;
+                f = f.replace(res[0], 'function(){console.log(1)}');
+
+
             }
+            console.log(f);
+            return f;
+
             //window.hasOwnProperty(reg.object.exec(res[1])[1]) проверка есть ли такой объек в окружении глобальных переменных
             //reg.object.exec(res[1])[1] === 'this' проверка является ли объект экземпляром текущей модели или контроллера
             //_this.__proto__.hasOwnProperty(reg.method.exec(res[1])[1]) проверка в свойстве прототипе объекта
 
 
-            console.log(res);
         };
-        var modFunction = function(func, callback){
-
+        var startModFunction = function(func, callback){
+            console.log(func);
         };
         var si = setInterval(function () {
             for (var i = 0; i < q.length; i++) {
@@ -337,7 +344,7 @@ var Logistic = {
                     var pFunc = 'return \'{true}\'';
 
 
-                    searchFunc(data);
+                    data = searchFunc(data);
 
 
 
