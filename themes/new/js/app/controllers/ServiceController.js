@@ -59,13 +59,18 @@ function ServiceController() {
         act[0].onclick = function () {
             window.event.preventDefault();
             _this.if(function(){
-                console.log(this)
+
+                var a = function(){
+                    123
+                }
+                console.log(this);
                 this.startModel('Service', function (model) {
                     model.getProperties();
                     model.save();
+                    return '{true}';
                 });
             }).then(function(){
-                alert('Данные сохранены')
+
             }).end()
         }
     }

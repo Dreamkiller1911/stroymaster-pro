@@ -296,7 +296,27 @@ var Logistic = {
     end: function () {
         var _this = this;
         var q = this.queue;
-        console.log(q);
+        var searchFunc = function (f) {
+
+            var reg = {
+                'object': /^(\w+)/,
+                'method': /^(?:.\w+\.?)(\w+)/,
+                'function' : /(((\w)+(\.)?)+)(\()(.+)?(\))/ig,
+            }
+            var res;
+            while(res = reg.function.exec(f)){
+                console.log(reg.object.exec(res[1])[1]);
+            }
+            //window.hasOwnProperty(reg.object.exec(res[1])[1]) проверка есть ли такой объек в окружении глобальных переменных
+            //reg.object.exec(res[1])[1] === 'this' проверка является ли объект экземпляром текущей модели или контроллера
+            //_this.__proto__.hasOwnProperty(reg.method.exec(res[1])[1]) проверка в свойстве прототипе объекта
+
+
+            console.log(res);
+        };
+        var modFunction = function(func, callback){
+
+        };
         var si = setInterval(function () {
             for (var i = 0; i < q.length; i++) {
                 if (q[i].hasOwnProperty('statusIF') && q[i].statusIF === false) {
@@ -315,15 +335,18 @@ var Logistic = {
                         p = x + 1;
                     } while (x != -1)
                     var pFunc = 'return \'{true}\'';
-                    data = data.replace(new RegExp(pFunc, 'i'), 'startIfComplete.statusIF=true;');
-                    console.log(data);
-                    q[i]['if'] = new Function('startIfComplete', data).bind(_this);
-                    q[i]['if'](q[i]);
-                    console.dir(_this.queue);
 
+
+                    searchFunc(data);
+
+
+
+                    data = data.replace(new RegExp(pFunc, 'i'), 'startIfComplete.statusIF=true;');
+                    q[i]['if'] = new Function('startIfComplete', 'startModifyFunction', data).bind(_this);
+                    q[i]['if'](q[i]);
                 } else if (q[i].statusIF === 'load') {
+
                 }else if(q[i].statusIF){
-                    console.log(q[i]['then']());
                     clearInterval(si);
                 }
             }
