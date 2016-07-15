@@ -48,20 +48,22 @@ function Service(){
       });
     };
     this.save = function (){
+        var _this = this;
         _this.ajax({
             type: "POST",
             url: "",
-            data: {'Services':_this.p.allPropertiesTo('Ajax'), ajax: 'update'},
+            data: {'Services':this.p.allPropertiesTo('Ajax'), ajax: 'update'},
             dataType: 'json',
             success: function(data){
                 if(data.complete === true){
                     _this.errors().showAll();
 
-                    _this.messages().showOne({
+                    /*this.messages().showOne({
                         label: 'save',
                         text: 'Все ОК'
-                    });
-                    return '{true}';
+                    });*/
+                    _this.ctrl.tester()
+
 
                 }else {
                     _this.errors().showAll({

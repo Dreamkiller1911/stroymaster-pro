@@ -6,12 +6,11 @@ function ServiceController() {
     this.statusLoadIndex = true;
 
     this.tester = function () {
-        var a = 1;
-        var b = 2;
-        _this.tester2(a,b);
+        return '{true}';
+
     };
     this.tester2 = function(a,b){
-        console.log(a)
+        return '{true}';
     };
 
     this.viewModal = function () {
@@ -71,13 +70,12 @@ function ServiceController() {
                 var _t = this;
 
                 this.startModel('Service', function (model) {
-                   //model.getProperties();
-                    //model.save();
-                    _t.tester();
-                    return '{true}';
+                    model.getProperties();
+                    model.save();
+
                 });
             }).then(function(){
-
+                alert('Я просканировал функцию в функции')
             }).end()
         }
     }
