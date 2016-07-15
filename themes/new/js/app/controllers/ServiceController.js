@@ -6,6 +6,12 @@ function ServiceController() {
     this.statusLoadIndex = true;
 
     this.tester = function () {
+        var a = 1;
+        var b = 2;
+        _this.tester2(a,b);
+    };
+    this.tester2 = function(a,b){
+        console.log(a)
     };
 
     this.viewModal = function () {
@@ -62,14 +68,12 @@ function ServiceController() {
         act[0].onclick = function () {
             window.event.preventDefault();
             _this.if(function(){
-
-                var a = function(){
-                };
+                var _t = this;
 
                 this.startModel('Service', function (model) {
-                    model.getProperties();
-                    model.save();
-
+                   //model.getProperties();
+                    //model.save();
+                    _t.tester();
                     return '{true}';
                 });
             }).then(function(){

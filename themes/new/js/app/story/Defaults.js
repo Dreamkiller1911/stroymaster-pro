@@ -301,14 +301,20 @@ var Logistic = {
             var reg = {
                 'object': /^(\w+)/,
                 'method': /^(?:.\w+\.?)(\w+)/,
-                'function' : /(((\w)+(\.)?)+)(\()(.+)?(\))/ig,
+                'function' : /(?:.[^\.\S])(((\w)+(\.)?)+)(\()(.+)?(\))/ig,
             }
             var res;
+            var newF;
             while(res = reg.function.exec(f)){
+                reg.function.lastIndex = res.index + res[1].length;
                 if(window.hasOwnProperty(reg.object.exec(res[1])[1])) continue;
                 if(reg.object.exec(res[1])[1] === 'function') continue;
                 if(reg.object.exec(res[1])[1] === 'this' && _this.__proto__.hasOwnProperty(reg.method.exec(res[1])[1])) continue;
-                f = f.replace(res[0], 'function(){console.log(1)}');
+                if(reg.object.exec(res[1])[1] === 'startModFunction') continue;
+                newF = 'startModFunction('.concat(res[1]).concat(')');
+                var r = new RegExp(res[1] + '\\(' + '\\)');
+                console.log(res[0])
+                f = f.replace(r, newF);
 
 
             }
@@ -322,7 +328,11 @@ var Logistic = {
 
         };
         var startModFunction = function(func, callback){
-            console.log(func);
+            console.log(func)
+            if(func instanceof Function){
+
+                searchFunc(func);
+            }
         };
         var si = setInterval(function () {
             for (var i = 0; i < q.length; i++) {
@@ -349,11 +359,13 @@ var Logistic = {
 
 
                     data = data.replace(new RegExp(pFunc, 'i'), 'startIfComplete.statusIF=true;');
-                    q[i]['if'] = new Function('startIfComplete', 'startModifyFunction', data).bind(_this);
-                    q[i]['if'](q[i]);
+                    q[i]['if'] = new Function('startIfComplete', 'startModFunction', data).bind(_this);
+                    //console.log( q[i]['if']);
+                    q[i]['if'](q[i], startModFunction);
                 } else if (q[i].statusIF === 'load') {
 
                 }else if(q[i].statusIF){
+                    q[i]['then']();
                     clearInterval(si);
                 }
             }
