@@ -286,13 +286,14 @@ var Logistic = {
          console.log('else-' + t);*/
         return this;
     },
-    end: function () {
+    end: function (params) {
         var _this = this;
         var q = this.queue;
         var argument = '';
         var preFunc = function (func, retArgs) {
-            var pattern = /(function)(\s)*((\()(.?)?(\)))(\s)?\{/i;
+            var pattern = /(function)(\s)*((\()(.*)*(\)))(\s)?\{/i;
             var mat = pattern.exec(func);
+
             if (retArgs) {
                 if (mat) {
                     return mat[5];
@@ -310,8 +311,10 @@ var Logistic = {
                 }
                 p = x + 1;
             } while (x != -1);
-            var pFunc = 'return \'{true}\'\s*(;)*';
-            return data.replace(new RegExp(pFunc, 'i'), 'startIfComplete.statusIF=true;\r\n');
+            var pFunc = /return \'\{true\}\'\s*(;)*/gm;
+            var result = data.replace(pFunc, 'startIfComplete.statusIF=true;\r\n');
+            //console.log(result);
+            return result;
         };
         var searchFunc = function (f) {
             var reg = {
@@ -341,16 +344,18 @@ var Logistic = {
                     'var startLastArguments = startModFunction(' + res[1] + ', true);\r\n' +
                     'var ar = startLastArguments != undefined ? startLastArguments + \',startIfComplete\' : \'startIfComplete\'   ;\r\n' +
                     res[1] + ' = new Function(ar, \'startModFunction\', startResultPreFunction.f);\r\n' +
+                    //'console.log(String(' + res[1] +'));\r\n' +
                     res[1] + '(' + v + 'startIfComplete, startModFunction);\r\n' +
                     res[1] + ' = startOriginFunction;';
                 var r = new RegExp('(' + res[1] + ')' + '(\\()(.+)?(\\))');
                 result['f'] = f.replace(r, newF);
-                console.log(newF);
+                //console.log(newF);
                 result['r'] = res;
                 result['obj'] = obj;
             }
             if (result.f) return result;
-            return false;
+            result.f = f;
+            return result;
             //window.hasOwnProperty(reg.object.exec(res[1])[1]) проверка есть ли такой объек в окружении глобальных переменных
             //reg.object.exec(res[1])[1] === 'this' проверка является ли объект экземпляром текущей модели или контроллера
             //_this.__proto__.hasOwnProperty(reg.method.exec(res[1])[1]) проверка в свойстве прототипе объекта
@@ -372,11 +377,7 @@ var Logistic = {
             var result = searchFunc(data);
             var origin = {f: ''};
             origin.f = data;
-            if (result) {
-                return result;
-            } else {
-                return origin;
-            }
+            return result;
         };
         var si = setInterval(function () {
             //console.log(q.length)
@@ -386,11 +387,23 @@ var Logistic = {
                     var func = String(q[i]['if']);
                     //console.log(func)
                     var result = searchFunc(preFunc(func));
-                    //console.log(result);
+                    var args = startModFunction(func, true);
+                    var nArgs;
+                    if(params){
+                        var args = '';
+                        for (var p in params){
+                            Object.defineProperty(window, p, {
+                                value: params[p],
+                            })
+                            args += ', ' + p;
+                        }
+                        nArgs = 'startIfComplete, startModFunction' + args;
+                    }else nArgs = 'startIfComplete, startModFunction';
 
 
-                    q[i]['if'] = new Function('startIfComplete', 'startModFunction', 'startFuncObject', result.f).bind(_this);
-                    q[i]['if'](q[i], startModFunction);
+
+                    q[i]['if'] = new Function(nArgs, result.f).bind(_this);
+                    q[i]['if'](q[i], startModFunction, params.model);
 
                 } else if (q[i].statusIF === true) {
                     if(q[i].hasOwnProperty('then')){

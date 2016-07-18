@@ -61,8 +61,7 @@ function Service(){
                         label: 'save',
                         text: 'Все ОК'
                     });*/
-                    var g = 'Параметр был успешно передан';
-                    _this.ctrl.tester(g)
+                    return '{true}';
                 }else {
                     _this.errors().showAll({
                         dataError: data,

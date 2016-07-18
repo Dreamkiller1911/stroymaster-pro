@@ -10,15 +10,15 @@ function ServiceController() {
         this.testers(a)
     };
     this.testers = function(c){
-        console.log(c);
         this.if(function(){
-            console.log(1)
             setTimeout(function(){
                 return '{true}';
             }, 2000)
         }).then(function(){
-            console.log(12345666)
-        }).end()
+            return '{true}'
+            console.log('Завершен второй цикл')
+        }).end();
+
     };
 
     this.restart = function (num){
@@ -75,19 +75,22 @@ function ServiceController() {
 
     };
     this.crud = function () {
-
         var act = _this.getControls();
         act[0].onclick = function () {
             window.event.preventDefault();
-            _this.if(function(){
-                this.startModel('Service', function (model) {
+                _this.startModel('Service', function (model) {
                     model.getProperties();
-                    model.save();
+
+                   _this.if(function(){
+                       console.log(window)
+                       model.save();
+                   }).then(function(){
+                       console.log(123)
+                   }).end({
+                       'model': model
+                   })
 
                 });
-            }).then(function(){
-                console.info('Я просканировал функцию в функции')
-            }).end()
         }
     }
 
