@@ -293,8 +293,10 @@ var Logistic = {
         var preFunc = function (func, retArgs) {
             var pattern = /(function)(\s)*((\()(.?)?(\)))(\s)?\{/i;
             var mat = pattern.exec(func);
-            if(retArgs){
-                if(mat){return mat[5];}
+            if (retArgs) {
+                if (mat) {
+                    return mat[5];
+                }
                 return false
             }
             var data = func.replace(pattern, '');
@@ -328,19 +330,22 @@ var Logistic = {
                         DefaultController.hasOwnProperty(reg.method.exec(res[1])[1]) ||
                         DefaultModel.hasOwnProperty(reg.method.exec(res[1])[1]) ||
                         DefaultView.hasOwnProperty(reg.method.exec(res[1])[1])
-                    )) continue;
+                    )) {
+                    continue;
+                }
                 if (reg.object.exec(res[1])[1] === 'startModFunction') continue;
                 var v = res[6] != undefined ? res[6] + ', ' : '';
                 newF =
-                    'var tmp = ' + res[1] + ';\r\n' +
-                    'var result  = startModFunction('.concat(res[1] + ');\r\n') +
-                    'var tmp = startModFunction(' + res[1] + ', true);\r\n' +
-                    'var ar = tmp != undefined ? tmp + \',startIfComplete\' : \'startIfComplete\'   ;\r\n' +
-                    res[1] + ' = new Function(ar, \'startModFunction\', result.f);\r\n' +
-                    res[1] + '(' + v +'startIfComplete, startModFunction);\r\n';
-                    res[1] + ' = tmp;';
+                    'var startOriginFunction = ' + res[1] + ';\r\n' +
+                    'var startResultPreFunction  = startModFunction('.concat(res[1] + ');\r\n') +
+                    'var startLastArguments = startModFunction(' + res[1] + ', true);\r\n' +
+                    'var ar = startLastArguments != undefined ? startLastArguments + \',startIfComplete\' : \'startIfComplete\'   ;\r\n' +
+                    res[1] + ' = new Function(ar, \'startModFunction\', startResultPreFunction.f);\r\n' +
+                    res[1] + '(' + v + 'startIfComplete, startModFunction);\r\n' +
+                    res[1] + ' = startOriginFunction;';
                 var r = new RegExp('(' + res[1] + ')' + '(\\()(.+)?(\\))');
                 result['f'] = f.replace(r, newF);
+                console.log(newF);
                 result['r'] = res;
                 result['obj'] = obj;
             }
@@ -351,7 +356,7 @@ var Logistic = {
             //_this.__proto__.hasOwnProperty(reg.method.exec(res[1])[1]) проверка в свойстве прототипе объекта
         };
         var startModFunction = function (func, getArgs) {
-            if(getArgs){
+            if (getArgs) {
                 var args = preFunc(String(func), true)
                 var dataArguments = new Array;
                 if (args) {
@@ -374,27 +379,36 @@ var Logistic = {
             }
         };
         var si = setInterval(function () {
+            //console.log(q.length)
             for (var i = 0; i < q.length; i++) {
                 if (q[i].hasOwnProperty('statusIF') && q[i].statusIF === false) {
                     q[i].statusIF = 'load';
                     var func = String(q[i]['if']);
+                    //console.log(func)
                     var result = searchFunc(preFunc(func));
+                    //console.log(result);
 
 
                     q[i]['if'] = new Function('startIfComplete', 'startModFunction', 'startFuncObject', result.f).bind(_this);
                     q[i]['if'](q[i], startModFunction);
 
-                } else if (q[i].statusIF === 'load') {
+                } else if (q[i].statusIF === true) {
+                    if(q[i].hasOwnProperty('then')){
+                        q[i]['then']();
+                        //console.log(_this.queue);
+                        q.splice(i,1);
+                        //console.log(_this);
+                        clearInterval(si);
+                    }
 
-                } else if (q[i].statusIF) {
-                    q[i]['then']();
-                    clearInterval(si);
+                }else if(q[i].statusIF === 'error') {
+
                 }
             }
-        }, 100)
+        }, 5)
     }
 
-}
+};
 
 
 function progress() {

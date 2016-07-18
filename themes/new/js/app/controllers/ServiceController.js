@@ -6,17 +6,22 @@ function ServiceController() {
     this.statusLoadIndex = true;
 
     this.tester = function (a) {
+        var a = 10;
         this.testers(a)
     };
     this.testers = function(c){
         console.log(c);
-        setTimeout(function(){
-            return '{true}';
-        }, 3000)
+        this.if(function(){
+            console.log(1)
+            setTimeout(function(){
+                return '{true}';
+            }, 2000)
+        }).then(function(){
+            console.log(12345666)
+        }).end()
     };
 
     this.restart = function (num){
-        alert(num)
         return '{true}';
     };
 
@@ -81,7 +86,7 @@ function ServiceController() {
 
                 });
             }).then(function(){
-                alert('Я просканировал функцию в функции')
+                console.info('Я просканировал функцию в функции')
             }).end()
         }
     }
