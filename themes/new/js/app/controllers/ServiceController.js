@@ -5,11 +5,18 @@ function ServiceController() {
     var _this = this;
     this.statusLoadIndex = true;
 
-    this.tester = function () {
-        return '{true}';
-
+    this.tester = function (a) {
+        this.testers(a)
     };
-    this.tester2 = function(a,b){
+    this.testers = function(c){
+        console.log(c);
+        setTimeout(function(){
+            return '{true}';
+        }, 3000)
+    };
+
+    this.restart = function (num){
+        alert(num)
         return '{true}';
     };
 
@@ -63,12 +70,11 @@ function ServiceController() {
 
     };
     this.crud = function () {
+
         var act = _this.getControls();
         act[0].onclick = function () {
             window.event.preventDefault();
             _this.if(function(){
-                var _t = this;
-
                 this.startModel('Service', function (model) {
                     model.getProperties();
                     model.save();

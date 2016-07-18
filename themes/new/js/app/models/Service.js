@@ -49,7 +49,7 @@ function Service(){
     };
     this.save = function (){
         var _this = this;
-        _this.ajax({
+        this.ajax({
             type: "POST",
             url: "",
             data: {'Services':this.p.allPropertiesTo('Ajax'), ajax: 'update'},
@@ -57,14 +57,12 @@ function Service(){
             success: function(data){
                 if(data.complete === true){
                     _this.errors().showAll();
-
                     /*this.messages().showOne({
                         label: 'save',
                         text: 'Все ОК'
                     });*/
-                    _this.ctrl.tester()
-
-
+                    var g = 'Параметр был успешно передан';
+                    _this.ctrl.tester(g)
                 }else {
                     _this.errors().showAll({
                         dataError: data,
