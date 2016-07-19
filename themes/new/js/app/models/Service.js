@@ -61,7 +61,6 @@ function Service(){
                         label: 'save',
                         text: 'Все ОК'
                     });*/
-                    return '{true}';
                 }else {
                     _this.errors().showAll({
                         dataError: data,

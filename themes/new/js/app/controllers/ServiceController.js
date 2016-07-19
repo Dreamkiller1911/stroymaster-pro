@@ -5,19 +5,21 @@ function ServiceController() {
     var _this = this;
     this.statusLoadIndex = true;
 
-    this.tester = function (a) {
+    this.tester = function () {
         var a = 10;
+        return true;
         this.testers(a)
     };
     this.testers = function(c){
+        var _this = this;
         this.if(function(){
             setTimeout(function(){
-                return '{true}';
+                return true;
             }, 2000)
         }).then(function(){
-            return '{true}'
-            console.log('Завершен второй цикл')
-        }).end();
+            console.log('Второй цикл - положительный результат')
+
+        }).end({q:23});
 
     };
 
@@ -82,10 +84,10 @@ function ServiceController() {
                     model.getProperties();
                     var qwerty = {testMessage: 'Мое тестовое сообщение, которое говорит о том, что теперь есть возможность передавать несколько параметров в функцию логики'};
                    _this.if(function(){
-                       console.log(data.testMessage);
                        model.save();
+                       this.testers();
                    }).then(function(){
-                       console.log(this)
+                       console.log('Первый цикл - положительный результат');
                    }).end({
                        'model': model,
                        'data' : qwerty

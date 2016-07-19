@@ -274,7 +274,6 @@ var Logistic = {
     then: function (body) {
         this.queue[this.queue.length - 1].then = body;
         this.queue[this.queue.length - 1].statusTHEN = false;
-        console.log();
         /* var t = this.testThen += 1;
          console.log('then-' + t);*/
         return this;
@@ -293,39 +292,35 @@ var Logistic = {
         var preFunc = function (func, retArgs) {
             var pattern = /(function)(\s)*((\()(.*)*(\)))(\s)?\{/i;
             var mat = pattern.exec(func);
-
             if (retArgs) {
                 if (mat) {
                     return mat[5];
                 }
                 return false
             }
-            var data = func.replace(pattern, '');
-            var p = 0;
-            do {
-                var x = data.indexOf('}', p);
-                if (x === -1) {
-                    var a = data.slice(0, p - 2);
-                    var b = data.slice(p);
-                    data = a.concat('', b);
-                }
-                p = x + 1;
-            } while (x != -1);
+            var data = _this._trimFunction(func);
             var pFunc = /return \'\{true\}\'\s*(;)*/gm;
             var result = data.replace(pFunc, 'startIfComplete.statusIF=true;\r\n');
             //console.log(result);
             return result;
         };
-        var searchFunc = function (f) {
+        var searchFunc = function (func) {
             var reg = {
                 'object': /^(\w+)/,
                 'method': /^(?:.\w+\.?)(\w+)/,
                 'function': /(?:.[^\.\S])(((\w)+(\.)?)+)(\()(.+)?(\))/g,
+                'true' : /((\s*)return\s*true)/g,
             };
             var res, newF, result = {};
-            while (res = reg.function.exec(f)) {
+            var resTrue = /(\s*)(return\s*true)/m
+            //console.log(resTrue.test(func))
+            if(resTrue){
+                func = func.replace(resTrue, '\r\nstartIfComplete.statusIF=true;\r\n' + '$2')
+            }
+            while (res = reg.function.exec(func)) {
                 var obj = reg.object.exec(res[1])[1];
                 reg.function.lastIndex = res.index + res[0].length;
+
                 if (window.hasOwnProperty(reg.object.exec(res[1])[1])) continue;
                 if (reg.object.exec(res[1])[1] === 'function') continue;
                 if (reg.object.exec(res[1])[1].search(/(if)|(else)|(for)|(while)|(switch)/) === 0) continue;
@@ -337,24 +332,29 @@ var Logistic = {
                     continue;
                 }
                 if (reg.object.exec(res[1])[1] === 'startModFunction') continue;
-                var v = res[6] != undefined ? res[6] + ', ' : '';
+                //console.log(res);
+                var v = res[6] != undefined ? ', ' + res[6] : '';
+                var r = (res[6] + '').split(',');
+                if(r[0] === '' || r[0] == 'undefined'){
+                    delete r[0];
+                }
                 newF =
                     'var startOriginFunction = ' + res[1] + ';\r\n' +
                     'var startResultPreFunction  = startModFunction('.concat(res[1] + ');\r\n') +
                     'var startLastArguments = startModFunction(' + res[1] + ', true);\r\n' +
-                    'var ar = startLastArguments != undefined ? startLastArguments + \',startIfComplete\' : \'startIfComplete\'   ;\r\n' +
-                    res[1] + ' = new Function(ar, \'startModFunction\', startResultPreFunction.f);\r\n' +
+                    'var ar = startLastArguments != undefined ? \'startIfComplete ,startModFunction, \' + startLastArguments : \'startIfComplete ,startModFunction \'   ;\r\n' +
+                    res[1] + ' = new Function(ar, startResultPreFunction.f);\r\n' +
                     //'console.log(String(' + res[1] +'));\r\n' +
-                    res[1] + '(' + v + 'startIfComplete, startModFunction);\r\n' +
+                    res[1] + '(startIfComplete, startModFunction ' + v + ');\r\n' +
                     res[1] + ' = startOriginFunction;';
                 var r = new RegExp('(' + res[1] + ')' + '(\\()(.+)?(\\))');
-                result['f'] = f.replace(r, newF);
-                //console.log(newF);
+                result['f'] = func.replace(r, newF);
                 result['r'] = res;
                 result['obj'] = obj;
             }
+            //console.log(func)
             if (result.f) return result;
-            result.f = f;
+            result.f = func;
             return result;
             //window.hasOwnProperty(reg.object.exec(res[1])[1]) проверка есть ли такой объек в окружении глобальных переменных
             //reg.object.exec(res[1])[1] === 'this' проверка является ли объект экземпляром текущей модели или контроллера
@@ -385,60 +385,69 @@ var Logistic = {
                 if (q[i].hasOwnProperty('statusIF') && q[i].statusIF === false) {
                     q[i].statusIF = 'load';
                     var func = String(q[i]['if']);
-                    //console.log(func)
                     var result = searchFunc(preFunc(func));
                     var args = startModFunction(func, true);
                     var nArgs;
-                    if(params){
+                    if (params) {
                         var args = '';
-                        for (var p in params){
-                            Object.defineProperty(window, p, {
-                                value: params[p],
-                            })
+                        for (var p in params) {
                             args += ', ' + p;
                         }
                         nArgs = 'startIfComplete, startModFunction' + args;
-                    }else nArgs = 'startIfComplete, startModFunction';
-
-                    var runFunction = function(func, prop){
+                    } else nArgs = 'startIfComplete, startModFunction';
+                    var runFunction = function (func, prop) {
                         var args = new Object();
                         var val = new Array;
                         var res;
-                        for (res in prop){
+                        for (res in prop) {
                             args[res] = prop[res];
                             val.push('args.' + res);
                         }
-                        var completeArguments = val.length > 0 ? ', '+ val.join(', ') : '';
+                        var completeArguments = val.length > 0 ? ', ' + val.join(', ') : '';
                         var compliteFunc = func + '(q[i], startModFunction ' + completeArguments + ')';
-                       eval(compliteFunc);
+                        eval(compliteFunc);
 
                     };
-
-
-
-
-
                     q[i]['if'] = new Function(nArgs, result.f).bind(_this);
-
-                    var func = 'q[i]["if"](q[i], startModFunction)';
                     runFunction('q[i]["if"]', params);
-                    //q[i]['if'](q[i], startModFunction, test(params) );
 
                 } else if (q[i].statusIF === true) {
-                    if(q[i].hasOwnProperty('then')){
+
+                    if (q[i].hasOwnProperty('then')) {
                         q[i]['then']();
+
+
                         //console.log(_this.queue);
-                        q.splice(i,1);
+                        q.splice(i, 1);
                         //console.log(_this);
                         clearInterval(si);
                     }
 
-                }else if(q[i].statusIF === 'error') {
+                } else if (q[i].statusIF === 'error') {
 
                 }
             }
         }, 5)
+    },
+    _trimFunction: function (func) {
+        var pattern = /(function)(\s)*((\()(.*)*(\)))(\s)?\{/i;
+        var data = func.replace(pattern, '');
+        var p = 0;
+        do {
+            var x = data.indexOf('}', p);
+            if (x === -1) {
+                var a = data.slice(0, p - 2);
+                var b = data.slice(p);
+                data = a.concat('', b);
+            }
+            p = x + 1;
+        } while (x != -1);
+        return data;
+    },
+    _thisSetFinal: function(){
+
     }
+
 
 };
 
