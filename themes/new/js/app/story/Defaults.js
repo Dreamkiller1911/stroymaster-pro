@@ -400,10 +400,29 @@ var Logistic = {
                         nArgs = 'startIfComplete, startModFunction' + args;
                     }else nArgs = 'startIfComplete, startModFunction';
 
+                    var runFunction = function(func, prop){
+                        var args = new Object();
+                        var val = new Array;
+                        var res;
+                        for (res in prop){
+                            args[res] = prop[res];
+                            val.push('args.' + res);
+                        }
+                        var completeArguments = val.length > 0 ? ', '+ val.join(', ') : '';
+                        var compliteFunc = func + '(q[i], startModFunction ' + completeArguments + ')';
+                       eval(compliteFunc);
+
+                    };
+
+
+
 
 
                     q[i]['if'] = new Function(nArgs, result.f).bind(_this);
-                    q[i]['if'](q[i], startModFunction, params.model);
+
+                    var func = 'q[i]["if"](q[i], startModFunction)';
+                    runFunction('q[i]["if"]', params);
+                    //q[i]['if'](q[i], startModFunction, test(params) );
 
                 } else if (q[i].statusIF === true) {
                     if(q[i].hasOwnProperty('then')){

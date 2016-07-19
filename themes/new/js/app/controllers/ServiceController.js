@@ -80,14 +80,15 @@ function ServiceController() {
             window.event.preventDefault();
                 _this.startModel('Service', function (model) {
                     model.getProperties();
-
+                    var qwerty = {testMessage: 'Мое тестовое сообщение, которое говорит о том, что теперь есть возможность передавать несколько параметров в функцию логики'};
                    _this.if(function(){
-                       console.log(window)
+                       console.log(data.testMessage);
                        model.save();
                    }).then(function(){
-                       console.log(123)
+                       console.log(this)
                    }).end({
-                       'model': model
+                       'model': model,
+                       'data' : qwerty
                    })
 
                 });
