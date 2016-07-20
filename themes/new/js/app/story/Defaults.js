@@ -266,23 +266,17 @@ var DefaultView = {
 };
 var Logistic = {
     if: function (body) {
-        this.queue.push({'if': body, 'statusIF': false});
-        /*var t = this.testIf += 1;
-         console.log('if-' + t);*/
+        this.queue.push({'if': body, 'statusIF': 'started'});
         return this;
     },
     then: function (body) {
         this.queue[this.queue.length - 1].then = body;
         this.queue[this.queue.length - 1].statusTHEN = false;
-        /* var t = this.testThen += 1;
-         console.log('then-' + t);*/
         return this;
     },
     else: function (body) {
         this.queue[this.queue.length - 1].else = body;
         this.queue[this.queue.length - 1].statusELSE = false;
-        /*var t = this.testElse += 1;
-         console.log('else-' + t);*/
         return this;
     },
     end: function (params) {
@@ -309,13 +303,15 @@ var Logistic = {
                 'object': /^(\w+)/,
                 'method': /^(?:.\w+\.?)(\w+)/,
                 'function': /(?:.[^\.\S])(((\w)+(\.)?)+)(\()(.+)?(\))/g,
-                'true' : /((\s*)return\s*true)/g,
+                'true' : /((\s*)return\s*true)/gm,
+                'false' : /((\s*)return\s*false)/gm
             };
             var res, newF, result = {};
-            var resTrue = /(\s*)(return\s*true)/m
-            //console.log(resTrue.test(func))
-            if(resTrue){
-                func = func.replace(resTrue, '\r\nstartIfComplete.statusIF=true;\r\n' + '$2')
+            if(reg.false.test(func)){
+                func = func.replace(reg.false, '\r\nstartIfComplete.statusIF=false;\r\n' + '$2');
+            };
+            if((reg.true.test(func))){
+                func = func.replace(reg.true, '\r\nstartIfComplete.statusIF=true;\r\n' + '$2')
             }
             while (res = reg.function.exec(func)) {
                 var obj = reg.object.exec(res[1])[1];
@@ -382,7 +378,7 @@ var Logistic = {
         var si = setInterval(function () {
             //console.log(q.length)
             for (var i = 0; i < q.length; i++) {
-                if (q[i].hasOwnProperty('statusIF') && q[i].statusIF === false) {
+                if (q[i].hasOwnProperty('statusIF') && q[i].statusIF === 'started') {
                     q[i].statusIF = 'load';
                     var func = String(q[i]['if']);
                     var result = searchFunc(preFunc(func));
@@ -415,15 +411,16 @@ var Logistic = {
 
                     if (q[i].hasOwnProperty('then')) {
                         q[i]['then']();
-
-
-                        //console.log(_this.queue);
                         q.splice(i, 1);
-                        //console.log(_this);
                         clearInterval(si);
                     }
-
-                } else if (q[i].statusIF === 'error') {
+                } else if(q[i].statusIF === false){
+                    if (q[i].hasOwnProperty('else')) {
+                        q[i]['else']();
+                        q.splice(i, 1);
+                        clearInterval(si);
+                    }
+                }else if (q[i].statusIF === 'error') {
 
                 }
             }

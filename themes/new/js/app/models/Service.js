@@ -61,6 +61,11 @@ function Service(){
                         label: 'save',
                         text: 'Все ОК'
                     });*/
+                    if(_this.ctrl.tester()){
+                        return true;
+                    }
+
+
                 }else {
                     _this.errors().showAll({
                         dataError: data,
@@ -72,6 +77,7 @@ function Service(){
                             label.innerHTML  = ''
                         }
                     })
+                    return false
                 }
             }
         });

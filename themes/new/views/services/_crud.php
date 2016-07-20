@@ -6,6 +6,17 @@ $form = $this->beginWidget('CActiveForm', array(
         'enctype' => 'multipart/form-data',
     )
 )); ?>
+<div id="myModal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog"
+     aria-labelledby="myLargeModalLabel">
+    <div class="modal-dialog modal-lg">
+        <div class="row modal-content col-sm-12">
+        </div>
+        <div class="row">
+            &nbsp;
+        </div>
+    </div>
+
+</div>
 <div class="col-xs-12 services">
     <div class="row form well">
         <div class="col-sm-8 col-sm-offset-2">
@@ -22,7 +33,7 @@ $form = $this->beginWidget('CActiveForm', array(
                             'size' => 50,
                             'maxlength' => 300,
                             'class' => 'form-control',
-                            'StartModel'=>'srv_note'
+                            'StartModel' => 'srv_note'
                         )); ?>
                         <?php echo $form->error($model, 'note'); ?>
                         <div StartModel="srv_error_note"></div>
@@ -33,7 +44,7 @@ $form = $this->beginWidget('CActiveForm', array(
                         <?php echo CHtml::activeTextArea($model, 'description', array(
                             'rows' => '8',
                             'class' => 'form-control',
-                            'StartModel'=>'srv_description'
+                            'StartModel' => 'srv_description'
                         )) ?>
                         <?php echo $form->error($model, 'description'); ?>
                         <div StartModel="srv_error_description"></div>
@@ -41,7 +52,9 @@ $form = $this->beginWidget('CActiveForm', array(
 
                     <div class="row- ">
                         <div class="col-xs-4">
-                        <button StartCtrl="Service_crud" type="button" name="sendServices" class="btn btn-default">Сохранить</button>
+                            <button StartCtrl="Service_crud" type="button" name="sendServices" class="btn btn-default">
+                                Сохранить
+                            </button>
                         </div>
                         <div StartModel="srv_msg_save" class="col-xs-8 servicesError">
                         </div>
@@ -54,35 +67,39 @@ $form = $this->beginWidget('CActiveForm', array(
 
 
     <div class="row" id="imgList">
-        <div class="col-sm-push-12">
-        <?php $this->renderPartial('_imgList', array('model' => $model)) ?>
+        <div class="col-sm-12">
+            <?php $this->renderPartial('_imgList', array('model' => $model)) ?>
         </div>
     </div>
 
-<div class="row col-xs-8 col-xs-offset-2" id="addAllImg">
+    <div class="row col-xs-8 col-xs-offset-2" id="addAllImg">
         <div class="row well text-muted text-center">
             <div class="col-xs-12" rel="title">
-            <h4 >Вы можете загрузить фотографии в формате :<br> <span class="text-danger">*.jpeg *.gif *.png</span><br>
-            Размер фотографии не долже превышать 5Мб</h4>
+                <h4>Вы можете загрузить фотографии в формате :<br> <span
+                        class="text-danger">*.jpeg *.gif *.png</span><br>
+                    Размер фотографии не долже превышать 5Мб</h4>
             </div>
         </div>
-    <form typeof="multipart/form data">
+        <form typeof="multipart/form data">
             <div class="row">
                 <div class="col-xs-5">
                     <input type="hidden" StartModel="imgSrv_description" value="test сообщения">
-                <label class="form-control btn btn-default">Загрузить фотографии <span class="text-info glyphicon glyphicon-download-alt"></span>
-                <input StartCtrl="imgSrv_uploadAll" StartModel="imgSrvF_file"  style="opacity: 0; position: fixed"  type="file" name="saveAllImg[]" multiple>
+                    <label class="form-control btn btn-default">Загрузить фотографии <span
+                            class="text-info glyphicon glyphicon-download-alt"></span>
+                        <input StartCtrl="imgSrv_uploadAll" StartModel="imgSrvF_file"
+                               style="opacity: 0; position: fixed" type="file" name="saveAllImg[]" multiple>
 
-                </label>
+                    </label>
                 </div>
 
                 <div class="col-xs-7">
                     <span class="form-control">Доступно фотографий -
-                    <span StartModel="imgSrvF_numOst" class="badge" id="numOst"><?php print_r($model->img_limit - count($model->imgServices)) ?>
+                    <span StartModel="imgSrvF_numOst" class="badge"
+                          id="numOst"><?php print_r($model->img_limit - count($model->imgServices)) ?>
                     </span>
-                    </div>
+                </div>
             </div>
-    </form>
-</div>
+        </form>
+    </div>
     <?php $this->endWidget(); ?>
 </div>

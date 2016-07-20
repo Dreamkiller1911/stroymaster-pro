@@ -50,22 +50,23 @@ function ImgServiceController() {
 
         for(var i = 0; i < ctrl.length; i++){
             ctrl[i].onclick = function(){
-                _this.if(function(){
-                    setTimeout(function(){
-                        console.log(123);
-                        return '{true}';
-                    }, 1000)
-                }
-                ).then(
-                    function(){
-                        alert(123);
-                    }
-                ).else(
-                    function(){
-                        alert('Не вышло');
-                    }
-                ).end();
-            }
+                var id = this.id;
+                var btn = this;
+                _this.
+                if(function(){
+                    this.startModel('ImgServiceForm', function(model){
+                        model.delete(id)
+                    });
+                }).
+                then(function(){
+                   var blockElement = btn.parentElement.parentElement;
+                    blockElement.parentElement.removeChild(blockElement);
+                }).
+                else(function(){
+                    alert('Удаление завершено с ошибкой, все файлы были сохранены')
+                }).
+                end({'id':id})
+        }
         }
     }
 

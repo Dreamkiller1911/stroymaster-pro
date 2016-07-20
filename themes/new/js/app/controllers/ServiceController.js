@@ -6,9 +6,8 @@ function ServiceController() {
     this.statusLoadIndex = true;
 
     this.tester = function () {
-        var a = 10;
+        console.log('i am tester');
         return true;
-        this.testers(a)
     };
     this.testers = function(c){
         var _this = this;
@@ -18,7 +17,9 @@ function ServiceController() {
             }, 2000)
         }).then(function(){
             console.log('Второй цикл - положительный результат')
-
+            _this.startModel('Service', function(model){
+                model.viewFromId(2);
+            })
         }).end({q:23});
 
     };
@@ -82,17 +83,19 @@ function ServiceController() {
             window.event.preventDefault();
                 _this.startModel('Service', function (model) {
                     model.getProperties();
-                    var qwerty = {testMessage: 'Мое тестовое сообщение, которое говорит о том, что теперь есть возможность передавать несколько параметров в функцию логики'};
-                   _this.if(function(){
-                       model.save();
-                       this.testers();
-                   }).then(function(){
-                       console.log('Первый цикл - положительный результат');
-                   }).end({
-                       'model': model,
-                       'data' : qwerty
+                   _this.
+                   if(function(){
+                       model.save()
+                   }).
+                   then(function(){
+                       model.viewFromId(1);
+                   }).
+                   else(function(){
+                       alert('Не удалось выполнить запрос на сохранение')
+                   }).
+                   end({
+                       'model': model
                    })
-
                 });
         }
     }

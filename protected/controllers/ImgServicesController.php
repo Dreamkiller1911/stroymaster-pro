@@ -104,6 +104,8 @@ class ImgServicesController extends Controller
             } catch (Exception $e) {
                 echo json_encode($e->getMessage());
             }
+        }else{
+            echo 'Нужен POST - deleteImg';
         }
     }
 }

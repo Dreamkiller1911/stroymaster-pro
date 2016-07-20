@@ -50,12 +50,26 @@ function ImgServiceForm() {
         });
     };
     this.delete = function (id) {
-        _this.ajax({
+        var _this = this;
+        this.ajax({
             type: "POST",
-            url: "",
-            data: {id: id},
+            url: "/imgServices/delete/",
+            data: {'deleteImg': {id: id}},
+            dataType: 'json',
             success: function (data) {
-                console.log(data)
+                if(data.complete === true){
+                    if(_this.p){
+                        _this.p.numOst.innerHTML = Number(_this.p.numOst.innerHTML) + 1;
+                    }else {
+                        _this.getProperties();
+                        _this.p.numOst.innerHTML = Number(_this.p.numOst.innerHTML) + 1;
+                    }
+                    console.log(_this.p.numOst)
+                    return true;
+                }else {
+                    console.log(333)
+                    return false;
+                }
             }
         });
     }
