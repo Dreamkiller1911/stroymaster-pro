@@ -18,13 +18,13 @@ function Start(prop) {
      * Функция "findValue(array, value, [moreInfo])" ищет в массиве "array" значение "value" и возвращает true или false
      */
     this.array = {
-        'findValue' : function(array, value){
+        'findValue': function (array, value) {
             var a = array, v = value, t = false;
             var p = new RegExp("^(" + v + ")$");
-            for (var r in a){
-                if(p.test(a[r])) t = true;
+            for (var r in a) {
+                if (p.test(a[r])) t = true;
             }
-            if(t === false && _this.debugMode){
+            if (t === false && _this.debugMode) {
                 console.warn('В массиве не было найдено значение "' + v + '"')
             }
             return t;
@@ -178,7 +178,7 @@ function Start(prop) {
         }
     };
     this.loadModel = function (modelName, bodyScript, ctrl, prop) {
-        var ctrl = findCtrlByName(ctrl);
+        var ctrl = this._findCtrlByName(ctrl);
         var addProperty = function (model) {
             Object.defineProperties(model, {
                     'ctrl': {
@@ -186,6 +186,12 @@ function Start(prop) {
                     },
                 }
             );
+            if (model.hasOwnProperty('attributes') === false) {
+                Object.defineProperty(model, 'attributes', {
+                    value: new Object(),
+                    enumerable: true
+                });
+            }
             if (('messages' in model && Object.getOwnPropertyDescriptor(model, 'messages').writable) || 'messages' in model === false) {
                 Object.defineProperty(model, 'messages', {
                     value: function () {
@@ -197,7 +203,7 @@ function Start(prop) {
                             });
                             return model.m;
                         }
-                    },
+                    }
                 })
             }
             /*if(model.hasOwnProperty('messages') && this.m instanceof Messages){
@@ -215,10 +221,19 @@ function Start(prop) {
 
              }*/
         };
+        var setGetSet = function (model) {
+            if (model.labels.length > 0) {
+                for (var i in model.labels) {
+                    model._defineGetSet(model.labels[i])
+                }
+            }
+        };
         if (modelName === undefined || modelName.length === 0) {
 
         } else if (findModelByName(modelName) && _this.models[modelName].status === 'ready') {
-            addProperty(_this.models[modelName].obj);
+            var model = _this.models[modelName].obj;
+            this._setModelValues(model, modelName, ctrl)
+            setGetSet(_this.models[modelName].obj);
             bodyScript(_this.models[modelName].obj);
             return true;
         } else {
@@ -228,15 +243,17 @@ function Start(prop) {
             });
             _this.models[modelName].timer = setInterval(function () {
                 if (_this.models[modelName].status === 'ready') {
+                    var model = _this.models[modelName].obj;
+                    _this._setModelValues(model, modelName, ctrl)
                     clearInterval(_this.models[modelName].timer);
-                    addProperty(_this.models[modelName].obj);
+                    setGetSet(_this.models[modelName].obj);
                     bodyScript(_this.models[modelName].obj, prop);
                     return true;
                 }
             }, 100)
         }
     };
-    this._trimFunction =  function (func) {
+    this._trimFunction = function (func) {
         var pattern = /(function)(\s)*((\()(.*)*(\)))(\s)?\{/i;
         var data = func.replace(pattern, '');
         var p = 0;
@@ -298,7 +315,7 @@ function Start(prop) {
                 value: new window[modelName.toString()](),
                 writable: true
             });
-            _this.models[modelName.toString()].obj.modelName = modelName;
+
             _this.models[modelName.toString()].obj.start = _this;
             _this.models[modelName].status = 'ready';
         };
@@ -362,7 +379,7 @@ function Start(prop) {
             return true;
         }
     };
-    var findCtrlByName = function (name) {
+    this._findCtrlByName = function (name) {
         if (name === undefined || name === '') {
             return false;
         }
@@ -372,9 +389,18 @@ function Start(prop) {
             return false
         }
     };
-    var cloningObject = function(a, b){
-        for (var i in b){
-            if(a.hasOwnProperty(i) || i in a) break;
+    this._setModelValues = function (obj, modelName, ctrl) {
+        console.log(Object.getOwnPropertyDescriptor(obj, 'modelName'));
+
+        if (Object.getOwnPropertyDescriptor(obj, 'modelName').configurable === true) {
+            delete obj.modelName;
+        }
+
+
+    };
+    var cloningObject = function (a, b) {
+        for (var i in b) {
+            if (a.hasOwnProperty(i) || i in a) break;
             a[i] = b[i];
         }
     }

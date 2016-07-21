@@ -4,24 +4,24 @@ $(document).ready(function(){
     $('#in').click(function(event){
         $e = event || window.event;
         $e.preventDefault();
-        user.trigForm();
+        user.trigForm(this);
     });
     $('body').on('click', '#reg',function(event){
         $e = event || window.event;
         $e.preventDefault();
         $e.preventDefault();
-        user.trigForm();
+        user.trigForm(this);
     });
     $('body').on('click', '#loginForm button[name = "Login"]', function (event){
         $e = event || window.event;
         $e.preventDefault();
         $e.preventDefault();
-        user.login();
+        user.login(this);
     })
     $('body').on('click', '#regForm button[name = "btnRegUser"]', function (event){
         $e = event || window.event;
         $e.preventDefault();
         $e.preventDefault();
-        user.regUser();
+        user.regUser(this);
     })
 });

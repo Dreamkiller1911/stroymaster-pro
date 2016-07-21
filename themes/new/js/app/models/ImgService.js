@@ -2,6 +2,7 @@
  * Created by Admin on 08.07.2016.
  */
 function ImgService() {
+
     var _this = this;
     this.prefix = 'imgSrvF_';
     this.properties = ['file', 'numOst'];
@@ -78,11 +79,12 @@ function ImgService() {
         this.ajax({
             type: "POST",
             url: "/imgServices/getOne/",
-            data: {'id': id},
+            data: {'id': _this.id},
             dataType: 'json',
             success: function(data){
-                _this.setAttributes(data);
-                console.log(_this.attributes)
+                var img = _this.newModel('ImgService');
+                console.log(img)
+
             }
         })
     }

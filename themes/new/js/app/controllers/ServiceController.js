@@ -9,22 +9,22 @@ function ServiceController() {
         console.log('i am tester');
         return true;
     };
-    this.testers = function(c){
+    this.testers = function (c) {
         var _this = this;
-        this.if(function(){
-            setTimeout(function(){
+        this.if(function () {
+            setTimeout(function () {
                 return true;
             }, 2000)
-        }).then(function(){
+        }).then(function () {
             console.log('Второй цикл - положительный результат')
-            _this.startModel('Service', function(model){
+            _this.startModel('Service', function (model) {
                 model.viewFromId(2);
             })
-        }).end({q:23});
+        }).end({q: 23});
 
     };
 
-    this.restart = function (num){
+    this.restart = function (num) {
         return '{true}';
     };
 
@@ -52,7 +52,17 @@ function ServiceController() {
             }
             return false;
         }
-            var serviceBody = document.querySelector('[rel="services"]');
+        var serviceBody = document.querySelector('[rel="services"]');
+        if (getPosition(serviceBody) && _this.statusLoadIndex) {
+            _this.statusLoadIndex = false;
+            _this.startModel('Service', function (model) {
+                model.loadScroll(serviceBody, _this.properties.indexLoad.Id);
+                model.statusLoadIndex = false;
+
+
+            })
+        }
+        window.onscroll = function () {
             if (getPosition(serviceBody) && _this.statusLoadIndex) {
                 _this.statusLoadIndex = false;
                 _this.startModel('Service', function (model) {
@@ -62,47 +72,38 @@ function ServiceController() {
 
                 })
             }
-            window.onscroll = function () {
-                if (getPosition(serviceBody) && _this.statusLoadIndex) {
-                    _this.statusLoadIndex = false;
-                    _this.startModel('Service', function (model) {
-                        model.loadScroll(serviceBody, _this.properties.indexLoad.Id);
-                        model.statusLoadIndex = false;
 
-
-                    })
-                }
-
-            };
+        };
 
 
     };
     this.crud = function () {
         var act = _this.getControls();
-        _this.startModel('Service', function(model){
+        _this.startModel('Service', function (model) {
             model.getProperties();
-            model.p.description.onblur = function(){
+            model.p.description.onblur = function () {
                 model.save();
             }
         });
-        act[0].onclick = function () {
-            window.event.preventDefault();
-                _this.startModel('Service', function (model) {
-                    model.getProperties();
-                   _this.
-                   if(function(){
-                       model.save()
-                   }).
-                   then(function(){
-                       model.viewFromId(1);
-                   }).
-                   else(function(){
-                       alert('Не удалось выполнить запрос на сохранение')
-                   }).
-                   end({
-                       'model': model
-                   })
-                });
+        act[0].onclick = function (event) {
+            var e = window.event || event;
+            e.preventDefault;
+            _this.startModel('Service', function (model) {
+                model.getProperties();
+                _this.
+                if(function () {
+                    model.save()
+                }).
+                then(function () {
+                    model.viewFromId(1);
+                }).
+                else(function () {
+                    alert('Не удалось выполнить запрос на сохранение')
+                }).
+                end({
+                    'model': model
+                })
+            });
         }
     }
 

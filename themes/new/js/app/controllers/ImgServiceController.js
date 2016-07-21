@@ -14,11 +14,13 @@ function ImgServiceController() {
     this.testView = function(){
         var ctrl = this.getControls()
         for (var i = 0 ; i < ctrl.length; i++){
-            ctrl[i].onclick = function(){
-                window.event.preventDefault();
+            ctrl[i].onclick = function(event){
+                var e = window.event || event;
+                e.preventDefault();
                 var id = this.id;
                 _this.startModel('ImgService',function(model){
-                    model.getOne(id)
+                    model.id = id;
+                    model.getOne()
                 })
             }
         }

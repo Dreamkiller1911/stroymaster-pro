@@ -15,7 +15,7 @@ function UserAuth(){
 
     Messager.call(this);
 
-    this.trigForm = function(myId) {//Функция для открытия и закрытия блока и отображения содержимого
+    this.trigForm = function(input) {//Функция для открытия и закрытия блока и отображения содержимого
         if(_this.base === undefined) {
             var start = '<div class="container-fluid col-sm-6  col-sm-pull-3 col-md-7 col-xs-12 col-xs-offset-0" id="loginForm"><div></div></div>';
 
@@ -23,13 +23,8 @@ function UserAuth(){
             _this.blockContent = _this.base.children().eq(0).css('opacity', 0);
         }
         var id, c;
-        if(myId == undefined) {
-            console.dir(document);
-            var target = $(event.target);//Получаем кнопку нажатую в данный момент
-            id = $(target).attr('id');//Получаем id кнопки
-        }else{
-            id = myId;//Получаем id кнопки
-        }
+
+        id = input.id;
 
         descContent(id);//Записываем в переменную this.content контент на основе id
 
@@ -54,8 +49,8 @@ function UserAuth(){
         }
     };
 //Функция для авторизации
-    this.login = function(){
-        var target = $(event.target);
+    this.login = function(target){
+        var target = $(target);
         var email = target.parents().eq(1).find('input[name*="email"]');
         var password = target.parents().eq(1).find('input[name*="password"]');
         var error = $('#Login_error');
@@ -104,8 +99,8 @@ function UserAuth(){
             }
         });
     };
-    this.regUser = function(){//Функция для регистрации пользователей
-        var target = $(event.target);//Определяем кнопку которая была нажата
+    this.regUser = function(target){//Функция для регистрации пользователей
+        var target = $(target);//Определяем кнопку которая была нажата
         var form = $('form[name="UserReg"]');//Находим форму регистрации
         var data = form.serialize();//Получаем введенные данные из формы
         var login = form.find('input[name*="email"]').val();

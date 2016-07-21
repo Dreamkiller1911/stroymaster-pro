@@ -36,8 +36,6 @@ var DefaultController =
     }
 };
 var DefaultModel = {
-    modelName: undefined,
-    prefix: undefined,
     /*p: new Object(),
      P: undefined,*/
     errors: function () {
@@ -264,12 +262,6 @@ var DefaultModel = {
             for (var res in atr) {
 
                 if (this.start.array.findValue(lab, res) === false) continue;
-                if (this.hasOwnProperty('attributes') === false) {
-                    Object.defineProperty(this, 'attributes', {
-                        value: new Object(),
-                        enumerable: true
-                    });
-                }
 
                 if (_get.test) {
                     this._defineGetSet(res, atr[res]);
@@ -290,24 +282,33 @@ var DefaultModel = {
             }
         }
     },
-    _defineGetSet: function (attr, val) {
+    newModel: function(modelName){
+        console.log(this);
+        return new window[modelName.toString()]
+    },
+    _defineGetSet: function (attr) {
+        if({}.__defineGetter__ === false){
+            return;
+        }
         var _this = this;
         var func = function (f) {
             var tmp = _this.prototype._trimFunction(f.toString());
             var pAttr = /(\'\{attr\}\')/gm;
-            var pVal = /(\'\{val\}\')/gm;
             tmp = tmp.replace(pAttr, attr);
-            tmp = tmp.replace(pVal, val);
             var newFunc = new Function('obj', tmp);
             newFunc(_this);
-
-        }
+        };
         func(function () {
+            if(obj.hasOwnProperty("'{attr}'")){
+                return false
+            }
             Object.defineProperty(obj, "'{attr}'", {
+                enumerable: true,
                 set: function(value){
                     this.attributes["'{attr}'"] = value;
                 },
                 get: function(){
+                    if(this.attributes["'{attr}'"] === undefined) return undefined;
                     return this.attributes["'{attr}'"];
                 }
             })
