@@ -108,4 +108,8 @@ class ImgServicesController extends Controller
             echo 'Нужен POST - deleteImg';
         }
     }
+    public function actionGetOne(){
+        $model = ImgServices::model()->findByPk($_POST['id']);
+        echo json_encode($model->attributes);
+    }
 }

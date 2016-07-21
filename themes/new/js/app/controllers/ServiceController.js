@@ -79,6 +79,12 @@ function ServiceController() {
     };
     this.crud = function () {
         var act = _this.getControls();
+        _this.startModel('Service', function(model){
+            model.getProperties();
+            model.p.description.onblur = function(){
+                model.save();
+            }
+        });
         act[0].onclick = function () {
             window.event.preventDefault();
                 _this.startModel('Service', function (model) {

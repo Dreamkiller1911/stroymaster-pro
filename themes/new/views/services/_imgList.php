@@ -23,7 +23,7 @@ $data = isset($model->imgServices) ? $model->imgServices : $model;
         <div class="row url form-inline " style="position: relative">
             <label class="btn btn-default">Заменить файл <span
                     class="text-info glyphicon glyphicon-download-alt"></span>
-                <input class="imgItem" id="<?php echo $key->id ?>" type="file"
+                <input StartCtrl="imgSrv_testView" class="imgItem" id="<?php echo $key->id ?>" type="file"
                        name="imgServices[<?php echo $key->id ?>]"
                        style="opacity: 0.3; position: fixed; height: 35px; width: 180px">
             </label>

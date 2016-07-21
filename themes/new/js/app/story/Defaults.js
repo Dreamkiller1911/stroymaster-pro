@@ -250,6 +250,68 @@ var DefaultModel = {
             }
             return false;
         }
+    },
+    setAttributes: function (attributes) {
+        var atr = attributes;
+        var lab = this.labels;
+
+        if (atr != undefined && typeof atr === 'object') {
+            var _get = {
+                get test() {
+                    return true;
+                }
+            };
+            for (var res in atr) {
+
+                if (this.start.array.findValue(lab, res) === false) continue;
+                if (this.hasOwnProperty('attributes') === false) {
+                    Object.defineProperty(this, 'attributes', {
+                        value: new Object(),
+                        enumerable: true
+                    });
+                }
+
+                if (_get.test) {
+                    this._defineGetSet(res, atr[res]);
+                    this[res] = atr[res];
+                    /*if(this.attributes.hasOwnProperty(res)){delete this.attributes[res]}
+                     Object.defineProperty(this, res, {
+                     get : function(){
+                     return this[res.toString()];
+                     },
+                     set : function(value){
+                     this.attributes[res] = value;
+                     id = value;
+                     }
+                     });
+                     this[res] = atr[res];*/
+                }
+
+            }
+        }
+    },
+    _defineGetSet: function (attr, val) {
+        var _this = this;
+        var func = function (f) {
+            var tmp = _this.prototype._trimFunction(f.toString());
+            var pAttr = /(\'\{attr\}\')/gm;
+            var pVal = /(\'\{val\}\')/gm;
+            tmp = tmp.replace(pAttr, attr);
+            tmp = tmp.replace(pVal, val);
+            var newFunc = new Function('obj', tmp);
+            newFunc(_this);
+
+        }
+        func(function () {
+            Object.defineProperty(obj, "'{attr}'", {
+                set: function(value){
+                    this.attributes["'{attr}'"] = value;
+                },
+                get: function(){
+                    return this.attributes["'{attr}'"];
+                }
+            })
+        })
     }
 };
 var DefaultView = {
@@ -303,14 +365,15 @@ var Logistic = {
                 'object': /^(\w+)/,
                 'method': /^(?:.\w+\.?)(\w+)/,
                 'function': /(?:.[^\.\S])(((\w)+(\.)?)+)(\()(.+)?(\))/g,
-                'true' : /((\s*)return\s*true)/gm,
-                'false' : /((\s*)return\s*false)/gm
+                'true': /((\s*)return\s*true)/gm,
+                'false': /((\s*)return\s*false)/gm
             };
             var res, newF, result = {};
-            if(reg.false.test(func)){
+            if (reg.false.test(func)) {
                 func = func.replace(reg.false, '\r\nstartIfComplete.statusIF=false;\r\n' + '$2');
-            };
-            if((reg.true.test(func))){
+            }
+            ;
+            if ((reg.true.test(func))) {
                 func = func.replace(reg.true, '\r\nstartIfComplete.statusIF=true;\r\n' + '$2')
             }
             while (res = reg.function.exec(func)) {
@@ -331,7 +394,7 @@ var Logistic = {
                 //console.log(res);
                 var v = res[6] != undefined ? ', ' + res[6] : '';
                 var r = (res[6] + '').split(',');
-                if(r[0] === '' || r[0] == 'undefined'){
+                if (r[0] === '' || r[0] == 'undefined') {
                     delete r[0];
                 }
                 newF =
@@ -340,7 +403,7 @@ var Logistic = {
                     'var startLastArguments = startModFunction(' + res[1] + ', true);\r\n' +
                     'var ar = startLastArguments != undefined ? \'startIfComplete ,startModFunction, \' + startLastArguments : \'startIfComplete ,startModFunction \'   ;\r\n' +
                     res[1] + ' = new Function(ar, startResultPreFunction.f);\r\n' +
-                    //'console.log(String(' + res[1] +'));\r\n' +
+                        //'console.log(String(' + res[1] +'));\r\n' +
                     res[1] + '(startIfComplete, startModFunction ' + v + ');\r\n' +
                     res[1] + ' = startOriginFunction;';
                 var r = new RegExp('(' + res[1] + ')' + '(\\()(.+)?(\\))');
@@ -414,13 +477,13 @@ var Logistic = {
                         q.splice(i, 1);
                         clearInterval(si);
                     }
-                } else if(q[i].statusIF === false){
+                } else if (q[i].statusIF === false) {
                     if (q[i].hasOwnProperty('else')) {
                         q[i]['else']();
                         q.splice(i, 1);
                         clearInterval(si);
                     }
-                }else if (q[i].statusIF === 'error') {
+                } else if (q[i].statusIF === 'error') {
 
                 }
             }
@@ -441,10 +504,9 @@ var Logistic = {
         } while (x != -1);
         return data;
     },
-    _thisSetFinal: function(){
+    _thisSetFinal: function () {
 
-    }
-
+    },
 
 };
 

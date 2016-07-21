@@ -12,6 +12,26 @@ function Start(prop) {
     this.views = new Object();
     this.ctrls = new Object();
 
+    /**
+     *
+     * @type {{findValue: Start.array.'findValue'}}
+     * Функция "findValue(array, value, [moreInfo])" ищет в массиве "array" значение "value" и возвращает true или false
+     */
+    this.array = {
+        'findValue' : function(array, value){
+            var a = array, v = value, t = false;
+            var p = new RegExp("^(" + v + ")$");
+            for (var r in a){
+                if(p.test(a[r])) t = true;
+            }
+            if(t === false && _this.debugMode){
+                console.warn('В массиве не было найдено значение "' + v + '"')
+            }
+            return t;
+        }
+    };
+
+
     this.init = function (ctrl, act, p) {
 
         try {
@@ -216,7 +236,21 @@ function Start(prop) {
             }, 100)
         }
     };
-
+    this._trimFunction =  function (func) {
+        var pattern = /(function)(\s)*((\()(.*)*(\)))(\s)?\{/i;
+        var data = func.replace(pattern, '');
+        var p = 0;
+        do {
+            var x = data.indexOf('}', p);
+            if (x === -1) {
+                var a = data.slice(0, p - 2);
+                var b = data.slice(p);
+                data = a.concat('', b);
+            }
+            p = x + 1;
+        } while (x != -1);
+        return data;
+    };
 
     var includeJSCtrl = function (scriptName, a, p) {
         _this.ctrls[scriptName] = new Object();
@@ -258,6 +292,7 @@ function Start(prop) {
             writable: true
         });
         script.onload = function () {
+            DefaultModel.prototype = Logistic;
             window[modelName.toString()].prototype = DefaultModel;
             Object.defineProperty(_this.models[modelName.toString()], 'obj', {
                 value: new window[modelName.toString()](),
@@ -322,7 +357,6 @@ function Start(prop) {
         script.src = pathView;
         head[0].appendChild(script);
     };
-
     var findModelByName = function (modelName) {
         if (_this.models.hasOwnProperty(modelName)) {
             return true;
@@ -338,12 +372,13 @@ function Start(prop) {
             return false
         }
     };
-
     var cloningObject = function(a, b){
         for (var i in b){
             if(a.hasOwnProperty(i) || i in a) break;
             a[i] = b[i];
         }
     }
+
+
 }
 

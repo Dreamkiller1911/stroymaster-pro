@@ -1,10 +1,11 @@
 /**
  * Created by Admin on 08.07.2016.
  */
-function ImgServiceForm() {
+function ImgService() {
     var _this = this;
     this.prefix = 'imgSrvF_';
     this.properties = ['file', 'numOst'];
+    this.labels = ['id', 'id_service', 'url', 'simple_url', 'description'];
 
 
     this.countImgToService = function (id) {
@@ -72,6 +73,18 @@ function ImgServiceForm() {
                 }
             }
         });
+    };
+    this.getOne = function(id){
+        this.ajax({
+            type: "POST",
+            url: "/imgServices/getOne/",
+            data: {'id': id},
+            dataType: 'json',
+            success: function(data){
+                _this.setAttributes(data);
+                console.log(_this.attributes)
+            }
+        })
     }
 
 }

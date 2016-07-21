@@ -11,18 +11,30 @@ function ImgServiceController() {
     this.init = function(){
 
     };
+    this.testView = function(){
+        var ctrl = this.getControls()
+        for (var i = 0 ; i < ctrl.length; i++){
+            ctrl[i].onclick = function(){
+                window.event.preventDefault();
+                var id = this.id;
+                _this.startModel('ImgService',function(model){
+                    model.getOne(id)
+                })
+            }
+        }
+    };
     this.uploadAll = function () {
 
         var ctrl = _this.getControls();
         if (!ctrl) return false;
 
-        _this.startModel('ImgServiceForm', function (model) {
+        _this.startModel('ImgService', function (model) {
             ctrl[0].onclick = function () {
                 var cPl = model.getProperty('numOst');
 
                 if (Number(cPl.innerHTML) > 0) {
                     ctrl[0].onchange = function () {
-                        _this.startModel('ImgServiceForm', function (model) {
+                        _this.startModel('ImgService', function (model) {
                             model.addAll();
                         });
                     }
@@ -32,18 +44,11 @@ function ImgServiceController() {
                 }
             }
         });
-
         ctrl[0].onchange = function () {
-
-
-            _this.startModel('ImgServiceForm', function (model) {
+            _this.startModel('ImgService', function (model) {
                 model.addAll();
             });
-
-
         }
-
-
     };
     this.delete = function(){
         var ctrl = _this.getControls();
@@ -54,7 +59,7 @@ function ImgServiceController() {
                 var btn = this;
                 _this.
                 if(function(){
-                    this.startModel('ImgServiceForm', function(model){
+                    this.startModel('ImgService', function(model){
                         model.delete(id)
                     });
                 }).
