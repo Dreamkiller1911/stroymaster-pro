@@ -72,6 +72,7 @@ class ImgServicesController extends Controller
 
     public function actionSaveOne()
     {
+        var_dump($_POST);
         if (isset($_FILES['OneImg'])) {
             var_dump($_FILES);
             die;
@@ -111,5 +112,13 @@ class ImgServicesController extends Controller
     public function actionGetOne(){
         $model = ImgServices::model()->findByPk($_POST['id']);
         echo json_encode($model->attributes);
+    }
+    public function actionGetAll(){
+        $model = Services::model()->findByPk($_POST['id_service']);
+        $data = array();
+        foreach ($model->imgServices as $key){
+            array_push($data, $key->attributes);
+        }
+        echo json_encode($data);
     }
 }

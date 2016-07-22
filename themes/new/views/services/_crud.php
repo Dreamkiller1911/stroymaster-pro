@@ -68,7 +68,7 @@ $form = $this->beginWidget('CActiveForm', array(
 
     <div class="row" id="imgList">
         <div class="col-sm-12">
-            <?php $this->renderPartial('_imgList', array('model' => $model)) ?>
+<!--            --><?php //$this->renderPartial('_imgList', array('model' => $model)) ?>
         </div>
     </div>
 

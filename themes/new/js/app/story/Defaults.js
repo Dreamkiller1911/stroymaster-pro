@@ -26,12 +26,11 @@ var DefaultController =
         var bS = bodyScript || false;
         this.start.loadModel(mN, bS, this.ctrlName, prop);
     },
-    render: function (fileName) {
-        if (this.start.views.hasOwnProperty(this.ctrlName)) {
-            return this.start.loadActView(this.ctrlName, fileName);
+    render: function (fileName, ctrlName) {
+        if (this.start.views.hasOwnProperty(ctrlName || this.ctrlName)) {
+            return this.start.loadActView(ctrlName || this.ctrlName, fileName);
         } else {
-
-            this.start.includeJSView(this.ctrlName, fileName);
+            this.start.includeJSView(ctrlName || this.ctrlName, fileName);
         }
     }
 };
@@ -264,7 +263,7 @@ var DefaultModel = {
                 if (this.start.array.findValue(lab, res) === false) continue;
 
                 if (_get.test) {
-                    this._defineGetSet(res, atr[res]);
+                    this._defineGetSet(res);
                     this[res] = atr[res];
                     /*if(this.attributes.hasOwnProperty(res)){delete this.attributes[res]}
                      Object.defineProperty(this, res, {
@@ -282,12 +281,19 @@ var DefaultModel = {
             }
         }
     },
-    newModel: function(modelName){
-        console.log(this);
-        return new window[modelName.toString()]
+    newModel: function (modelName) {
+        var model = new window[modelName.toString()];
+        this.start._setModelValues(model, modelName, this.ctrl);
+        if (model.hasOwnProperty('labels') && model.labels.length > 0) {
+            var l = model.labels;
+            for (var p in l) {
+                this._defineGetSet(l[p], model);
+            }
+        }
+        return model;
     },
-    _defineGetSet: function (attr) {
-        if({}.__defineGetter__ === false){
+    _defineGetSet: function (attr, model) {
+        if ({}.__defineGetter__ === false) {
             return;
         }
         var _this = this;
@@ -296,19 +302,19 @@ var DefaultModel = {
             var pAttr = /(\'\{attr\}\')/gm;
             tmp = tmp.replace(pAttr, attr);
             var newFunc = new Function('obj', tmp);
-            newFunc(_this);
+            newFunc(model || _this);
         };
         func(function () {
-            if(obj.hasOwnProperty("'{attr}'")){
+            if (obj.hasOwnProperty("'{attr}'")) {
                 return false
             }
             Object.defineProperty(obj, "'{attr}'", {
                 enumerable: true,
-                set: function(value){
+                set: function (value) {
                     this.attributes["'{attr}'"] = value;
                 },
-                get: function(){
-                    if(this.attributes["'{attr}'"] === undefined) return undefined;
+                get: function () {
+                    if (this.attributes["'{attr}'"] === undefined) return undefined;
                     return this.attributes["'{attr}'"];
                 }
             })
@@ -329,7 +335,7 @@ var DefaultView = {
 };
 var Logistic = {
     if: function (body) {
-        this.queue.push({'if': body, 'statusIF': 'started'});
+        this.queue.push({'if': body, 'statusIF': 'started', 'resultIF': 'startNullResultIF', 'params': false});
         return this;
     },
     then: function (body) {
@@ -343,6 +349,7 @@ var Logistic = {
         return this;
     },
     end: function (params) {
+        if(this.hasOwnProperty('startSetIntervalEnd')) clearInterval(this.startSetIntervalEnd);
         var _this = this;
         var q = this.queue;
         var argument = '';
@@ -367,21 +374,30 @@ var Logistic = {
                 'method': /^(?:.\w+\.?)(\w+)/,
                 'function': /(?:.[^\.\S])(((\w)+(\.)?)+)(\()(.+)?(\))/g,
                 'true': /((\s*)return\s*true)/gm,
-                'false': /((\s*)return\s*false)/gm
+                'false': /((\s*)return\s*false)/gm,
+                'returnData': /(\s*return\s*([^;]*)*)/gm,
             };
             var res, newF, result = {};
-            if (reg.false.test(func)) {
-                func = func.replace(reg.false, '\r\nstartIfComplete.statusIF=false;\r\n' + '$2');
+
+            if (reg.returnData.test(func)) {
+                func = func.replace(reg.returnData, '\r\nstartIfComplete.resultIF=$2;\r\n' + 'return startIfComplete.resultIF');
             }
             ;
-            if ((reg.true.test(func))) {
-                func = func.replace(reg.true, '\r\nstartIfComplete.statusIF=true;\r\n' + '$2')
-            }
             while (res = reg.function.exec(func)) {
+
                 var obj = reg.object.exec(res[1])[1];
                 reg.function.lastIndex = res.index + res[0].length;
 
-                if (window.hasOwnProperty(reg.object.exec(res[1])[1])) continue;
+                if (window.hasOwnProperty(reg.object.exec(res[1])[1])) {
+                    continue;
+                }
+                if (
+                    Array.prototype.hasOwnProperty(res[2]) ||
+                    String.prototype.hasOwnProperty(res[2]) ||
+                    Object.prototype.hasOwnProperty(res[2])
+                ) {
+                    continue;
+                }
                 if (reg.object.exec(res[1])[1] === 'function') continue;
                 if (reg.object.exec(res[1])[1].search(/(if)|(else)|(for)|(while)|(switch)/) === 0) continue;
                 if ((obj === 'this' || obj === '_this') && (
@@ -392,7 +408,6 @@ var Logistic = {
                     continue;
                 }
                 if (reg.object.exec(res[1])[1] === 'startModFunction') continue;
-                //console.log(res);
                 var v = res[6] != undefined ? ', ' + res[6] : '';
                 var r = (res[6] + '').split(',');
                 if (r[0] === '' || r[0] == 'undefined') {
@@ -404,7 +419,6 @@ var Logistic = {
                     'var startLastArguments = startModFunction(' + res[1] + ', true);\r\n' +
                     'var ar = startLastArguments != undefined ? \'startIfComplete ,startModFunction, \' + startLastArguments : \'startIfComplete ,startModFunction \'   ;\r\n' +
                     res[1] + ' = new Function(ar, startResultPreFunction.f);\r\n' +
-                        //'console.log(String(' + res[1] +'));\r\n' +
                     res[1] + '(startIfComplete, startModFunction ' + v + ');\r\n' +
                     res[1] + ' = startOriginFunction;';
                 var r = new RegExp('(' + res[1] + ')' + '(\\()(.+)?(\\))');
@@ -412,13 +426,9 @@ var Logistic = {
                 result['r'] = res;
                 result['obj'] = obj;
             }
-            //console.log(func)
             if (result.f) return result;
             result.f = func;
             return result;
-            //window.hasOwnProperty(reg.object.exec(res[1])[1]) проверка есть ли такой объек в окружении глобальных переменных
-            //reg.object.exec(res[1])[1] === 'this' проверка является ли объект экземпляром текущей модели или контроллера
-            //_this.__proto__.hasOwnProperty(reg.method.exec(res[1])[1]) проверка в свойстве прототипе объекта
         };
         var startModFunction = function (func, getArgs) {
             if (getArgs) {
@@ -439,16 +449,18 @@ var Logistic = {
             origin.f = data;
             return result;
         };
-        var si = setInterval(function () {
-            //console.log(q.length)
+        this.startSetIntervalEnd = setInterval(function () {
             for (var i = 0; i < q.length; i++) {
                 if (q[i].hasOwnProperty('statusIF') && q[i].statusIF === 'started') {
                     q[i].statusIF = 'load';
+                    if(q[i].params === false){
+                        q[i].params = params;
+                    }
                     var func = String(q[i]['if']);
                     var result = searchFunc(preFunc(func));
                     var args = startModFunction(func, true);
                     var nArgs;
-                    if (params) {
+                    if (q[i].params) {
                         var args = '';
                         for (var p in params) {
                             args += ', ' + p;
@@ -465,27 +477,32 @@ var Logistic = {
                         }
                         var completeArguments = val.length > 0 ? ', ' + val.join(', ') : '';
                         var compliteFunc = func + '(q[i], startModFunction ' + completeArguments + ')';
+
                         eval(compliteFunc);
 
                     };
                     q[i]['if'] = new Function(nArgs, result.f).bind(_this);
-                    runFunction('q[i]["if"]', params);
+                    runFunction('q[i]["if"]', q[i].params);
 
-                } else if (q[i].statusIF === true) {
+                } else if ((q[i].resultIF) && q[i].resultIF != 'startNullResultIF') {
 
                     if (q[i].hasOwnProperty('then')) {
-                        q[i]['then']();
+                        var result = {
+                            'if': q[i].resultIF
+                        }
+                        q[i]['then'](result);
                         q.splice(i, 1);
-                        clearInterval(si);
+                        clearInterval(_this.startSetIntervalEnd);
                     }
-                } else if (q[i].statusIF === false) {
+                } else if ((q[i].resultIF === false || q[i].resultIF === undefined) && q[i].resultIF != 'startNullResultIF') {
                     if (q[i].hasOwnProperty('else')) {
-                        q[i]['else']();
+                        var result = {
+                            'if': q[i].resultIF
+                        }
+                        q[i]['else'](result);
                         q.splice(i, 1);
-                        clearInterval(si);
+                        clearInterval(_this.startSetIntervalEnd);
                     }
-                } else if (q[i].statusIF === 'error') {
-
                 }
             }
         }, 5)

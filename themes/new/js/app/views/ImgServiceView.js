@@ -6,7 +6,9 @@ function ImgServiceView() {
     this.prefix = 'ImgServiceView';
 
 
+    this.viewOneImg = function(model){
 
+    };
     this.viewImgEdit = function(){
         _this.write(
             '<div class="modal">Тестовый див для генерации представления </div>'

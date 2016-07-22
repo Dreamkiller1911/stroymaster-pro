@@ -61,11 +61,7 @@ function Service(){
                         label: 'save',
                         text: 'Все ОК'
                     });*/
-                    if(_this.ctrl.tester()){
-                        return true;
-                    }
-
-
+                    return true;
                 }else {
                     _this.errors().showAll({
                         dataError: data,

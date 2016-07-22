@@ -5,7 +5,7 @@ function ImgService() {
 
     var _this = this;
     this.prefix = 'imgSrvF_';
-    this.properties = ['file', 'numOst'];
+    this.properties = ['file', 'numOst', 'description'];
     this.labels = ['id', 'id_service', 'url', 'simple_url', 'description'];
 
 
@@ -13,6 +13,23 @@ function ImgService() {
         _this.getProperty();
         console.log(this.p.allOptionsTo());
 
+    };
+    this.getAllFromIdService = function (id_service) {
+        var _this = this;
+        this.ajax({
+            type: "POST",
+            url: '/imgServices/getAll/',
+            data: {'id_service': id_service},
+            dataType: 'json',
+            success: function(data) {
+                var i, model = new Array;
+                for (i = 0; i < data.length; i++) {
+                    model[i] = _this.newModel('ImgService');
+                    model[i].setAttributes(data[i]);
+                }
+                return model;
+            }
+        });
     };
     this.addAll = function () {
         _this.getProperties();
@@ -82,11 +99,26 @@ function ImgService() {
             data: {'id': _this.id},
             dataType: 'json',
             success: function(data){
+                _this.getProperties();
                 var img = _this.newModel('ImgService');
+                img.setAttributes(data);
+                img.description = '2';
+                img.save();
                 console.log(img)
 
             }
         })
+    }
+    this.save = function(){
+        var _this = this;
+        this.ajax({
+            type: "POST",
+            url: '/imgServices/saveOne/',
+            data: {id: _this.id, descroption: _this.description},
+            success: function(data){
+                console.log(data);
+            }
+        });
     }
 
 }

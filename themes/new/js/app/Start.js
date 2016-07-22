@@ -33,6 +33,7 @@ function Start(prop) {
 
 
     this.init = function (ctrl, act, p) {
+        var _this = this;
 
         try {
             if (_this.appPath === undefined) {
@@ -55,7 +56,7 @@ function Start(prop) {
                             var p = _this.queue[i].prop;
 
                             if (_this.ctrls.hasOwnProperty(c) === false) {
-                                includeJSCtrl(c, a, p);
+                                _this._includeJSCtrl(c, a, p);
                             } else {
                                 if (_this.queue[i].statusC === 'load') {
                                     if (_this.ctrls[c].status === 'ready') {
@@ -154,44 +155,33 @@ function Start(prop) {
         }
     };
     this.loadActView = function (fileName, view) {
-        if (_this.views.hasOwnProperty(fileName) === false || _this.views[fileName].hasOwnProperty('obj') === false) {
-            if (_this.debugMode) {
+        if (this.views.hasOwnProperty(fileName) === false || this.views[fileName].hasOwnProperty('obj') === false) {
+            if (this.debugMode) {
                 throw new Error('Файл представления ' + fileName + 'View.js, не был подключен или не существует');
             }
             return false;
         }
-        var obj = _this.views[fileName].obj;
+        var obj = this.views[fileName].obj;
         var method = 'view' + view;
         if (obj.hasOwnProperty(method) === false) {
-            if (_this.debugMode) {
+            if (this.debugMode) {
                 throw new Error('В представлении ' + fileName + 'View() не найден метод View' + view + ', путь до файла \r\n' +
-                    _this.paths.views + fileName + 'View.js')
+                    this.paths.views + fileName + 'View.js')
             }
             return false;
         }
         obj[method]()
         if (obj.components.length > 0) {
-            var data = obj.components.join('\r\n');
-            console.log(data)
+            var data = obj.components.join('\r\n').toString();
+
             obj.components = new Array;
-            return data;
-        }
+            return obj;
+        }else return false;
     };
     this.loadModel = function (modelName, bodyScript, ctrl, prop) {
         var ctrl = this._findCtrlByName(ctrl);
         var addProperty = function (model) {
-            Object.defineProperties(model, {
-                    'ctrl': {
-                        value: ctrl
-                    },
-                }
-            );
-            if (model.hasOwnProperty('attributes') === false) {
-                Object.defineProperty(model, 'attributes', {
-                    value: new Object(),
-                    enumerable: true
-                });
-            }
+
             if (('messages' in model && Object.getOwnPropertyDescriptor(model, 'messages').writable) || 'messages' in model === false) {
                 Object.defineProperty(model, 'messages', {
                     value: function () {
@@ -222,7 +212,7 @@ function Start(prop) {
              }*/
         };
         var setGetSet = function (model) {
-            if (model.labels.length > 0) {
+            if (model.hasOwnProperty('labels') && model.labels.length > 0) {
                 for (var i in model.labels) {
                     model._defineGetSet(model.labels[i])
                 }
@@ -237,7 +227,7 @@ function Start(prop) {
             bodyScript(_this.models[modelName].obj);
             return true;
         } else {
-            includeJSModel(modelName);
+            this._includeJSModel(modelName);
             Object.defineProperty(_this.models[modelName], 'timer', {
                 writable: true
             });
@@ -250,7 +240,7 @@ function Start(prop) {
                     bodyScript(_this.models[modelName].obj, prop);
                     return true;
                 }
-            }, 100)
+            }, 10)
         }
     };
     this._trimFunction = function (func) {
@@ -269,8 +259,8 @@ function Start(prop) {
         return data;
     };
 
-    var includeJSCtrl = function (scriptName, a, p) {
-        _this.ctrls[scriptName] = new Object();
+    this._includeJSCtrl = function (scriptName, a, p) {
+        this.ctrls[scriptName] = new Object();
         var script = document.createElement('script');
         Object.defineProperty(_this.ctrls[scriptName], 'status', {
             value: 'load',
@@ -301,22 +291,22 @@ function Start(prop) {
         document.getElementsByTagName('head')[0].appendChild(script);
 
     };
-    var includeJSModel = function (modelName) {
-        _this.models[modelName] = new Object();
+    this._includeJSModel = function (modelName) {
+        this.models[modelName] = new Object();
         var script = document.createElement('script');
         Object.defineProperty(_this.models[modelName], 'status', {
             value: 'load',
             writable: true
         });
         script.onload = function () {
+
             DefaultModel.prototype = Logistic;
+            cloningObject(DefaultModel, Logistic);
             window[modelName.toString()].prototype = DefaultModel;
             Object.defineProperty(_this.models[modelName.toString()], 'obj', {
                 value: new window[modelName.toString()](),
                 writable: true
             });
-
-            _this.models[modelName.toString()].obj.start = _this;
             _this.models[modelName].status = 'ready';
         };
         script.onerror = function () {
@@ -334,7 +324,7 @@ function Start(prop) {
         var script = document.createElement('script');
         var head = document.getElementsByTagName('head');
         var fullName = fileName.toString() + 'View';
-
+        var _this = this;
         script.onload = function () {
             window[fullName.toString()].prototype = DefaultView;
 
@@ -351,17 +341,15 @@ function Start(prop) {
                 'nameFunction': {
                     value: view,
                     writable: true,
-
                 },
                 'start': {
                     value: _this
                 },
-                'ctrl': {
-                    value: _this.ctrls[fileName].obj
-                }
             });
-
             _this.loadActView(fileName, view)
+        };
+        script.onerror = function(){
+            console.error('Не удалось найти файл отображения с именем "' + fileName + 'View.js"\r\nПолный путь к файлу "' + pathView + '"')
         };
         Object.defineProperty(_this.views, fileName, {
             value: new Object(),
@@ -390,10 +378,85 @@ function Start(prop) {
         }
     };
     this._setModelValues = function (obj, modelName, ctrl) {
-        console.log(Object.getOwnPropertyDescriptor(obj, 'modelName'));
+        if(obj.hasOwnProperty('modelName')){
+            if (Object.getOwnPropertyDescriptor(obj, 'modelName').configurable === true) {
+                delete obj.modelName;
+                Object.defineProperty(obj, 'modelName', {
+                    value: modelName,
+                    enumerable: true
 
-        if (Object.getOwnPropertyDescriptor(obj, 'modelName').configurable === true) {
-            delete obj.modelName;
+                });
+            }
+        }else{
+            Object.defineProperty(obj, 'modelName', {
+                value: modelName,
+                enumerable: true
+
+            });
+        }
+        if(obj.hasOwnProperty('ctrl')){
+            if (Object.getOwnPropertyDescriptor(obj, 'ctrl').configurable === true) {
+                delete obj.ctrl;
+                Object.defineProperty(obj, 'ctrl', {
+                    value: ctrl,
+                    enumerable: true
+
+                });
+            }
+        }else{
+            Object.defineProperty(obj, 'ctrl', {
+                value: ctrl,
+                enumerable: true
+
+            });
+        }
+        if(obj.hasOwnProperty('start')){
+            if (Object.getOwnPropertyDescriptor(obj, 'start').configurable === true) {
+                delete obj.start;
+                Object.defineProperty(obj, 'start', {
+                    value: this,
+                    enumerable: true
+
+                });
+            }
+        }else{
+            Object.defineProperty(obj, 'start', {
+                value: this,
+                enumerable: true
+
+            });
+        }
+        if(obj.hasOwnProperty('attributes')){
+            if (Object.getOwnPropertyDescriptor(obj, 'attributes').configurable === true) {
+                delete obj.attributes;
+                Object.defineProperty(obj, 'attributes', {
+                    value: new Object(),
+                    enumerable: true
+
+                });
+            }
+        }else{
+            Object.defineProperty(obj, 'attributes', {
+                value: new Object(),
+                enumerable: true
+
+            });
+        }
+        if(obj.hasOwnProperty('queue')){
+            if (Object.getOwnPropertyDescriptor(obj, 'queue').configurable === true) {
+                delete obj.queue;
+                Object.defineProperty(obj, 'attributes', {
+                    value: new Array(),
+                    enumerable: true
+
+                });
+            }
+        }else{
+            Object.defineProperty(obj, 'queue', {
+                value: new Array(),
+                enumerable: true
+
+            });
         }
 
 

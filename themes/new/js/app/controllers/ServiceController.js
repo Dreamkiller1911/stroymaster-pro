@@ -5,29 +5,6 @@ function ServiceController() {
     var _this = this;
     this.statusLoadIndex = true;
 
-    this.tester = function () {
-        console.log('i am tester');
-        return true;
-    };
-    this.testers = function (c) {
-        var _this = this;
-        this.if(function () {
-            setTimeout(function () {
-                return true;
-            }, 2000)
-        }).then(function () {
-            console.log('Второй цикл - положительный результат')
-            _this.startModel('Service', function (model) {
-                model.viewFromId(2);
-            })
-        }).end({q: 23});
-
-    };
-
-    this.restart = function (num) {
-        return '{true}';
-    };
-
     this.viewModal = function () {
         var ctrl = _this.getControls();
         for (var i = 0; i < ctrl.length; i++) {
@@ -78,6 +55,8 @@ function ServiceController() {
 
     };
     this.crud = function () {
+
+        var prop = this.properties.crud;
         var act = _this.getControls();
         _this.startModel('Service', function (model) {
             model.getProperties();
@@ -88,10 +67,13 @@ function ServiceController() {
         act[0].onclick = function (event) {
             var e = window.event || event;
             e.preventDefault;
+
+
             _this.startModel('Service', function (model) {
                 model.getProperties();
                 _this.
                 if(function () {
+                    console.log(model)
                     model.save()
                 }).
                 then(function () {
@@ -103,6 +85,18 @@ function ServiceController() {
                 end({
                     'model': model
                 })
+            });
+            _this.startModel('ImgService', function(model){
+
+                _this.if(function(){
+                    model.getAllFromIdService(prop.id_service);
+                }).then(function(result){
+                    console.log(result.if)
+                }).end({
+                    'model':model,
+                    'prop': prop
+                });
+
             });
         }
     }

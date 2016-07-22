@@ -16,7 +16,7 @@ $data = isset($model->imgServices) ? $model->imgServices : $model;
         <div class="row description form-inline">
 
                 <?php echo CHtml::label('Описание', 'imgServices[' . $key->id . '][description]') ?><br>
-                <input class="form-control" id="<?php echo $key->id ?>" type="text"
+                <input StartModel="imgSrvF_description" class="form-control" id="<?php echo $key->id ?>" type="text"
                        name="imgServices'[<?php echo $key->id ?>][description]" value="<?php echo $key->description ?>">
 
         </div>
