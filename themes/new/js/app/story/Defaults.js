@@ -112,8 +112,14 @@ var DefaultModel = {
                     + this.modelName + '"')
             }
         }
+        var ajax;
+        if (window.XMLHttpRequest) {
 
-        var ajax = new XMLHttpRequest();
+            ajax = new XMLHttpRequest();
+        }
+        else {
+            ajax = new ActiveXObject("Microsoft.XMLHTTP");
+        }
         ajax.onreadystatechange = function () {
             if (ajax.readyState === 4 && ajax.status === 200) {
                 var data = ajax.responseText;
@@ -133,6 +139,10 @@ var DefaultModel = {
         if (g.test(prop.type && prop.data != '')) {
             prop.url += '?' + prop.data;
             prop.data = null;
+        }
+
+        if (prop.url === '') {
+            prop.url = window.location.pathname;
         }
         ajax.open(prop.type, prop.url, prop.async);
         if (prop.dataEncode) {
@@ -349,10 +359,11 @@ var Logistic = {
         return this;
     },
     end: function (params) {
-        if(this.hasOwnProperty('startSetIntervalEnd')) clearInterval(this.startSetIntervalEnd);
-        var _this = this;
+        if (this.hasOwnProperty('startSetIntervalEnd')) clearInterval(this.startSetIntervalEnd);
         var q = this.queue;
-        var argument = '';
+        q[q.length - 1].params = params;
+        q[q.length - 1].end = true;
+        var _this = this;
         var preFunc = function (func, retArgs) {
             var pattern = /(function)(\s)*((\()(.*)*(\)))(\s)?\{/i;
             var mat = pattern.exec(func);
@@ -365,14 +376,13 @@ var Logistic = {
             var data = _this._trimFunction(func);
             var pFunc = /return \'\{true\}\'\s*(;)*/gm;
             var result = data.replace(pFunc, 'startIfComplete.statusIF=true;\r\n');
-            //console.log(result);
             return result;
         };
         var searchFunc = function (func) {
             var reg = {
                 'object': /^(\w+)/,
-                'method': /^(?:.\w+\.?)(\w+)/,
-                'function': /(?:.[^\.\S])(((\w)+(\.)?)+)(\()(.+)?(\))/g,
+                'method': /^(?:\w+\.?)(\w+)/,
+                'function': /(var\s*\w*\d*=\s*)??((\w+(\.)?)+)(\()(.+)?(\))/g,
                 'true': /((\s*)return\s*true)/gm,
                 'false': /((\s*)return\s*false)/gm,
                 'returnData': /(\s*return\s*([^;]*)*)/gm,
@@ -384,11 +394,10 @@ var Logistic = {
             }
             ;
             while (res = reg.function.exec(func)) {
-
-                var obj = reg.object.exec(res[1])[1];
+                console.dir(res)
+                var obj = reg.object.exec(res[2])[1];
                 reg.function.lastIndex = res.index + res[0].length;
-
-                if (window.hasOwnProperty(reg.object.exec(res[1])[1])) {
+                if (window.hasOwnProperty(reg.object.exec(res[2])[1])) {
                     continue;
                 }
                 if (
@@ -398,30 +407,33 @@ var Logistic = {
                 ) {
                     continue;
                 }
-                if (reg.object.exec(res[1])[1] === 'function') continue;
-                if (reg.object.exec(res[1])[1].search(/(if)|(else)|(for)|(while)|(switch)/) === 0) continue;
+                if (reg.object.exec(res[2])[1] === 'function') continue;
+                if (reg.object.exec(res[2])[1].search(/(if)|(else)|(for)|(while)|(switch)/) === 0) continue;
                 if ((obj === 'this' || obj === '_this') && (
-                        DefaultController.hasOwnProperty(reg.method.exec(res[1])[1]) ||
-                        DefaultModel.hasOwnProperty(reg.method.exec(res[1])[1]) ||
-                        DefaultView.hasOwnProperty(reg.method.exec(res[1])[1])
+                        (DefaultController.hasOwnProperty(reg.method.exec(res[2])[1]) ||
+                        DefaultModel.hasOwnProperty(reg.method.exec(res[2])[1]) ||
+                        DefaultView.hasOwnProperty(reg.method.exec(res[2])[1])) &&
+                        res[2][0] === '_'
                     )) {
                     continue;
                 }
-                if (reg.object.exec(res[1])[1] === 'startModFunction') continue;
+                if (reg.object.exec(res[2])[1] === 'startModFunction') continue;
+
+
                 var v = res[6] != undefined ? ', ' + res[6] : '';
                 var r = (res[6] + '').split(',');
                 if (r[0] === '' || r[0] == 'undefined') {
                     delete r[0];
                 }
                 newF =
-                    'var startOriginFunction = ' + res[1] + ';\r\n' +
-                    'var startResultPreFunction  = startModFunction('.concat(res[1] + ');\r\n') +
-                    'var startLastArguments = startModFunction(' + res[1] + ', true);\r\n' +
+                    'var startOriginFunction = ' + res[2] + ';\r\n' +
+                    'var startResultPreFunction  = startModFunction('.concat(res[2] + ');\r\n') +
+                    'var startLastArguments = startModFunction(' + res[2] + ', true);\r\n' +
                     'var ar = startLastArguments != undefined ? \'startIfComplete ,startModFunction, \' + startLastArguments : \'startIfComplete ,startModFunction \'   ;\r\n' +
-                    res[1] + ' = new Function(ar, startResultPreFunction.f);\r\n' +
-                    res[1] + '(startIfComplete, startModFunction ' + v + ');\r\n' +
-                    res[1] + ' = startOriginFunction;';
-                var r = new RegExp('(' + res[1] + ')' + '(\\()(.+)?(\\))');
+                    res[2] + ' = new Function(ar, startResultPreFunction.f);\r\n' +
+                    res[2] + '(startIfComplete, startModFunction ' + v + ');\r\n' +
+                    res[2] + ' = startOriginFunction;';
+                var r = new RegExp('(' + res[2] + ')' + '(\\()(.+)?(\\))');
                 result['f'] = func.replace(r, newF);
                 result['r'] = res;
                 result['obj'] = obj;
@@ -431,31 +443,66 @@ var Logistic = {
             return result;
         };
         var startModFunction = function (func, getArgs) {
-            if (getArgs) {
-                var args = preFunc(String(func), true)
-                var dataArguments = new Array;
-                if (args) {
-                    var arr = args.split(',');
-                    for (var i = 0; i < arr.length; i++) {
-                        dataArguments.push('\'' + arr[i] + '\'');
+            try {
+                if (getArgs) {
+                    var args = preFunc(String(func), true)
+                    var dataArguments = new Array;
+                    if (args) {
+                        var arr = args.split(',');
+                        for (var i = 0; i < arr.length; i++) {
+                            dataArguments.push('\'' + arr[i] + '\'');
+                        }
+                        return args.split(',');
                     }
-                    return args.split(',');
+                    return undefined;
                 }
-                return undefined;
+                var data = preFunc(String(func));
+                var result = searchFunc(data);
+                var origin = {f: ''};
+                origin.f = data;
+                return result;
+            } catch (e) {
+                console.log(51561)
             }
-            var data = preFunc(String(func));
-            var result = searchFunc(data);
-            var origin = {f: ''};
-            origin.f = data;
-            return result;
         };
         this.startSetIntervalEnd = setInterval(function () {
             for (var i = 0; i < q.length; i++) {
-                if (q[i].hasOwnProperty('statusIF') && q[i].statusIF === 'started') {
-                    q[i].statusIF = 'load';
-                    if(q[i].params === false){
-                        q[i].params = params;
+                if ((q[i].resultIF) && q[i].resultIF != 'startNullResultIF' && q[i].end === true) {
+                    try {
+                        if (q[i].hasOwnProperty('then')) {
+                            var result = {'if': q[i].resultIF};
+                            q[i]['then'](result);
+                        }
+                    } catch (e) {
+                        if(_this.start.debugMode){
+                            console.error(e + '\r\n' +
+                                'Было выброшенно исключение с ошибкой в функции \r\n"' + q[i]['then'] + '"');
+                        }else {
+                            console.warn('Было полученно исключение в коде, рекомендуем проверить fraemwork в debugMode')
+                        }
+                    }finally {
+                        q.splice(i, 1);
+                        break;
                     }
+                } else if ((q[i].resultIF === false || q[i].resultIF === undefined) && q[i].resultIF != 'startNullResultIF' && q[i].end === true) {
+                    try {
+                        if (q[i].hasOwnProperty('else')) {
+                            var result = {'if': q[i].resultIF};
+                            q[i]['else'](result);
+                        }
+                    } catch (e) {
+                        if(_this.start.debugMode){
+                            console.error(e + '\r\n' +
+                                'Было выброшенно исключение с ошибкой в функции \r\n"' + q[i]['else'] + '"');
+                        }else {
+                            console.warn(_this.start.ERROR_WARN_MSG)
+                        }
+                    } finally {
+                        q.splice(i, 1)
+                        break;
+                    }
+                } else if (q[i].hasOwnProperty('statusIF') && q[i].statusIF === 'started' && q[i].end === true) {
+                    q[i].statusIF = 'load';
                     var func = String(q[i]['if']);
                     var result = searchFunc(preFunc(func));
                     var args = startModFunction(func, true);
@@ -476,40 +523,24 @@ var Logistic = {
                             val.push('args.' + res);
                         }
                         var completeArguments = val.length > 0 ? ', ' + val.join(', ') : '';
-                        var compliteFunc = func + '(q[i], startModFunction ' + completeArguments + ')';
-
-                        eval(compliteFunc);
-
+                        var completeFunc = func + '(q[i], startModFunction ' + completeArguments + ')';
+                        eval(completeFunc);
                     };
-                    q[i]['if'] = new Function(nArgs, result.f).bind(_this);
+                    //console.log(result.f);
+                    q[i]["if"] = new Function(nArgs, result.f).bind(_this);
                     runFunction('q[i]["if"]', q[i].params);
-
-                } else if ((q[i].resultIF) && q[i].resultIF != 'startNullResultIF') {
-
-                    if (q[i].hasOwnProperty('then')) {
-                        var result = {
-                            'if': q[i].resultIF
-                        }
-                        q[i]['then'](result);
-                        q.splice(i, 1);
-                        clearInterval(_this.startSetIntervalEnd);
-                    }
-                } else if ((q[i].resultIF === false || q[i].resultIF === undefined) && q[i].resultIF != 'startNullResultIF') {
-                    if (q[i].hasOwnProperty('else')) {
-                        var result = {
-                            'if': q[i].resultIF
-                        }
-                        q[i]['else'](result);
-                        q.splice(i, 1);
-                        clearInterval(_this.startSetIntervalEnd);
-                    }
+                }
+                if (q.length === 0) {
+                    clearInterval(this.startSetIntervalEnd)
                 }
             }
-        }, 5)
+        }, 100)
     },
     _trimFunction: function (func) {
+        var s = new Start();
         var pattern = /(function)(\s)*((\()(.*)*(\)))(\s)?\{/i;
         var data = func.replace(pattern, '');
+
         var p = 0;
         do {
             var x = data.indexOf('}', p);
@@ -520,18 +551,25 @@ var Logistic = {
             }
             p = x + 1;
         } while (x != -1);
+        var completeFunc = 'try{';
+        var endFunc = '}catch(e){' +
+            'if(this.start.debugMode){' +
+                'console.error(e + "\\r\\n'+ s.string.trimS(s.string.addSlash(data, ['\'','"'])) +'")' +
+            '}else{' +
+                'console.warn("Было полученно исключение в коде, рекомендуем проверить fraemwork в debugMode")' +
+                '}' +
+            '}';
+        completeFunc += String(data) + endFunc;
+
         return data;
     },
     _thisSetFinal: function () {
 
     },
-
 };
-
 
 function progress() {
     var _this = this;
-
     this.progress = function (p) {
         switch (p.type) {
             case 'ajax1':

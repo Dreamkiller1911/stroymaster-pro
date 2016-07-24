@@ -56,6 +56,39 @@ function ServiceController() {
     };
     this.crud = function () {
 
+        _this.startModel('ImgService', function (model) {
+
+            _this.if(function () {
+                model.getAllFromIdService(prop.id_service);
+            }).then(function (result) {
+                console.log(result.if)
+                if(result.if){
+                    var r = result.if, i = 0;
+                    for ( ; i < r.length; i++){
+                        _this.if(
+                            function(){
+                                //console.log(data);
+                                this.render('OneImg');
+                            }
+                        ).then(
+                            function(result){
+                                console.log(444)
+                            }
+                        ).else(
+                            function(result){
+                            console.log(444)
+                            }
+                        ).end({'data':r[i]});
+
+                    }
+                }
+            }).end({
+                'model': model,
+                'prop': prop
+            });
+
+        });
+
         var prop = this.properties.crud;
         var act = _this.getControls();
         _this.startModel('Service', function (model) {
@@ -73,31 +106,19 @@ function ServiceController() {
                 model.getProperties();
                 _this.
                 if(function () {
-                    console.log(model)
                     model.save()
                 }).
                 then(function () {
                     model.viewFromId(1);
+
                 }).
                 else(function () {
                     alert('Не удалось выполнить запрос на сохранение')
+
                 }).
-                end({
-                    'model': model
-                })
+                end({'model': model})
             });
-            _this.startModel('ImgService', function(model){
 
-                _this.if(function(){
-                    model.getAllFromIdService(prop.id_service);
-                }).then(function(result){
-                    console.log(result.if)
-                }).end({
-                    'model':model,
-                    'prop': prop
-                });
-
-            });
         }
     }
 

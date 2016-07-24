@@ -61,6 +61,7 @@ function Service(){
                         label: 'save',
                         text: 'Все ОК'
                     });*/
+                    //console.log(data)
                     return true;
                 }else {
                     _this.errors().showAll({

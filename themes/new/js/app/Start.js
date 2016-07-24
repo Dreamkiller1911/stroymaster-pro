@@ -4,13 +4,15 @@
 function Start(prop) {
     var _this = this;
 
-    this.debugMode = prop.debugMode != undefined ? prop.debugMode : false;
+    this.debugMode = prop != undefined && prop.hasOwnProperty('debugMode') ? prop.debugMode : false;
     this.appPath = undefined;//Путь к корню приложения
     this.paths = {models: undefined, views: undefined, ctrls: undefined};
     this.queue = new Array();
     this.models = new Object();
     this.views = new Object();
     this.ctrls = new Object();
+
+    this.ERROR_WARN_MSG = 'Было полученно исключение в коде, рекомендуем проверить fraemwork в debugMode';
 
     /**
      *
@@ -28,6 +30,47 @@ function Start(prop) {
                 console.warn('В массиве не было найдено значение "' + v + '"')
             }
             return t;
+        }
+    };
+    this.string = {
+        addSlash: function (string, symbol) {
+            try {
+                var beginMessage = 'Вы воспользовались обработчиком строк "addSlash" для экранирования символов';
+                var result = '';
+                if(!string){
+                    throw new Error(beginMessage + '\r\n необходимо передать первый парамет в качестве строки в которой будут ' +
+                        'экранироваться символы');
+                }
+                if (!symbol) {
+                    throw new Error(beginMessage + '\r\n необходимо передать второй параметр в качестве стоки для одного символа' +
+                        'или в качестве массива для множественного экранирования')
+                }
+                if(typeof symbol === 'string'){
+                    result = string.replace(new RegExp('(' + symbol + ')', 'gm'), '\\$1');
+                }
+                if(typeof symbol === 'object'){
+                    var i, data;
+                    for (i = 0; i < symbol.length; i++){
+                        string = string.replace(new RegExp('(' + symbol[i] + ')', 'gm'), '\\$1')
+                    }
+                    result = string
+                }
+            } catch (e) {
+                if(this.debugMode){
+                    console.error(e.message);
+                }else {
+                    console.warn(this.ERROR_WARN_MSG)
+                }
+            } finally {
+
+                if (result === ''){
+                    return false;
+                }
+                return result;
+            }
+        },
+        trimS: function(str){
+            return str.replace(new RegExp("\\s", "gm"), '');
         }
     };
 
@@ -155,10 +198,11 @@ function Start(prop) {
         }
     };
     this.loadActView = function (fileName, view) {
+
         if (this.views.hasOwnProperty(fileName) === false || this.views[fileName].hasOwnProperty('obj') === false) {
-            if (this.debugMode) {
+            /*if (this.debugMode) {
                 throw new Error('Файл представления ' + fileName + 'View.js, не был подключен или не существует');
-            }
+            }*/
             return false;
         }
         var obj = this.views[fileName].obj;
@@ -176,7 +220,10 @@ function Start(prop) {
 
             obj.components = new Array;
             return obj;
-        }else return false;
+        } else{
+            console.log('false')
+            return false;
+        }
     };
     this.loadModel = function (modelName, bodyScript, ctrl, prop) {
         var ctrl = this._findCtrlByName(ctrl);
@@ -348,7 +395,7 @@ function Start(prop) {
             });
             _this.loadActView(fileName, view)
         };
-        script.onerror = function(){
+        script.onerror = function () {
             console.error('Не удалось найти файл отображения с именем "' + fileName + 'View.js"\r\nПолный путь к файлу "' + pathView + '"')
         };
         Object.defineProperty(_this.views, fileName, {
@@ -378,7 +425,7 @@ function Start(prop) {
         }
     };
     this._setModelValues = function (obj, modelName, ctrl) {
-        if(obj.hasOwnProperty('modelName')){
+        if (obj.hasOwnProperty('modelName')) {
             if (Object.getOwnPropertyDescriptor(obj, 'modelName').configurable === true) {
                 delete obj.modelName;
                 Object.defineProperty(obj, 'modelName', {
@@ -387,14 +434,14 @@ function Start(prop) {
 
                 });
             }
-        }else{
+        } else {
             Object.defineProperty(obj, 'modelName', {
                 value: modelName,
                 enumerable: true
 
             });
         }
-        if(obj.hasOwnProperty('ctrl')){
+        if (obj.hasOwnProperty('ctrl')) {
             if (Object.getOwnPropertyDescriptor(obj, 'ctrl').configurable === true) {
                 delete obj.ctrl;
                 Object.defineProperty(obj, 'ctrl', {
@@ -403,14 +450,14 @@ function Start(prop) {
 
                 });
             }
-        }else{
+        } else {
             Object.defineProperty(obj, 'ctrl', {
                 value: ctrl,
                 enumerable: true
 
             });
         }
-        if(obj.hasOwnProperty('start')){
+        if (obj.hasOwnProperty('start')) {
             if (Object.getOwnPropertyDescriptor(obj, 'start').configurable === true) {
                 delete obj.start;
                 Object.defineProperty(obj, 'start', {
@@ -419,14 +466,14 @@ function Start(prop) {
 
                 });
             }
-        }else{
+        } else {
             Object.defineProperty(obj, 'start', {
                 value: this,
                 enumerable: true
 
             });
         }
-        if(obj.hasOwnProperty('attributes')){
+        if (obj.hasOwnProperty('attributes')) {
             if (Object.getOwnPropertyDescriptor(obj, 'attributes').configurable === true) {
                 delete obj.attributes;
                 Object.defineProperty(obj, 'attributes', {
@@ -435,14 +482,14 @@ function Start(prop) {
 
                 });
             }
-        }else{
+        } else {
             Object.defineProperty(obj, 'attributes', {
                 value: new Object(),
                 enumerable: true
 
             });
         }
-        if(obj.hasOwnProperty('queue')){
+        if (obj.hasOwnProperty('queue')) {
             if (Object.getOwnPropertyDescriptor(obj, 'queue').configurable === true) {
                 delete obj.queue;
                 Object.defineProperty(obj, 'attributes', {
@@ -451,7 +498,7 @@ function Start(prop) {
 
                 });
             }
-        }else{
+        } else {
             Object.defineProperty(obj, 'queue', {
                 value: new Array(),
                 enumerable: true
