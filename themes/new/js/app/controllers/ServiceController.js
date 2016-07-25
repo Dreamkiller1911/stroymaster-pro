@@ -4,7 +4,10 @@
 function ServiceController() {
     var _this = this;
     this.statusLoadIndex = true;
-
+    this.t = function(per){
+        return 'qwe';
+    }
+    this.proprrr;
     this.viewModal = function () {
         var ctrl = _this.getControls();
         for (var i = 0; i < ctrl.length; i++) {
@@ -59,29 +62,11 @@ function ServiceController() {
         _this.startModel('ImgService', function (model) {
 
             _this.if(function () {
-                model.getAllFromIdService(prop.id_service);
-            }).then(function (result) {
-                console.log(result.if)
-                if(result.if){
-                    var r = result.if, i = 0;
-                    for ( ; i < r.length; i++){
-                        _this.if(
-                            function(){
-                                //console.log(data);
-                                this.render('OneImg');
-                            }
-                        ).then(
-                            function(result){
-                                console.log(444)
-                            }
-                        ).else(
-                            function(result){
-                            console.log(444)
-                            }
-                        ).end({'data':r[i]});
+                this.proprrr = this.t(555);
 
-                    }
-                }
+            }).then(function (result) {
+                //console.log(result.if)
+
             }).end({
                 'model': model,
                 'prop': prop
