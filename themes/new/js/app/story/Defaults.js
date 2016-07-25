@@ -390,9 +390,10 @@ var Logistic = {
             var res, newF, result = {};
 
             if (reg.returnData.test(func)) {
-                func = func.replace(reg.returnData, '\r\nstartIfComplete.resultIF=$2;\r\n' + 'return startIfComplete.resultIF');
+                func = func.replace(reg.returnData, '\r\n;startIfComplete.resultIF=$2;\r\n' + 'return startIfComplete.resultIF');
             }
             while (res = reg.function.exec(func)) {
+                console.dir(res)
 
                 reg.function.lastIndex = res.index + res[0].length;
                 if (window.hasOwnProperty(res[3])) {
@@ -416,7 +417,6 @@ var Logistic = {
                     continue;
                 }
                 if (res[3] === 'startModFunction') continue;
-                console.dir(res);
 
                 var value = res[6] != undefined ? ', ' + res[6] : '';
                 var r = (res[6] + '').split(',');
@@ -432,7 +432,7 @@ var Logistic = {
                     res[2] + '(startIfComplete, startModFunction ' + value + ');\r\n' +
                     res[2] + ' = startOriginFunction;';
                 var r = new RegExp('(' + res[1] + ')(' + res[2] + ')' + '(\\()(.+)?(\\))');
-                result['f'] = func.replace(r, newF);
+                result['f'] = func.replace(res[0], newF);
                 console.log(result['f']);
                 result['r'] = res;
                 result['obj'] = res[3];
@@ -489,10 +489,14 @@ var Logistic = {
                         }
                         var completeArguments = val.length > 0 ? ', ' + val.join(', ') : '';
                         var completeFunc = func + '(q[i], startModFunction ' + completeArguments + ')';
+                        console.log(1)
                         eval(completeFunc);
+                        console.log(2);
                     };
                     q[i]["if"] = new Function(nArgs, result.f).bind(_this);
+                    console.log('Перед запуском функции');
                     runFunction('q[i]["if"]', q[i].params);
+                    console.log('После запуска функции')
                 }else if ((q[i].resultIF) && q[i].resultIF != 'startNullResultIF' && q[i].end === true) {
                     try {
                         if (q[i].hasOwnProperty('then')) {
@@ -508,7 +512,6 @@ var Logistic = {
                         }
                     } finally {
                         q.splice(i, 1);
-                        break;
                     }
                 } else if ((q[i].resultIF === false || q[i].resultIF === undefined) && q[i].resultIF != 'startNullResultIF' && q[i].end === true) {
                     try {
@@ -525,12 +528,10 @@ var Logistic = {
                         }
                     } finally {
                         q.splice(i, 1)
-                        continue;
                     }
                 }
-                console.log(q.length)
-                if (q.length === 0) {
-                    clearInterval(this.startSetIntervalEnd)
+                if (q.length < 1) {
+                    clearInterval(_this.startSetIntervalEnd)
                 }
             }
         }, 100)

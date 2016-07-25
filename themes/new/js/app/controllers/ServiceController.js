@@ -5,6 +5,7 @@ function ServiceController() {
     var _this = this;
     this.statusLoadIndex = true;
     this.t = function(per){
+        console.log('t')
         return 'qwe';
     }
     this.proprrr;
@@ -62,15 +63,13 @@ function ServiceController() {
         _this.startModel('ImgService', function (model) {
 
             _this.if(function () {
-                this.proprrr = this.t(555);
+               this.t(555);
+                return true
 
             }).then(function (result) {
-                //console.log(result.if)
+                console.log(result.if)
 
-            }).end({
-                'model': model,
-                'prop': prop
-            });
+            }).end();
 
         });
 
