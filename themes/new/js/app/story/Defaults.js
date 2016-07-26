@@ -383,7 +383,8 @@ var Logistic = {
                 'object': /^(\w+)/,
                 'method': /^(?:\w+\.?)(\w+)/,
                 //'function': /((?:var\s+?_*\$*\w)|(?:\w+\.*(?!resultIF)\1)+\s*=\s*(?!new))?(([^\s.])(?:\.(\S+\.)*)(?=[^\s.]+)\1|(\.[^\s]))\s*(?:\()(.*)(?:\))(?!\s\{)/g,
-                'function': /((?:var\s+?_*\$*\w)|(?:\w+\.*(?!resultIF)\1)+\s*=\s*(?!new))?((?=[^\s.])(?:\.(\S+\.)*)(?=[^\s.]+)\1|(\.[^\s]))\s*(?:\()(.*)(?:\))(?!\s\{)/g,
+                //'function': /((?:(?:var\s[$\w]+)|(?:[$\w]+\.*(?!resultIF)\1)+)\s*=\s*(?!new)\1)?(?=(([^\s.;]+)(?:\.?([^\s.;]+(?=\.)\3)*([^\s.;]+(?!\.)\4))?)\s*(?:\()(.*)(?:\))(?!\s\{))\2/g,
+                'function': /^(?:\s*)(([^\s.;]+)(?:\.?(?:[^\s.;]+(?=\.)\3)*([^\s.;]+(?!\.)\4))?)\s*(?:\()(.*)(?:\))(?!\s\{)/g,
                 'true': /((\s*)return\s*true)/gm,
                 'false': /((\s*)return\s*false)/gm,
                 'returnData': /(?:\s*return\s*(?!startIfComplete\.resultIF)([^;]+)*)(?:(?:;)|(?:\r\n))/g,
@@ -400,46 +401,47 @@ var Logistic = {
             while (res = reg.function.exec(func)) {
                 console.dir(res);
                 //reg.function.lastIndex = res.index + res[0].length;
-                if (window.hasOwnProperty(res[3])) {
+                if (window.hasOwnProperty(res[2])) {
                     continue;
                 }
                 if (
-                    Array.prototype.hasOwnProperty(res[5]) ||
-                    String.prototype.hasOwnProperty(res[5]) ||
-                    Object.prototype.hasOwnProperty(res[5])
+                    Array.prototype.hasOwnProperty(res[3]) ||
+                    String.prototype.hasOwnProperty(res[3]) ||
+                    Object.prototype.hasOwnProperty(res[3])
                 ) {
                     continue;
                 }
-                if (res[3] === 'function') continue;
-                if (res[3].search(/(if)|(else)|(for)|(while)|(switch)/) === 0) continue;
+                if (res[2] === 'function') continue;
+                if (res[2].search(/(if)|(else)|(for)|(while)|(switch)/) === 0) continue;
                 if (
-                    (DefaultController.hasOwnProperty(res[5]) ||
-                    DefaultModel.hasOwnProperty(res[5]) ||
-                    DefaultView.hasOwnProperty(res[5])) &&
-                    res[5][0] === '_'
+                    (DefaultController.hasOwnProperty(res[3]) ||
+                    DefaultModel.hasOwnProperty(res[3]) ||
+                    DefaultView.hasOwnProperty(res[3])) &&
+                    res[3][0] === '_'
                 ) {
                     continue;
                 }
-                if (res[3] === 'startModFunction') continue;
+                if (res[2] === 'startModFunction') continue;
 
-                var value = res[6] != undefined ? ', ' + res[6] : '';
-                var r = (res[6] + '').split(',');
+                var value = res[4] != undefined && res[4] != '' ? ', ' + res[4] : '';
+
+                var r = (res[4] + '').split(',');
                 if (r[0] === '' || r[0] == 'undefined') {
                     delete r[0];
                 }
-
                 newF =
-                    'var startOriginFunction = ' + res[2] + ';\r\n' +
-                    'var startResultPreFunction  = startModFunction('.concat(res[2] + ');\r\n') +
-                    'var startLastArguments = startModFunction(' + res[2] + ', true);\r\n' +
+                    'var startOriginFunction = ' + res[1] + ';\r\n' +
+                    'var startResultPreFunction  = startModFunction('.concat(res[1] + ');\r\n') +
+                    'var startLastArguments = startModFunction(' + res[1] + ', true);\r\n' +
                     'var startNewFunctionArguments = startLastArguments != undefined ? \'startIfComplete ,startModFunction, \' + startLastArguments : \'startIfComplete ,startModFunction \'   ;\r\n' +
-                    res[2] + ' = new Function(startNewFunctionArguments, startResultPreFunction.f);\r\n' +
-                    res[2] + '(startIfComplete, startModFunction ' + value + ');\r\n' +
-                    res[2] + ' = startOriginFunction;';
-                var r = new RegExp('(' + res[1] + ')(' + res[2] + ')' + '(\\()(.+)?(\\))');
+                    'console.log(startLastArguments);\r\n'+
+                    res[1] + ' = new Function(startNewFunctionArguments, startResultPreFunction.f);\r\n' +
+                    res[1] + '(startIfComplete, startModFunction ' + value + ');\r\n' +
+                    res[1] + ' = startOriginFunction;';
+                var r = new RegExp('(' + res[1] + ')(' + res[1] + ')' + '(\\()(.+)?(\\))');
                 result['f'] = func.replace(res[0], newF);
                 result['r'] = res;
-                result['obj'] = res[3];
+                result['obj'] = res[2];
                 reg.function.lastIndex = res.index + (function(){if(result.f){return newF.length}else return res[0].length}());
             }
 
@@ -452,7 +454,7 @@ var Logistic = {
         };
         var startModFunction = function (func, getArgs) {
             if (getArgs) {
-                var args = preFunc(String(func), true)
+                var args = preFunc(String(func), true);
                 var dataArguments = new Array;
                 if (args) {
                     var arr = args.split(',');

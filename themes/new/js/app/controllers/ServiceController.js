@@ -4,7 +4,14 @@
 function ServiceController() {
     var _this = this;
     this.statusLoadIndex = true;
-    this.t = function(per){
+    this.test = {
+        'new': {
+            'data': function () {
+                console.log(3)
+            }
+        }
+    }
+    this.t = function (per) {
         console.log('t')
         return 'qwe';
     }
@@ -59,17 +66,24 @@ function ServiceController() {
 
     };
     this.crud = function () {
-
+        var _this = this;
         _this.startModel('ImgService', function (model) {
-
             _this.if(function () {
-               var t = model.getAllFromIdService(1);
-
+                model.getAllFromIdService(1);
             }).then(function (result) {
-                console.log(result.if)
-
+                _this.if(function(){
+                    this.render('OneImg', 'ImgService')
+                }).then(
+                    function () {
+                        console.log('Рендер прошел')
+                    }
+                ).else(
+                    function () {
+                        console.log('Рендер не прошел')
+                    }
+                ).end()
             }).end({
-                'model':model
+                'model': model
             });
 
         });

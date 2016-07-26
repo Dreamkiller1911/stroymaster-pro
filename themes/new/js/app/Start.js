@@ -198,7 +198,6 @@ function Start(prop) {
         }
     };
     this.loadActView = function (fileName, view) {
-
         if (this.views.hasOwnProperty(fileName) === false || this.views[fileName].hasOwnProperty('obj') === false) {
             /*if (this.debugMode) {
                 throw new Error('Файл представления ' + fileName + 'View.js, не был подключен или не существует');
@@ -217,7 +216,6 @@ function Start(prop) {
         obj[method]()
         if (obj.components.length > 0) {
             var data = obj.components.join('\r\n').toString();
-
             obj.components = new Array;
             return obj;
         } else{
