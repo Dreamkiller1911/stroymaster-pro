@@ -382,20 +382,24 @@ var Logistic = {
             var reg = {
                 'object': /^(\w+)/,
                 'method': /^(?:\w+\.?)(\w+)/,
-                'function': /((?:(?:var\s+?_*\$*\w)|(?:\w+\.*)+)\s*=\s*(?!new))?(([^\s.]+)\.?(?:(?:(.*)\.)*([^\s.]+)+?)?)\s*(?:\()(.*)(?:\))/g,
+                //'function': /((?:var\s+?_*\$*\w)|(?:\w+\.*(?!resultIF)\1)+\s*=\s*(?!new))?(([^\s.])(?:\.(\S+\.)*)(?=[^\s.]+)\1|(\.[^\s]))\s*(?:\()(.*)(?:\))(?!\s\{)/g,
+                'function': /((?:var\s+?_*\$*\w)|(?:\w+\.*(?!resultIF)\1)+\s*=\s*(?!new))?((?=[^\s.])(?:\.(\S+\.)*)(?=[^\s.]+)\1|(\.[^\s]))\s*(?:\()(.*)(?:\))(?!\s\{)/g,
                 'true': /((\s*)return\s*true)/gm,
                 'false': /((\s*)return\s*false)/gm,
-                'returnData': /(\s*return\s*([^;]*)*)/gm,
+                'returnData': /(?:\s*return\s*(?!startIfComplete\.resultIF)([^;]+)*)(?:(?:;)|(?:\r\n))/g,
             };
-            var res, newF, result = {};
+            var res, ret, newF, result = {};
 
-            if (reg.returnData.test(func)) {
-                func = func.replace(reg.returnData, '\r\n;startIfComplete.resultIF=$2;\r\n' + 'return startIfComplete.resultIF');
+            while (ret = reg.returnData.exec(func)) {
+                var compliteReturn = '\r\n;startIfComplete.resultIF=' + ret[1] + ';\r\n' + 'return startIfComplete.resultIF;\r\n';
+                reg.returnData.lastIndex = ret.index + compliteReturn.length;
+                //tmp = func.substr(0, ret.index) + compliteReturn + func.substr(ret[0].length);
+                func = func.substr(0, ret.index) + compliteReturn + func.substr(ret.index + ret[0].length);
+                //result.f = result.f.replace(ret[0], '\r\n;startIfComplete.resultIF=' + ret[1] + ';\r\n' + 'return startIfComplete.resultIF')
             }
             while (res = reg.function.exec(func)) {
-                console.dir(res)
-
-                reg.function.lastIndex = res.index + res[0].length;
+                console.dir(res);
+                //reg.function.lastIndex = res.index + res[0].length;
                 if (window.hasOwnProperty(res[3])) {
                     continue;
                 }
@@ -423,6 +427,7 @@ var Logistic = {
                 if (r[0] === '' || r[0] == 'undefined') {
                     delete r[0];
                 }
+
                 newF =
                     'var startOriginFunction = ' + res[2] + ';\r\n' +
                     'var startResultPreFunction  = startModFunction('.concat(res[2] + ');\r\n') +
@@ -433,40 +438,74 @@ var Logistic = {
                     res[2] + ' = startOriginFunction;';
                 var r = new RegExp('(' + res[1] + ')(' + res[2] + ')' + '(\\()(.+)?(\\))');
                 result['f'] = func.replace(res[0], newF);
-                console.log(result['f']);
                 result['r'] = res;
                 result['obj'] = res[3];
+                reg.function.lastIndex = res.index + (function(){if(result.f){return newF.length}else return res[0].length}());
             }
-            if (result.f) return result;
+
+            if (result.f){
+
+                return result;
+            }
             result.f = func;
             return result;
         };
         var startModFunction = function (func, getArgs) {
-            try {
-                if (getArgs) {
-                    var args = preFunc(String(func), true)
-                    var dataArguments = new Array;
-                    if (args) {
-                        var arr = args.split(',');
-                        for (var i = 0; i < arr.length; i++) {
-                            dataArguments.push('\'' + arr[i] + '\'');
-                        }
-                        return args.split(',');
+            if (getArgs) {
+                var args = preFunc(String(func), true)
+                var dataArguments = new Array;
+                if (args) {
+                    var arr = args.split(',');
+                    for (var i = 0; i < arr.length; i++) {
+                        dataArguments.push('\'' + arr[i] + '\'');
                     }
-                    return undefined;
+                    return args.split(',');
                 }
-                var data = preFunc(String(func));
-                var result = searchFunc(data);
-                var origin = {f: ''};
-                origin.f = data;
-                return result;
-            } catch (e) {
-                console.log(51561)
+                return undefined;
             }
+            var data = preFunc(String(func));
+            var result = searchFunc(data);
+            var origin = {f: ''};
+            origin.f = data;
+            return result;
         };
         this.startSetIntervalEnd = setInterval(function () {
             for (var i = 0; i < q.length; i++) {
-                if (q[i].hasOwnProperty('statusIF') && q[i].statusIF === 'started' && q[i].end === true) {
+                if ((q[i].resultIF) && q[i].resultIF != 'startNullResultIF' && q[i].end === true) {
+                    try {
+                        if (q[i].hasOwnProperty('then')) {
+                            var result = {'if': q[i].resultIF};
+                            q[i]['then'](result);
+                        }
+                    } catch (e) {
+                        if (_this.start.debugMode) {
+                            console.error(e + '\r\n' +
+                                'Было выброшенно исключение с ошибкой в функции \r\n"' + q[i]['then'] + '"');
+                        } else {
+                            console.warn('Было полученно исключение в коде, рекомендуем проверить fraemwork в debugMode')
+                        }
+                    } finally {
+                        q.splice(i, 1);
+                        continue;
+                    }
+                } else if ((q[i].resultIF === false || q[i].resultIF === undefined) && q[i].resultIF != 'startNullResultIF' && q[i].end === true) {
+                    try {
+                        if (q[i].hasOwnProperty('else')) {
+                            var result = {'if': q[i].resultIF};
+                            q[i]['else'](result);
+                        }
+                    } catch (e) {
+                        if (_this.start.debugMode) {
+                            console.error(e + '\r\n' +
+                                'Было выброшенно исключение с ошибкой в функции \r\n"' + q[i]['else'] + '"');
+                        } else {
+                            console.warn(_this.start.ERROR_WARN_MSG)
+                        }
+                    } finally {
+                        q.splice(i, 1)
+                        continue;
+                    }
+                }else if (q[i].hasOwnProperty('statusIF') && q[i].statusIF === 'started' && q[i].end === true) {
                     q[i].statusIF = 'load';
                     var func = String(q[i]['if']);
                     var result = searchFunc(preFunc(func));
@@ -489,52 +528,17 @@ var Logistic = {
                         }
                         var completeArguments = val.length > 0 ? ', ' + val.join(', ') : '';
                         var completeFunc = func + '(q[i], startModFunction ' + completeArguments + ')';
-                        console.log(1)
                         eval(completeFunc);
-                        console.log(2);
+
                     };
                     q[i]["if"] = new Function(nArgs, result.f).bind(_this);
-                    console.log('Перед запуском функции');
                     runFunction('q[i]["if"]', q[i].params);
-                    console.log('После запуска функции')
-                }else if ((q[i].resultIF) && q[i].resultIF != 'startNullResultIF' && q[i].end === true) {
-                    try {
-                        if (q[i].hasOwnProperty('then')) {
-                            var result = {'if': q[i].resultIF};
-                            q[i]['then'](result);
-                        }
-                    } catch (e) {
-                        if (_this.start.debugMode) {
-                            console.error(e + '\r\n' +
-                                'Было выброшенно исключение с ошибкой в функции \r\n"' + q[i]['then'] + '"');
-                        } else {
-                            console.warn('Было полученно исключение в коде, рекомендуем проверить fraemwork в debugMode')
-                        }
-                    } finally {
-                        q.splice(i, 1);
-                    }
-                } else if ((q[i].resultIF === false || q[i].resultIF === undefined) && q[i].resultIF != 'startNullResultIF' && q[i].end === true) {
-                    try {
-                        if (q[i].hasOwnProperty('else')) {
-                            var result = {'if': q[i].resultIF};
-                            q[i]['else'](result);
-                        }
-                    } catch (e) {
-                        if (_this.start.debugMode) {
-                            console.error(e + '\r\n' +
-                                'Было выброшенно исключение с ошибкой в функции \r\n"' + q[i]['else'] + '"');
-                        } else {
-                            console.warn(_this.start.ERROR_WARN_MSG)
-                        }
-                    } finally {
-                        q.splice(i, 1)
-                    }
                 }
                 if (q.length < 1) {
                     clearInterval(_this.startSetIntervalEnd)
                 }
             }
-        }, 100)
+        }, 10)
     },
     _trimFunction: function (func) {
         var s = new Start();
@@ -562,10 +566,7 @@ var Logistic = {
         completeFunc += String(data) + endFunc;
 
         return data;
-    },
-    _thisSetFinal: function () {
-
-    },
+    }
 };
 
 function progress() {

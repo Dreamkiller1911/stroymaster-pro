@@ -63,13 +63,14 @@ function ServiceController() {
         _this.startModel('ImgService', function (model) {
 
             _this.if(function () {
-               this.t(555);
-                return true
+               var t = model.getAllFromIdService(1);
 
             }).then(function (result) {
                 console.log(result.if)
 
-            }).end();
+            }).end({
+                'model':model
+            });
 
         });
 
