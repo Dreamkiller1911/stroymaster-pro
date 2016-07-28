@@ -1,8 +1,7 @@
 /**
  * Created by tazeb on 14.06.2016.
  */
-var DefaultController =
-{
+var DefaultController = {
     ctrlName: undefined,
     actName: undefined,
     prefix: undefined,
@@ -26,13 +25,45 @@ var DefaultController =
         var bS = bodyScript || false;
         this.start.loadModel(mN, bS, this.ctrlName, prop);
     },
-    render: function (fileName, ctrlName) {
-        if (this.start.views.hasOwnProperty(ctrlName || this.ctrlName)) {
-            console.log(1)
-            return this.start.loadActView(ctrlName || this.ctrlName, fileName);
+    render: function (fileName, property) {
+        var renderProperty = {
+            ctrl: undefined,
+            data: undefined
+        };
+        var _this = this;
+        (function () {
+            if (property && typeof property === 'object') {
+                var prop;
+                for (prop in property) {
+                    if (renderProperty.hasOwnProperty(prop) === false) {
+                        if (_this.start.debugMode) {
+                            console.warn('Не существующее свойство "' + prop + '" для метода "render" контроллера "' + _this.ctrlName + '"')
+                        }
+                        continue;
+                    }
+                    switch (prop) {
+                        case 'ctrl':
+                            if (typeof property[prop] === 'string') {
+                                renderProperty[prop] = property[prop]
+                            } else {
+                                if (_this.start.debugMode) {
+                                    console.warn('Свойство "' + prop + '" объекта "render" должно быть строкой')
+                                }
+                            }
+                            break;
+                        default:
+                            if(property[prop]){
+                                renderProperty[prop] = property[prop]
+                            }
+                    }
+
+                }
+            }
+        })();
+        if (this.start.views.hasOwnProperty(renderProperty.ctrl || this.ctrlName)) {
+            return this.start.loadActView(renderProperty.ctrl || this.ctrlName, fileName);
         } else {
-            console.log(2);
-            this.start.includeJSView(ctrlName || this.ctrlName, fileName);
+            this.start.includeJSView(renderProperty.ctrl || this.ctrlName, fileName);
         }
     }
 };
@@ -389,17 +420,16 @@ var Logistic = {
                 //'function': /((?:var\s+?_*\$*\w)|(?:\w+\.*(?!resultIF)\1)+\s*=\s*(?!new))?(([^\s.])(?:\.(\S+\.)*)(?=[^\s.]+)\1|(\.[^\s]))\s*(?:\()(.*)(?:\))(?!\s\{)/g,
                 //'function': /((?:(?:var\s[$\w]+)|(?:[$\w]+\.*(?!resultIF)\1)+)\s*=\s*(?!new)\1)?(?=(([^\s.;]+)(?:\.?([^\s.;]+(?=\.)\3)*([^\s.;]+(?!\.)\4))?)\s*(?:\()(.*)(?:\))(?!\s\{))\2/g,
                 //'function': /(([^\s.;]+)(?:\.?(?:[^\s.;]+(?=\.)\1)*([^\s.;]+(?!\.)\1))?)\s*(?:\()(.*)(?:\))(?!\s\{)/gm,
-                'function': /^(?:[\s]*)((\w+)(?:((?:\.\w+(?=\.))*)(?:(?:\.)(\w+))?)?)\s*(?:\()(.*)(?:\))(?!\s*[\{\.])/gm,
+                'function': /^(?:[\s]*)((\w+)(?:((?:\.\w+(?:\(.*\))?(?=\.))*)(?:(?:\.)(\w+))?)?)\s*(?:\()(.*)(?:\))(?!\s*[\{\.])/gm,
                 'true': /((\s*)return\s*true)/gm,
                 'false': /((\s*)return\s*false)/gm,
                 'returnData': /(?:\s*return\s*(?!startIfComplete\.resultIF)([^;]+)*)(?:(?:;)|(?:\r\n))/g,
             };
             var res, ret, newF, resCom, result = {}, commentPosition = new Array;
-            while (resCom = reg.commentBlock.exec(func)){
+            while (resCom = reg.commentBlock.exec(func)) {
                 commentPosition.push({'a': resCom.index, 'b': resCom.index + resCom[0].length})
             }
-            while (resCom = reg.commentLine.exec(func)){
-                //console.log(resCom[0])
+            while (resCom = reg.commentLine.exec(func)) {
                 commentPosition.push({'a': resCom.index, 'b': resCom.index + resCom[0].length})
             }
             while (ret = reg.returnData.exec(func)) {
@@ -408,9 +438,9 @@ var Logistic = {
                 func = func.substr(0, ret.index) + compliteReturn + func.substr(ret.index + ret[0].length);
             }
             glob: while (res = reg.function.exec(func)) {
-                var fullName = res[1],obj =  res[2], lastMethod = res[4], val = res[5];
-                for (var i = 0; i < commentPosition.length; i++){
-                    if(res.index > commentPosition[i].a && res.index < commentPosition[i].b){
+                var fullName = res[1], obj = res[2], lastMethod = res[4], val = res[5];
+                for (var i = 0; i < commentPosition.length; i++) {
+                    if (res.index > commentPosition[i].a && res.index < commentPosition[i].b) {
                         continue glob;
                     }
                 }
@@ -435,9 +465,6 @@ var Logistic = {
                     continue;
                 }
                 if (obj === 'startModFunction') continue;
-                console.log(res[0])
-
-
                 var value = val != undefined && val != '' ? ', ' + val : '';
                 var r = (val + '').split(',');
                 if (r[0] === '' || r[0] == 'undefined') {
@@ -448,7 +475,7 @@ var Logistic = {
                     'var startResultPreFunction  = startModFunction('.concat(fullName + ');\r\n') +
                     'var startLastArguments = startModFunction(' + fullName + ', true);\r\n' +
                     'var startNewFunctionArguments = startLastArguments != undefined ? \'startIfComplete ,startModFunction, \' + startLastArguments : \'startIfComplete ,startModFunction \'   ;\r\n' +
-                    //'console.log(startLastArguments);\r\n'+
+                        //'console.log(startLastArguments);\r\n'+
                     fullName + ' = new Function(startNewFunctionArguments, startResultPreFunction.f);\r\n' +
                     fullName + '(startIfComplete, startModFunction ' + value + ');\r\n' +
                     fullName + ' = startOriginFunction;';
@@ -456,10 +483,8 @@ var Logistic = {
                 result['f'] = func.replace(res[0], newF);
                 result['r'] = res;
                 result['obj'] = obj;
-                //reg.function.lastIndex = res.index + (function(){if(result.f){return newF.length}else return res[0].length}());
             }
-
-            if (result.f){
+            if (result.f) {
                 return result;
             }
             result.f = func;
@@ -520,7 +545,7 @@ var Logistic = {
                         q.splice(i, 1)
                         continue;
                     }
-                }else if (q[i].hasOwnProperty('statusIF') && q[i].statusIF === 'started' && q[i].end === true) {
+                } else if (q[i].hasOwnProperty('statusIF') && q[i].statusIF === 'started' && q[i].end === true) {
                     q[i].statusIF = 'load';
                     var func = String(q[i]['if']);
                     var result = searchFunc(preFunc(func));
@@ -636,50 +661,50 @@ function Errors(obj) {
 
 
     this.showAll = function (prop) {
-        setNewProperties(prop);
-        searchElements();
-        for (var i in _this.dataElements) {
-            var text = _this.dataElements[i].text[0];
-            var label = _this.dataElements[i].label;
-            var input = _this.dataElements[i].input;
-            if (_this.propError.dataError.hasOwnProperty(this.dataElements[i].key)) {
-                _this.propError.showMethod(text, label, input);
+        this._setNewProperties(prop);
+        this._searchElements();
+        for (var i in this.dataElements) {
+            var text = this.dataElements[i].text[0];
+            var label = this.dataElements[i].label;
+            var input = this.dataElements[i].input;
+            if (this.propError.dataError.hasOwnProperty(this.dataElements[i].key)) {
+                this.propError.showMethod(text, label, input);
 
             } else {
-                _this.propError.hideMethod(label);
+                this.propError.hideMethod(label);
             }
 
         }
     };
-    var setNewProperties = function (prop) {
+    this._setNewProperties = function (prop) {
         if (prop === undefined) {
-            _this.propError.dataError = {};
+            this.propError.dataError = {};
             return false;
         }
         for (var p in prop) {
-            if (_this.propError.hasOwnProperty(p.toString()) === false) {
+            if (this.propError.hasOwnProperty(p.toString()) === false) {
                 console.warn('Не существующее свойство "' + p.toString() + '" в методе "showErrors" объекта модели "' + _this.owner.modelName + '"')
             }
         }
         if (typeof prop.dataError === 'object') {
-            _this.propError.dataError = prop.dataError;
+            this.propError.dataError = prop.dataError;
         }
         if (typeof prop.errorPattern === 'object') {
-            _this.propError.errorPattern = prop.errorPattern;
+            this.propError.errorPattern = prop.errorPattern;
         }
         if (typeof prop.showMethod === 'function') {
-            _this.propError.showMethod = prop.showMethod;
+            this.propError.showMethod = prop.showMethod;
         }
 
     };
-    var searchElements = function () {
-        for (var i in _this.owner.properties) {
-            for (var p in _this.propError.dataError) {
-                var patt = new RegExp(_this.owner.properties[i].toString());
+    this._searchElements = function () {
+        for (var i in this.owner.properties) {
+            for (var p in this.propError.dataError) {
+                var patt = new RegExp(this.owner.properties[i].toString());
 
                 if (patt.test(p)) {
-                    if ('dataElements' in _this === false && typeof _this.dataElements != 'object') {
-                        Object.defineProperty(_this, 'dataElements', {
+                    if ('dataElements' in this === false && typeof this.dataElements != 'object') {
+                        Object.defineProperty(this, 'dataElements', {
                             value: new Object(),
                             enumerable: true,
                             writable: true,
@@ -687,7 +712,7 @@ function Errors(obj) {
                         })
                     }
 
-                    Object.defineProperty(_this.dataElements, _this.owner.properties[i].toString(), {
+                    Object.defineProperty(this.dataElements, this.owner.properties[i].toString(), {
                         value: {},
                         enumerable: true,
                         writable: true,
@@ -695,53 +720,53 @@ function Errors(obj) {
                     });
 
 
-                    var tmpPat = '[startmodel="' + _this.owner.prefix + 'error_' + _this.owner.properties[i] + '"]';
+                    var tmpPat = '[startmodel="' + this.owner.prefix + 'error_' + this.owner.properties[i] + '"]';
                     var elem = document.querySelector(tmpPat.toString());
                     if (elem) {
-                        Object.defineProperties(_this.dataElements[_this.owner.properties[i]], {
+                        Object.defineProperties(this.dataElements[this.owner.properties[i]], {
                             'label': {
                                 value: elem
                             },
                             'input': {
-                                value: _this.owner.p[_this.owner.properties[i]]
+                                value: this.owner.p[this.owner.properties[i]]
                             },
                             'text': {
-                                value: _this.propError.dataError[p]
+                                value: this.propError.dataError[p]
                             },
                             'key': {
                                 value: p
                             }
                         });
                     } else {
-                        if (_this.propError.errorPattern === undefined) {
-                            if (_this.owner.start.debugMode) {
-                                console.error('Не найден DOM элемент для "' + p + '", по "StartModel=' + _this.owner.prefix + 'error_' +
-                                    _this.owner.properties[i] + ' и не указано свойство errorPattern" для метода "showAll"')
+                        if (this.propError.errorPattern === undefined) {
+                            if (this.owner.start.debugMode) {
+                                console.error('Не найден DOM элемент для "' + p + '", по "StartModel=' + this.owner.prefix + 'error_' +
+                                    this.owner.properties[i] + ' и не указано свойство errorPattern" для метода "showAll"')
                             }
                             return false;
                         }
-                        for (var tagName in _this.propError.errorPattern) {
+                        for (var tagName in this.propError.errorPattern) {
                             switch (tagName.toLowerCase()) {
                                 case 'id':
-                                    var patternError = _this.propError.errorPattern[tagName].replace(new RegExp('{{prop}}'), _this.owner.properties[i]);
+                                    var patternError = this.propError.errorPattern[tagName].replace(new RegExp('{{prop}}'), this.owner.properties[i]);
                                     elem = document.getElementById(patternError.toString());
                                     if (elem) {
-                                        Object.defineProperties(_this.dataElements[_this.owner.properties[i]], {
+                                        Object.defineProperties(this.dataElements[this.owner.properties[i]], {
                                             'label': {
                                                 value: elem
                                             },
                                             'input': {
-                                                value: _this.owner.p[_this.owner.properties[i]]
+                                                value: this.owner.p[this.owner.properties[i]]
                                             },
                                             'text': {
-                                                value: _this.propError.dataError[p]
+                                                value: this.propError.dataError[p]
                                             },
                                             'key': {
                                                 value: p
                                             }
                                         })
                                     } else {
-                                        if (_this.owner.start.debugMode) {
+                                        if (this.owner.start.debugMode) {
                                             console.warn('Не найден дом элемент с ID="' + patternError + '". Вывод ошибки для "' +
                                                 p + '" не возможен')
                                         }

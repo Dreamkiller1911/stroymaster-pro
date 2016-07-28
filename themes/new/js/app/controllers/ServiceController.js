@@ -72,17 +72,28 @@ function ServiceController() {
                 this.test.new.data();
                 model.getAllFromIdService(1);
             }).then(function (result) {
-                _this.if(function(){
-                    this.render('OneImg', 'ImgService')
-                }).then(
+                _this.
+                if(function(){
+                    this.render('OneImg', {
+                        ctrl: 'ImgService',
+                        data: {
+                            'data' : data
+                        }
+                    })
+                }).
+                then(
                     function () {
                         console.log('Рендер прошел')
                     }
-                ).else(
+                ).
+                else(
                     function () {
                         console.log('Рендер не прошел')
                     }
-                ).end()
+                ).
+                end({
+                    'data': result.if
+                })
             }).end({
                 'model': model
             });

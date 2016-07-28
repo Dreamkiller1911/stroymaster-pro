@@ -6,8 +6,12 @@ function ImgServiceView() {
     this.prefix = 'ImgServiceView';
 
 
-    this.viewOneImg = function(model){
+    this.viewOneImg = function(model, rain, debug){
+        var r = function(){
 
+        }
+        console.log(this)
+        console.log(model)
     };
     this.viewImgEdit = function(){
         _this.write(

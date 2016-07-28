@@ -206,6 +206,7 @@ function Start(prop) {
         }
         var obj = this.views[fileName].obj;
         var method = 'view' + view;
+        var _this = this;
         if (obj.hasOwnProperty(method) === false) {
             if (this.debugMode) {
                 throw new Error('В представлении ' + fileName + 'View() не найден метод View' + view + ', путь до файла \r\n' +
@@ -213,13 +214,29 @@ function Start(prop) {
             }
             return false;
         }
-        obj[method]()
+        (function(){
+            var test = function(){
+                var reg = {
+                    'startFunc' : /^function\s*\((.*)\)\s*\{/,
+                };
+                var func = String(obj[method])
+                var stFunc = reg.startFunc.exec(func);
+                var argum = stFunc[1].split(/\s*,\s*/);
+                var bodyFunc = _this._trimFunction(func);
+                if(stFunc[1]){}
+                obj[method] = new Function('model',bodyFunc);
+                var qwe = 456;
+                eval('obj[method](qwe)')
+                console.dir(argum);
+            };
+            test();
+            //obj[method]();
+        }());
         if (obj.components.length > 0) {
             var data = obj.components.join('\r\n').toString();
             obj.components = new Array;
             return obj;
         } else{
-            console.log('false')
             return false;
         }
     };
