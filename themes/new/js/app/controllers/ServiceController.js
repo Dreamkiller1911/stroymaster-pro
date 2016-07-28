@@ -69,6 +69,7 @@ function ServiceController() {
         var _this = this;
         _this.startModel('ImgService', function (model) {
             _this.if(function () {
+                /*ServiceTestComments*/
                 model.getAllFromIdService(1);
             }).then(function (result) {
                 _this.if(function(){

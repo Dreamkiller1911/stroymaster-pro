@@ -28,8 +28,10 @@ var DefaultController =
     },
     render: function (fileName, ctrlName) {
         if (this.start.views.hasOwnProperty(ctrlName || this.ctrlName)) {
+            console.log(1)
             return this.start.loadActView(ctrlName || this.ctrlName, fileName);
         } else {
+            console.log(2);
             this.start.includeJSView(ctrlName || this.ctrlName, fileName);
         }
     }
@@ -382,14 +384,17 @@ var Logistic = {
             var reg = {
                 'object': /^(\w+)/,
                 'method': /^(?:\w+\.?)(\w+)/,
+                'commentLine': /we/gm,
+                    'commentBlock': /(\/)\*.*/gm,
                 //'function': /((?:var\s+?_*\$*\w)|(?:\w+\.*(?!resultIF)\1)+\s*=\s*(?!new))?(([^\s.])(?:\.(\S+\.)*)(?=[^\s.]+)\1|(\.[^\s]))\s*(?:\()(.*)(?:\))(?!\s\{)/g,
                 //'function': /((?:(?:var\s[$\w]+)|(?:[$\w]+\.*(?!resultIF)\1)+)\s*=\s*(?!new)\1)?(?=(([^\s.;]+)(?:\.?([^\s.;]+(?=\.)\3)*([^\s.;]+(?!\.)\4))?)\s*(?:\()(.*)(?:\))(?!\s\{))\2/g,
-                'function': /^(?:\s*)(([^\s.;]+)(?:\.?(?:[^\s.;]+(?=\.)\3)*([^\s.;]+(?!\.)\4))?)\s*(?:\()(.*)(?:\))(?!\s\{)/g,
+                'function': /^(?:[\s]*)(([^\s.;]+)(?:\.?(?:[^\s.;]+(?=\.)\1)*([^\s.;]+(?!\.)\1))?)\s*(?:\()(.*)(?:\))(?!\s\{)/gm,
                 'true': /((\s*)return\s*true)/gm,
                 'false': /((\s*)return\s*false)/gm,
                 'returnData': /(?:\s*return\s*(?!startIfComplete\.resultIF)([^;]+)*)(?:(?:;)|(?:\r\n))/g,
             };
             var res, ret, newF, result = {};
+            console.log(func.match(reg.commentBlock));
 
             while (ret = reg.returnData.exec(func)) {
                 var compliteReturn = '\r\n;startIfComplete.resultIF=' + ret[1] + ';\r\n' + 'return startIfComplete.resultIF;\r\n';
@@ -399,7 +404,6 @@ var Logistic = {
                 //result.f = result.f.replace(ret[0], '\r\n;startIfComplete.resultIF=' + ret[1] + ';\r\n' + 'return startIfComplete.resultIF')
             }
             while (res = reg.function.exec(func)) {
-                console.dir(res);
                 //reg.function.lastIndex = res.index + res[0].length;
                 if (window.hasOwnProperty(res[2])) {
                     continue;
@@ -422,7 +426,6 @@ var Logistic = {
                     continue;
                 }
                 if (res[2] === 'startModFunction') continue;
-
                 var value = res[4] != undefined && res[4] != '' ? ', ' + res[4] : '';
 
                 var r = (res[4] + '').split(',');
@@ -434,7 +437,7 @@ var Logistic = {
                     'var startResultPreFunction  = startModFunction('.concat(res[1] + ');\r\n') +
                     'var startLastArguments = startModFunction(' + res[1] + ', true);\r\n' +
                     'var startNewFunctionArguments = startLastArguments != undefined ? \'startIfComplete ,startModFunction, \' + startLastArguments : \'startIfComplete ,startModFunction \'   ;\r\n' +
-                    'console.log(startLastArguments);\r\n'+
+                    //'console.log(startLastArguments);\r\n'+
                     res[1] + ' = new Function(startNewFunctionArguments, startResultPreFunction.f);\r\n' +
                     res[1] + '(startIfComplete, startModFunction ' + value + ');\r\n' +
                     res[1] + ' = startOriginFunction;';
@@ -446,10 +449,11 @@ var Logistic = {
             }
 
             if (result.f){
-
+                //console.log(String(result.f))
                 return result;
             }
             result.f = func;
+            //console.log(result.f)
             return result;
         };
         var startModFunction = function (func, getArgs) {
