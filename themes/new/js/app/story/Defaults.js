@@ -384,76 +384,85 @@ var Logistic = {
             var reg = {
                 'object': /^(\w+)/,
                 'method': /^(?:\w+\.?)(\w+)/,
-                'commentLine': /we/gm,
-                    'commentBlock': /(\/)\*.*/gm,
+                'commentLine': /\/\/.*/g,
+                'commentBlock': /(?:\/\*)(?:([\w\s\S]*(?=\*\/)\1))(\*\/)/gm,
                 //'function': /((?:var\s+?_*\$*\w)|(?:\w+\.*(?!resultIF)\1)+\s*=\s*(?!new))?(([^\s.])(?:\.(\S+\.)*)(?=[^\s.]+)\1|(\.[^\s]))\s*(?:\()(.*)(?:\))(?!\s\{)/g,
                 //'function': /((?:(?:var\s[$\w]+)|(?:[$\w]+\.*(?!resultIF)\1)+)\s*=\s*(?!new)\1)?(?=(([^\s.;]+)(?:\.?([^\s.;]+(?=\.)\3)*([^\s.;]+(?!\.)\4))?)\s*(?:\()(.*)(?:\))(?!\s\{))\2/g,
-                'function': /^(?:[\s]*)(([^\s.;]+)(?:\.?(?:[^\s.;]+(?=\.)\1)*([^\s.;]+(?!\.)\1))?)\s*(?:\()(.*)(?:\))(?!\s\{)/gm,
+                //'function': /(([^\s.;]+)(?:\.?(?:[^\s.;]+(?=\.)\1)*([^\s.;]+(?!\.)\1))?)\s*(?:\()(.*)(?:\))(?!\s\{)/gm,
+                'function': /^(?:[\s]*)((\w+)(?:((?:\.\w+(?=\.))*)(?:(?:\.)(\w+))?)?)\s*(?:\()(.*)(?:\))(?!\s*[\{\.])/gm,
                 'true': /((\s*)return\s*true)/gm,
                 'false': /((\s*)return\s*false)/gm,
                 'returnData': /(?:\s*return\s*(?!startIfComplete\.resultIF)([^;]+)*)(?:(?:;)|(?:\r\n))/g,
             };
-            var res, ret, newF, result = {};
-            console.log(func.match(reg.commentBlock));
-
+            var res, ret, newF, resCom, result = {}, commentPosition = new Array;
+            while (resCom = reg.commentBlock.exec(func)){
+                commentPosition.push({'a': resCom.index, 'b': resCom.index + resCom[0].length})
+            }
+            while (resCom = reg.commentLine.exec(func)){
+                //console.log(resCom[0])
+                commentPosition.push({'a': resCom.index, 'b': resCom.index + resCom[0].length})
+            }
             while (ret = reg.returnData.exec(func)) {
                 var compliteReturn = '\r\n;startIfComplete.resultIF=' + ret[1] + ';\r\n' + 'return startIfComplete.resultIF;\r\n';
                 reg.returnData.lastIndex = ret.index + compliteReturn.length;
-                //tmp = func.substr(0, ret.index) + compliteReturn + func.substr(ret[0].length);
                 func = func.substr(0, ret.index) + compliteReturn + func.substr(ret.index + ret[0].length);
-                //result.f = result.f.replace(ret[0], '\r\n;startIfComplete.resultIF=' + ret[1] + ';\r\n' + 'return startIfComplete.resultIF')
             }
-            while (res = reg.function.exec(func)) {
-                //reg.function.lastIndex = res.index + res[0].length;
-                if (window.hasOwnProperty(res[2])) {
+            glob: while (res = reg.function.exec(func)) {
+                var fullName = res[1],obj =  res[2], lastMethod = res[4], val = res[5];
+                for (var i = 0; i < commentPosition.length; i++){
+                    if(res.index > commentPosition[i].a && res.index < commentPosition[i].b){
+                        continue glob;
+                    }
+                }
+                if (window.hasOwnProperty(obj)) {
                     continue;
                 }
                 if (
-                    Array.prototype.hasOwnProperty(res[3]) ||
-                    String.prototype.hasOwnProperty(res[3]) ||
-                    Object.prototype.hasOwnProperty(res[3])
+                    Array.prototype.hasOwnProperty(lastMethod) ||
+                    String.prototype.hasOwnProperty(lastMethod) ||
+                    Object.prototype.hasOwnProperty(lastMethod)
                 ) {
                     continue;
                 }
-                if (res[2] === 'function') continue;
-                if (res[2].search(/(if)|(else)|(for)|(while)|(switch)/) === 0) continue;
+                if (obj === 'function') continue;
+                if (obj.search(/(if)|(else)|(for)|(while)|(switch)/) === 0) continue;
                 if (
-                    (DefaultController.hasOwnProperty(res[3]) ||
-                    DefaultModel.hasOwnProperty(res[3]) ||
-                    DefaultView.hasOwnProperty(res[3])) &&
-                    res[3][0] === '_'
+                    (DefaultController.hasOwnProperty(lastMethod) ||
+                    DefaultModel.hasOwnProperty(lastMethod) ||
+                    DefaultView.hasOwnProperty(lastMethod)) &&
+                    lastMethod[0] === '_'
                 ) {
                     continue;
                 }
-                if (res[2] === 'startModFunction') continue;
-                var value = res[4] != undefined && res[4] != '' ? ', ' + res[4] : '';
+                if (obj === 'startModFunction') continue;
+                console.log(res[0])
 
-                var r = (res[4] + '').split(',');
+
+                var value = val != undefined && val != '' ? ', ' + val : '';
+                var r = (val + '').split(',');
                 if (r[0] === '' || r[0] == 'undefined') {
                     delete r[0];
                 }
                 newF =
-                    'var startOriginFunction = ' + res[1] + ';\r\n' +
-                    'var startResultPreFunction  = startModFunction('.concat(res[1] + ');\r\n') +
-                    'var startLastArguments = startModFunction(' + res[1] + ', true);\r\n' +
+                    'var startOriginFunction = ' + fullName + ';\r\n' +
+                    'var startResultPreFunction  = startModFunction('.concat(fullName + ');\r\n') +
+                    'var startLastArguments = startModFunction(' + fullName + ', true);\r\n' +
                     'var startNewFunctionArguments = startLastArguments != undefined ? \'startIfComplete ,startModFunction, \' + startLastArguments : \'startIfComplete ,startModFunction \'   ;\r\n' +
                     //'console.log(startLastArguments);\r\n'+
-                    res[1] + ' = new Function(startNewFunctionArguments, startResultPreFunction.f);\r\n' +
-                    res[1] + '(startIfComplete, startModFunction ' + value + ');\r\n' +
-                    res[1] + ' = startOriginFunction;';
-                var r = new RegExp('(' + res[1] + ')(' + res[1] + ')' + '(\\()(.+)?(\\))');
+                    fullName + ' = new Function(startNewFunctionArguments, startResultPreFunction.f);\r\n' +
+                    fullName + '(startIfComplete, startModFunction ' + value + ');\r\n' +
+                    fullName + ' = startOriginFunction;';
+                var r = new RegExp('(' + fullName + ')(' + fullName + ')' + '(\\()(.+)?(\\))');
                 result['f'] = func.replace(res[0], newF);
                 result['r'] = res;
-                result['obj'] = res[2];
-                reg.function.lastIndex = res.index + (function(){if(result.f){return newF.length}else return res[0].length}());
+                result['obj'] = obj;
+                //reg.function.lastIndex = res.index + (function(){if(result.f){return newF.length}else return res[0].length}());
             }
 
             if (result.f){
-                //console.log(String(result.f))
                 return result;
             }
             result.f = func;
-            //console.log(result.f)
             return result;
         };
         var startModFunction = function (func, getArgs) {

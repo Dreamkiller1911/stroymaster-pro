@@ -6,7 +6,7 @@ function ServiceController() {
     this.statusLoadIndex = true;
     this.test = {
         'new': {
-            'data': function () {
+            'data': function (mod) {
                 console.log(3)
             }
         }
@@ -69,7 +69,7 @@ function ServiceController() {
         var _this = this;
         _this.startModel('ImgService', function (model) {
             _this.if(function () {
-                /*ServiceTestComments*/
+                this.test.new.data();
                 model.getAllFromIdService(1);
             }).then(function (result) {
                 _this.if(function(){
@@ -101,7 +101,6 @@ function ServiceController() {
             var e = window.event || event;
             e.preventDefault;
 
-
             _this.startModel('Service', function (model) {
                 model.getProperties();
                 _this.
@@ -110,11 +109,9 @@ function ServiceController() {
                 }).
                 then(function () {
                     model.viewFromId(1);
-
                 }).
                 else(function () {
                     alert('Не удалось выполнить запрос на сохранение')
-
                 }).
                 end({'model': model})
             });
