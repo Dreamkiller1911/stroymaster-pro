@@ -4,13 +4,7 @@
 function ServiceController() {
     var _this = this;
     this.statusLoadIndex = true;
-    this.test = {
-        'new': {
-            'data': function (mod) {
-                console.log(3)
-            }
-        }
-    }
+
     this.t = function (per) {
         console.log('t')
         return 'qwe';
@@ -69,31 +63,23 @@ function ServiceController() {
         var _this = this;
         _this.startModel('ImgService', function (model) {
             _this.if(function () {
-                this.test.new.data();
                 model.getAllFromIdService(1);
             }).then(function (result) {
-                _this.
-                if(function(){
-                    this.render('OneImg', {
-                        ctrl: 'ImgService',
-                        data: {
-                            'data' : data
-                        }
-                    })
-                }).
-                then(
-                    function () {
-                        console.log('Рендер прошел')
-                    }
-                ).
-                else(
-                    function () {
-                        console.log('Рендер не прошел')
-                    }
-                ).
-                end({
-                    'data': result.if
-                })
+                var i = 0, res = result.if;
+                for ( ; i < res.length; i++){
+                    _this.if(function(){
+                        this.render('OneImg', {ctrl: 'ImgService', data: {'model':model}})
+                    }).
+                        then(function(result){
+
+                        console.log('Рендер прошел успешно')
+                    }).
+                        else(function(result){
+                        console.log(result.if)
+                        console.log('Рендер завершился неудачей ')
+                    }).
+                        end({'model':res[i]});
+                }
             }).end({
                 'model': model
             });

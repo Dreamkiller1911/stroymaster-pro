@@ -10,7 +10,6 @@ function ImgServiceView() {
         var r = function(){
 
         }
-        console.log(this)
         console.log(model)
     };
     this.viewImgEdit = function(){

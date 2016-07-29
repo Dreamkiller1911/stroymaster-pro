@@ -52,7 +52,7 @@ var DefaultController = {
                             }
                             break;
                         default:
-                            if(property[prop]){
+                            if (property[prop]) {
                                 renderProperty[prop] = property[prop]
                             }
                     }
@@ -60,12 +60,71 @@ var DefaultController = {
                 }
             }
         })();
-        if (this.start.views.hasOwnProperty(renderProperty.ctrl || this.ctrlName)) {
-            return this.start.loadActView(renderProperty.ctrl || this.ctrlName, fileName);
-        } else {
-            this.start.includeJSView(renderProperty.ctrl || this.ctrlName, fileName);
+        if (this.hasOwnProperty('_queueRender') === false) {
+            Object.defineProperties(this, {
+                '_queueRender': {
+                    value: new Array
+                },
+                '_renderTimeInterval': {
+                    value: undefined,
+                    writable: true
+                }
+            });
         }
-    }
+        if (!renderProperty.ctrl) {
+            renderProperty.ctrl = this.ctrlName;
+        }
+        this._queueRender.push({
+            'ctrl': renderProperty.ctrl,
+            'act': fileName,
+            'property': renderProperty.data,
+            'toReturn': function(a,b,c){
+                return _this.start.loadActView(a, b, c);
+            } ,
+            status: 'start'
+        });
+        var startViewQueue = function (_this) {
+                if (this._renderTimeInterval) clearInterval(this._renderTimeInterval);
+                this._renderTimeInterval = setInterval(function () {
+                    if (_this._queueRender.length < 1) {
+                        clearInterval(_this._renderTimeInterval);
+                        return false;
+                    }
+                    var i = 0, queue = _this._queueRender;
+                    for (; i < queue.length; i++) {
+                        if(queue[queue.length-1].status === 'ready'){
+                            clearInterval(_this._renderTimeInterval);
+                        }
+                        if(queue[i].status === 'start'){
+                            queue[i].status = 'load';
+                        }
+                        if(queue[i].status === 'load'){
+                            if (_this.start.views.hasOwnProperty(queue[i].ctrl)) {
+                                if (_this.start.views[queue[i].ctrl].status === 'ready') {
+                                    queue[i].toReturn(queue[i].ctrl, queue[i].act, queue[i].property);
+                                    queue[i].status = 'ready';
+                                    break;
+                                } else {
+                                    break;
+                                }
+                            } else {
+                                _this.start.includeJSView(queue[i].ctrl);
+                            }
+                        }
+                        if(queue[i].status != 'ready'){
+                            break;
+                        }
+                    }
+                }, 10)
+        };
+        startViewQueue(_this);
+        /*if (this.start.views.hasOwnProperty(renderProperty.ctrl)) {
+            return this.start.loadActView(renderProperty.ctrl, fileName, renderProperty.data);
+        } else {
+            this.start.includeJSView(renderProperty.ctrl || this.ctrlName, fileName, renderProperty.data);
+        }*/
+    },
+
 };
 var DefaultModel = {
     /*p: new Object(),

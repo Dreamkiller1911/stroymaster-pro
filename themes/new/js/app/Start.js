@@ -37,7 +37,7 @@ function Start(prop) {
             try {
                 var beginMessage = 'Вы воспользовались обработчиком строк "addSlash" для экранирования символов';
                 var result = '';
-                if(!string){
+                if (!string) {
                     throw new Error(beginMessage + '\r\n необходимо передать первый парамет в качестве строки в которой будут ' +
                         'экранироваться символы');
                 }
@@ -45,31 +45,31 @@ function Start(prop) {
                     throw new Error(beginMessage + '\r\n необходимо передать второй параметр в качестве стоки для одного символа' +
                         'или в качестве массива для множественного экранирования')
                 }
-                if(typeof symbol === 'string'){
+                if (typeof symbol === 'string') {
                     result = string.replace(new RegExp('(' + symbol + ')', 'gm'), '\\$1');
                 }
-                if(typeof symbol === 'object'){
+                if (typeof symbol === 'object') {
                     var i, data;
-                    for (i = 0; i < symbol.length; i++){
+                    for (i = 0; i < symbol.length; i++) {
                         string = string.replace(new RegExp('(' + symbol[i] + ')', 'gm'), '\\$1')
                     }
                     result = string
                 }
             } catch (e) {
-                if(this.debugMode){
+                if (this.debugMode) {
                     console.error(e.message);
-                }else {
+                } else {
                     console.warn(this.ERROR_WARN_MSG)
                 }
             } finally {
 
-                if (result === ''){
+                if (result === '') {
                     return false;
                 }
                 return result;
             }
         },
-        trimS: function(str){
+        trimS: function (str) {
             return str.replace(new RegExp("\\s", "gm"), '');
         }
     };
@@ -197,14 +197,15 @@ function Start(prop) {
                 + _this.paths.ctrls + ctrl + 'Controller.js\'');
         }
     };
-    this.loadActView = function (fileName, view) {
+    this.loadActView = function (fileName, view, params) {
         if (this.views.hasOwnProperty(fileName) === false || this.views[fileName].hasOwnProperty('obj') === false) {
             /*if (this.debugMode) {
-                throw new Error('Файл представления ' + fileName + 'View.js, не был подключен или не существует');
-            }*/
+             throw new Error('Файл представления ' + fileName + 'View.js, не был подключен или не существует');
+             }*/
             return false;
         }
         var obj = this.views[fileName].obj;
+        //console.log(this.views)
         var method = 'view' + view;
         var _this = this;
         if (obj.hasOwnProperty(method) === false) {
@@ -214,20 +215,24 @@ function Start(prop) {
             }
             return false;
         }
-        (function(){
-            var test = function(){
+        (function () {
+            var test = function () {
                 var reg = {
-                    'startFunc' : /^function\s*\((.*)\)\s*\{/,
+                    'startFunc': /^function\s*\((.*)\)\s*\{/,
                 };
-                var func = String(obj[method])
+                var origin = obj[method];
+                var func = String(obj[method]);
                 var stFunc = reg.startFunc.exec(func);
                 var argum = stFunc[1].split(/\s*,\s*/);
                 var bodyFunc = _this._trimFunction(func);
-                if(stFunc[1]){}
-                obj[method] = new Function('model',bodyFunc);
+                if (stFunc[1]) {
+                }
+                obj[method] = new Function('model', bodyFunc);
                 var qwe = 456;
                 eval('obj[method](qwe)')
-                console.dir(argum);
+                obj[method] = origin;
+                //console.log(func)
+                console.log(argum, params);
             };
             test();
             //obj[method]();
@@ -236,7 +241,7 @@ function Start(prop) {
             var data = obj.components.join('\r\n').toString();
             obj.components = new Array;
             return obj;
-        } else{
+        } else {
             return false;
         }
     };
@@ -381,7 +386,7 @@ function Start(prop) {
         script.type = 'text/javascript';
         document.getElementsByTagName('head')[0].appendChild(script);
     };
-    this.includeJSView = function (fileName, view) {
+    this.includeJSView = function (fileName) {
         var pathView = this.paths.views + fileName + 'View.js?' + Math.random();
         var script = document.createElement('script');
         var head = document.getElementsByTagName('head');
@@ -400,15 +405,11 @@ function Start(prop) {
                     writable: true,
                     enumerable: true
                 },
-                'nameFunction': {
-                    value: view,
-                    writable: true,
-                },
                 'start': {
                     value: _this
-                },
+                }
             });
-            _this.loadActView(fileName, view)
+            _this.views[fileName].status = 'ready';
         };
         script.onerror = function () {
             console.error('Не удалось найти файл отображения с именем "' + fileName + 'View.js"\r\nПолный путь к файлу "' + pathView + '"')
