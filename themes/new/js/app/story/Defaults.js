@@ -30,14 +30,14 @@ var DefaultController = {
             ctrl: undefined,
             data: undefined
         };
-        var _this = this;
+        var self = this;
         (function () {
             if (property && typeof property === 'object') {
                 var prop;
                 for (prop in property) {
                     if (renderProperty.hasOwnProperty(prop) === false) {
-                        if (_this.start.debugMode) {
-                            console.warn('Не существующее свойство "' + prop + '" для метода "render" контроллера "' + _this.ctrlName + '"')
+                        if (self.start.debugMode) {
+                            console.warn('Не существующее свойство "' + prop + '" для метода "render" контроллера "' + self.ctrlName + '"')
                         }
                         continue;
                     }
@@ -46,7 +46,7 @@ var DefaultController = {
                             if (typeof property[prop] === 'string') {
                                 renderProperty[prop] = property[prop]
                             } else {
-                                if (_this.start.debugMode) {
+                                if (self.start.debugMode) {
                                     console.warn('Свойство "' + prop + '" объекта "render" должно быть строкой')
                                 }
                             }
@@ -56,7 +56,6 @@ var DefaultController = {
                                 renderProperty[prop] = property[prop]
                             }
                     }
-
                 }
             }
         })();
@@ -79,28 +78,28 @@ var DefaultController = {
             'act': fileName,
             'property': renderProperty.data,
             'toReturn': function(a,b,c){
-                return _this.start.loadActView(a, b, c);
+                return self.start.loadActView(a, b, c);
             } ,
             status: 'start'
         });
-        var startViewQueue = function (_this) {
+        var startViewQueue = function (self) {
                 if (this._renderTimeInterval) clearInterval(this._renderTimeInterval);
                 this._renderTimeInterval = setInterval(function () {
-                    if (_this._queueRender.length < 1) {
-                        clearInterval(_this._renderTimeInterval);
+                    if (self._queueRender.length < 1) {
+                        clearInterval(self._renderTimeInterval);
                         return false;
                     }
-                    var i = 0, queue = _this._queueRender;
+                    var i = 0, queue = self._queueRender;
                     for (; i < queue.length; i++) {
                         if(queue[queue.length-1].status === 'ready'){
-                            clearInterval(_this._renderTimeInterval);
+                            clearInterval(self._renderTimeInterval);
                         }
                         if(queue[i].status === 'start'){
                             queue[i].status = 'load';
                         }
                         if(queue[i].status === 'load'){
-                            if (_this.start.views.hasOwnProperty(queue[i].ctrl)) {
-                                if (_this.start.views[queue[i].ctrl].status === 'ready') {
+                            if (self.start.views.hasOwnProperty(queue[i].ctrl)) {
+                                if (self.start.views[queue[i].ctrl].status === 'ready') {
                                     queue[i].toReturn(queue[i].ctrl, queue[i].act, queue[i].property);
                                     queue[i].status = 'ready';
                                     break;
@@ -108,16 +107,16 @@ var DefaultController = {
                                     break;
                                 }
                             } else {
-                                _this.start.includeJSView(queue[i].ctrl);
+                                self.start.includeJSView(queue[i].ctrl);
                             }
                         }
                         if(queue[i].status != 'ready'){
                             break;
                         }
                     }
-                }, 10)
+                }, 5)
         };
-        startViewQueue(_this);
+        startViewQueue(self);
         /*if (this.start.views.hasOwnProperty(renderProperty.ctrl)) {
             return this.start.loadActView(renderProperty.ctrl, fileName, renderProperty.data);
         } else {
@@ -247,6 +246,7 @@ var DefaultModel = {
      * @returns {boolean}
      */
     getProperties: function () {
+        var _this = this;
         if ('p' in this == false) {
             Object.defineProperty(this, 'p', {
                 value: new Object(),
@@ -282,8 +282,8 @@ var DefaultModel = {
             Object.defineProperty(this.p, 'allPropertiesTo', {
                 value: function (type) {
                     var optModel = this.model.properties;
-                    var tmpData = new Object();
-                    var fileData = new FormData();
+                    var _tmpData = new Object();
+                    var _fileData = new FormData();
                     var triger = false;
                     switch (type) {
                         default:
@@ -295,33 +295,33 @@ var DefaultModel = {
                                         if (opt.type === 'file') {
                                             triger = true;
                                             for (var i = 0; i < opt.files.length; i++) {
-                                                fileData.append(opt.name, opt.files[i]);
+                                                _fileData.append(opt.name, opt.files[i]);
                                             }
 
                                             break;
                                         } else {
-                                            tmpData[optModel[prop]] = this[optModel[prop]].value;
+                                            _tmpData[optModel[prop]] = this[optModel[prop]].value;
                                         }
                                         break;
                                     default:
                                         if (this.hasOwnProperty(optModel[prop])) {
-                                            tmpData[optModel[prop]] = this[optModel[prop]].value;
+                                            _tmpData[optModel[prop]] = this[optModel[prop]].value;
                                         }
                                 }
                             }
                             break;
                     }
                     if (triger) {
-                        for (var d in tmpData) {
-                            fileData.append(d, tmpData[d]);
+                        for (var d in _tmpData) {
+                            _fileData.append(d, _tmpData[d]);
                         }
-                        return fileData;
+                        return _fileData;
                     }
-                    return tmpData;
+                    return _tmpData;
                 }
             });
         }
-        return this.p;
+        return _this.p;
     },
     getProperty: function (prop) {
         if ('p' in this == false) {
@@ -416,7 +416,7 @@ var DefaultModel = {
                     this.attributes["'{attr}'"] = value;
                 },
                 get: function () {
-                    if (this.attributes["'{attr}'"] === undefined) return undefined;
+                    if (this.attributes["'{attr}'"] === undefined || this.attributes["'{attr}'"] === null) return '';
                     return this.attributes["'{attr}'"];
                 }
             })
@@ -426,14 +426,49 @@ var DefaultModel = {
 var DefaultView = {
     prefix: undefined,
 
+    show: function(newNode){
+        var tmp = document.createElement('div');
+        tmp.innerHTML = newNode;
+        var _renderComplete = {
+            _result : 555,
+            effects: undefined,
+            append: function(nodeElement){
+                nodeElement.appendChild(this._result);
+            }
+        };
+        console.log(this._renderEffects)
+        _renderComplete._result = tmp;
+        //console.log(this._renderComplete)
+        //this._renderResult.push(this._renderComplete);
+        return _renderComplete
+    },
+    addEffect: function(nameGroup, element, effects){
+        if(!element || element === '') throw new Error('Первый параметр метода "addEffect" объекта "" является обязательным');
+        if(typeof element != 'string') throw new Error('Первый параметр метода "addEffect" объекта "" должен быть строкой');
+        if( !effects || effects.length === 0 || !Array.isArray(effects)) throw new Error('Третий параметр метода "addEffect" объекта "" является обязательным и должен быть массивом');
+        var regexp = /^(<\w+(?=\s+))/;
+        var arrayEffects = [];
+        var fix = Math.round(Math.random()*100000);
+        var selector = '[StartViewEffectsId="' + this.prefix + '_' + nameGroup + '_' + fix + '"]';
+        element = element.replace(regexp, '$1 StartViewEffectsId="' + this.prefix + '_' + nameGroup + '_' + fix + '"');
+        if(Array.isArray(effects[0])){
+
+        }else {
+            arrayEffects[nameGroup] = {};
+            arrayEffects[nameGroup][effects[0]] = function(){
+                var res = document.querySelector(selector);
+                effects[1](res);
+            };
+        }
+
+        this._renderEffects.push(arrayEffects, true);
+        return element;
+    },
     write: function (body) {
         if (body === undefined || body === '') return false;
         this.components.push(body);
         return this
     },
-    create: function () {
-
-    }
 };
 var Logistic = {
     if: function (body) {
@@ -476,13 +511,10 @@ var Logistic = {
                 'method': /^(?:\w+\.?)(\w+)/,
                 'commentLine': /\/\/.*/g,
                 'commentBlock': /(?:\/\*)(?:([\w\s\S]*(?=\*\/)\1))(\*\/)/gm,
-                //'function': /((?:var\s+?_*\$*\w)|(?:\w+\.*(?!resultIF)\1)+\s*=\s*(?!new))?(([^\s.])(?:\.(\S+\.)*)(?=[^\s.]+)\1|(\.[^\s]))\s*(?:\()(.*)(?:\))(?!\s\{)/g,
-                //'function': /((?:(?:var\s[$\w]+)|(?:[$\w]+\.*(?!resultIF)\1)+)\s*=\s*(?!new)\1)?(?=(([^\s.;]+)(?:\.?([^\s.;]+(?=\.)\3)*([^\s.;]+(?!\.)\4))?)\s*(?:\()(.*)(?:\))(?!\s\{))\2/g,
-                //'function': /(([^\s.;]+)(?:\.?(?:[^\s.;]+(?=\.)\1)*([^\s.;]+(?!\.)\1))?)\s*(?:\()(.*)(?:\))(?!\s\{)/gm,
                 'function': /^(?:[\s]*)((\w+)(?:((?:\.\w+(?:\(.*\))?(?=\.))*)(?:(?:\.)(\w+))?)?)\s*(?:\()(.*)(?:\))(?!\s*[\{\.])/gm,
                 'true': /((\s*)return\s*true)/gm,
                 'false': /((\s*)return\s*false)/gm,
-                'returnData': /(?:\s*return\s*(?!startIfComplete\.resultIF)([^;]+)*)(?:(?:;)|(?:\r\n))/g,
+                'returnData': /(?:(?:\s*return\s*)(?!startIfComplete\.resultIF)([^_;]+)*)(?:(?:;)|(?:\r\n))/g,
             };
             var res, ret, newF, resCom, result = {}, commentPosition = new Array;
             while (resCom = reg.commentBlock.exec(func)) {
@@ -509,7 +541,8 @@ var Logistic = {
                 if (
                     Array.prototype.hasOwnProperty(lastMethod) ||
                     String.prototype.hasOwnProperty(lastMethod) ||
-                    Object.prototype.hasOwnProperty(lastMethod)
+                    Object.prototype.hasOwnProperty(lastMethod) ||
+                    FormData.prototype.hasOwnProperty(lastMethod)
                 ) {
                     continue;
                 }
@@ -665,7 +698,7 @@ var Logistic = {
         completeFunc += String(data) + endFunc;
 
         return data;
-    }
+    },
 };
 
 function progress() {

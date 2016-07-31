@@ -7,10 +7,10 @@ function Start(prop) {
     this.debugMode = prop != undefined && prop.hasOwnProperty('debugMode') ? prop.debugMode : false;
     this.appPath = undefined;//Путь к корню приложения
     this.paths = {models: undefined, views: undefined, ctrls: undefined};
-    this.queue = new Array();
-    this.models = new Object();
-    this.views = new Object();
-    this.ctrls = new Object();
+    this.queue = [];
+    this.models = {};
+    this.views = {};
+    this.ctrls = {};
 
     this.ERROR_WARN_MSG = 'Было полученно исключение в коде, рекомендуем проверить fraemwork в debugMode';
 
@@ -208,42 +208,70 @@ function Start(prop) {
         //console.log(this.views)
         var method = 'view' + view;
         var _this = this;
+        var result;
         if (obj.hasOwnProperty(method) === false) {
             if (this.debugMode) {
                 throw new Error('В представлении ' + fileName + 'View() не найден метод View' + view + ', путь до файла \r\n' +
                     this.paths.views + fileName + 'View.js')
             }
-            return false;
+            //return false;
         }
         (function () {
             var test = function () {
-                var reg = {
-                    'startFunc': /^function\s*\((.*)\)\s*\{/,
-                };
-                var origin = obj[method];
-                var func = String(obj[method]);
-                var stFunc = reg.startFunc.exec(func);
-                var argum = stFunc[1].split(/\s*,\s*/);
-                var bodyFunc = _this._trimFunction(func);
-                if (stFunc[1]) {
+                try {
+                    var reg = {
+                        'startFunc': /^function\s*\((.*)\)\s*\{/,
+                    };
+                    var fulArguments = [];
+                    var fulParameters = [];
+                    var origin = obj[method];
+                    var func = String(obj[method]);
+                    var stFunc = reg.startFunc.exec(func);
+                    var argum = stFunc[1].split(/\s*,\s*/);
+                    var bodyFunc = _this._trimFunction(func);
+                    if (stFunc[1]) {
+                    }
+                    if (params) {
+                        var i = 0, cloneParams = {};
+                        for (var p in params) {
+                            cloneParams[p] = params[p];
+                        }
+                        for (; i < argum.length; i++) {
+                            if (cloneParams.hasOwnProperty(argum[i])) {
+                                fulParameters.push('params.' + argum[i]);
+                                fulArguments.push(argum[i]);
+                                delete cloneParams[argum[i]];
+                            } else {
+                                fulArguments.push(argum[i]);
+                                fulParameters.push('params.' + argum[i]);
+                                params[argum[i]] = undefined;
+                            }
+                        }
+                        for (var p in cloneParams) {
+                            if (p) {
+                                fulArguments.push(p);
+                                fulParameters.push('params.' + p);
+                            }
+                        }
+                    }
+                    if (fulArguments.length < 1) {
+                        fulArguments.push('undefined')
+                    }
+                    obj[method] = new Function(fulArguments.join(', '), bodyFunc);
+                    result = eval('obj[method](' + fulParameters.join(', ') + ')')
+                    obj[method] = origin;
+                } catch (e) {
+                    if(_this.debugMode){
+                        console.error(e)
+                    }else {
+                        console.warn(_this.ERROR_WARN_MSG)
+                    }
                 }
-                obj[method] = new Function('model', bodyFunc);
-                var qwe = 456;
-                eval('obj[method](qwe)')
-                obj[method] = origin;
-                //console.log(func)
-                console.log(argum, params);
             };
             test();
-            //obj[method]();
         }());
-        if (obj.components.length > 0) {
-            var data = obj.components.join('\r\n').toString();
-            obj.components = new Array;
-            return obj;
-        } else {
-            return false;
-        }
+        return result;
+
     };
     this.loadModel = function (modelName, bodyScript, ctrl, prop) {
         var ctrl = this._findCtrlByName(ctrl);
@@ -338,7 +366,7 @@ function Start(prop) {
             var o = _this.ctrls[scriptName];
             DefaultController.prototype = Logistic;
 
-            cloningObject(DefaultController, Logistic);
+            _this._cloningObject(DefaultController, Logistic);
             window[fullCtrl.toString()].prototype = DefaultController;
 
 
@@ -368,7 +396,7 @@ function Start(prop) {
         script.onload = function () {
 
             DefaultModel.prototype = Logistic;
-            cloningObject(DefaultModel, Logistic);
+            _this._cloningObject(DefaultModel, Logistic);
             window[modelName.toString()].prototype = DefaultModel;
             Object.defineProperty(_this.models[modelName.toString()], 'obj', {
                 value: new window[modelName.toString()](),
@@ -393,6 +421,8 @@ function Start(prop) {
         var fullName = fileName.toString() + 'View';
         var _this = this;
         script.onload = function () {
+            DefaultView.prototype = Logistic;
+            _this._cloningObject(DefaultView, Logistic);
             window[fullName.toString()].prototype = DefaultView;
 
             Object.defineProperty(_this.views[fileName], 'obj', {
@@ -400,13 +430,17 @@ function Start(prop) {
                 enumerable: true
             });
             Object.defineProperties(_this.views[fileName].obj, {
-                'components': {
-                    value: new Array,
-                    writable: true,
-                    enumerable: true
+                '_renderResult': {
+                    value: []
                 },
                 'start': {
                     value: _this
+                },
+                '_renderEffects': {
+                    value: []
+                },
+                '_effectsAutocomplete': {
+                    value: []
                 }
             });
             _this.views[fileName].status = 'ready';
@@ -524,7 +558,7 @@ function Start(prop) {
 
 
     };
-    var cloningObject = function (a, b) {
+    this._cloningObject = function (a, b) {
         for (var i in b) {
             if (a.hasOwnProperty(i) || i in a) break;
             a[i] = b[i];

@@ -26,8 +26,8 @@ function ImgServiceController() {
         }
     };
     this.uploadAll = function () {
-
         var ctrl = _this.getControls();
+        var place = document.getElementById('imgList');
         if (!ctrl) return false;
 
         _this.startModel('ImgService', function (model) {
@@ -37,7 +37,20 @@ function ImgServiceController() {
                 if (Number(cPl.innerHTML) > 0) {
                     ctrl[0].onchange = function () {
                         _this.startModel('ImgService', function (model) {
-                            model.addAll();
+                            _this.if(function(){
+                                model.addAll();
+                            }).then(function(result){
+                                var i = 0;
+                                for ( ; i < result.if.length; i++){
+                                    _this.if(function(){
+                                        this.render('OneImg', {'data': {'model': model}})
+                                    }).then(function (result) {
+                                        place.appendChild(result.if.render);
+                                        _this.start.init('ImgService', 'delete');
+                                        result.if.effects.fansybox();
+                                    }).end({'model':result.if[i]})
+                                }
+                            }).end({'model':model})
                         });
                     }
                 } else {

@@ -58,10 +58,8 @@ class ImgServicesController extends Controller
                 $img = ImgServices::addMyImg($_FILES['saveAllImg'], $id_service);
                 $arg = array('complete' => true, 'imgBalance' => User::getMyImgLimit(true));
                 foreach ($img as $key) {
-                    $model['ImgServices'] = ImgServices::model()->findByPk($key->id);
-                    $arg['img'][] = $this->renderFile(Yii::app()->theme->baseUrl . '/views/services/_imgList.php', array(
-                        'model' => $model
-                    ), true);
+                    $model = ImgServices::model()->findByPk($key->id);
+                    $arg['img'][] = $model->attributes;
                 }
                 echo json_encode($arg);
             } else throw new Exception("<h4>Вы не выбрали файл</h4>");

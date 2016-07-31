@@ -32,10 +32,11 @@ function ImgService() {
         });
     };
     this.addAll = function () {
-        _this.getProperties();
-        var data = _this.p.allPropertiesTo();
+        var _this = this;
+        this.getProperties();
+        var data = this.p.allPropertiesTo();
         data.append('root', 'master');
-        _this.ajax({
+        this.ajax({
             type: "POsT",
             url: "/imgServices/saveAll/",
             data: data,
@@ -44,26 +45,8 @@ function ImgService() {
                 if (data.complete) {
                     _this.p.numOst.style.background = 'red';
                     _this.p.numOst.innerHTML = data.imgBalance;
-
-                    setTimeout(function () {
-                        _this.p.numOst.style.background = 'gray';
-                        var i = 0;
-                        var place = document.getElementById('imgList');
-                        var addImgI = setInterval(function () {
-                            if (i >= data.img.length - 1) {
-                                _this.start.init('ImgService', 'delete');
-                                clearInterval(addImgI);
-                            }
-                            var div = document.createElement('div');
-                            div.innerHTML = data.img[i];
-                            place.appendChild(div.children[0]);
-                            i++;
-
-                        }, 250);
-                    }, 150);
-
+                    return data.img
                 }
-
                 console.log(data);
             }
         });

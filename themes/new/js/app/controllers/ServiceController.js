@@ -3,13 +3,13 @@
  */
 function ServiceController() {
     var _this = this;
+    this.timeIterator = 0;
     this.statusLoadIndex = true;
 
     this.t = function (per) {
         console.log('t')
         return 'qwe';
     }
-    this.proprrr;
     this.viewModal = function () {
         var ctrl = _this.getControls();
         for (var i = 0; i < ctrl.length; i++) {
@@ -60,7 +60,9 @@ function ServiceController() {
 
     };
     this.crud = function () {
+        this.start.init('ImgService', 'uploadAll')
         var _this = this;
+        var place = document.getElementById('imgList');
         _this.startModel('ImgService', function (model) {
             _this.if(function () {
                 model.getAllFromIdService(1);
@@ -68,14 +70,17 @@ function ServiceController() {
                 var i = 0, res = result.if;
                 for ( ; i < res.length; i++){
                     _this.if(function(){
-                        this.render('OneImg', {ctrl: 'ImgService', data: {'model':model}})
+                        this.render('OneImg', {ctrl: 'ImgService', data: {'now':89207582615, 'model':model}})
                     }).
                         then(function(result){
-
-                        console.log('Рендер прошел успешно')
+                        _this.timeIterator ++;
+                        setTimeout(function(){
+                            result.if.append(place)
+                        }, 60 * _this.timeIterator);
+                        //place.appendChild(result.if.render);
+                        _this.start.init('ImgService', 'delete');
                     }).
                         else(function(result){
-                        console.log(result.if)
                         console.log('Рендер завершился неудачей ')
                     }).
                         end({'model':res[i]});
