@@ -428,27 +428,39 @@ var DefaultView = {
 
     show: function (newNode) {
         var tmp = document.createElement('div');
-        var re = [], i = 0, a = this._renderEffects, autoApply = [];
+        var re = [], i = 0, a = this._renderEffects, autoApply = [], bin = {};
         for (; i < a.length; i++) {
             for (var block in a[i]) {
                 re[block] = {};
                 autoApply[block] = {};
                 for (var comp in a[i][block]) {
                     re[block][comp] = a[i][block][comp].func;
+                    bin[block] = a[i][block][comp].bind;
                     autoApply[block][comp] = a[i][block][comp].autoApply;
                 }
             }
         }
-
         tmp.innerHTML = newNode;
 
         var _renderComplete = {
-            result: undefined,
-            _autoApplyList: undefined,
-            effects: undefined,
+            result: tmp,
+            effects: re,
+            _autoApplyList: autoApply,
+            _bindList : bin,
             append: function (nodeElement) {
                 nodeElement.appendChild(this.result);
                 this._autoApply();
+            },
+            bind: function(group, event, action){
+                if(this._bindList.hasOwnProperty(group) === false) {
+                    console.log('error')
+                }
+                var selector = this._bindList[group];
+                var element = document.querySelector(selector);
+                if(!selector){
+                    console.log('Нет элементов');
+                }
+                element[event] = action;
             },
             _autoApply: function () {
                 if (this._autoApplyList === undefined) return false;
@@ -457,7 +469,7 @@ var DefaultView = {
 
                 for(var block in list){
                    for(var element in list[block]){
-                       if(list[block][element]){
+                       if(list[block][element] === true){
                            this.effects[block][element]();
                        }
                    }
@@ -465,9 +477,10 @@ var DefaultView = {
             }
         };
         this._renderEffects.length = 0;
-        _renderComplete.result = tmp;
+        /*_renderComplete.result = tmp;
         _renderComplete.effects = re;
-        _renderComplete._autoApplyList = autoApply;
+        _renderComplete._autoApplyList = autoApply;*/
+
         return _renderComplete;
     },
     addEffect: function (nameGroup, element, effects) {
@@ -475,15 +488,61 @@ var DefaultView = {
         if (typeof element != 'string') throw new Error('Первый параметр метода "addEffect" объекта "" должен быть строкой');
         if (!effects || effects.length === 0 || !Array.isArray(effects)) throw new Error('Третий параметр метода "addEffect" объекта "" является обязательным и должен быть массивом');
         var regexp = /^(<\w+(?=\s+))/;
+        var _this = this;
         var arrayEffects = [];
         var fix = Math.round(Math.random() * 100000);
+        var test = function(nameG, ef, ar, sl){
+            if(nameG in ar === false){
+                ar[nameG] = {};
+            }
+            if(nameG in  _this._effectsAutocomplete === false){
+                _this._effectsAutocomplete[nameG] = [];
+            }
+            ar[nameG][ef[0]] = {};
+            ar[nameG][ef[0]]['func'] = function () {
+                var res = document.querySelector(sl);
+                ef[1](res);
+            };
+            ar[nameG][ef[0]]['bind'] = selector;
+            if (ef[2] != undefined && ef[2] === false) {
+                ar[nameG][ef[0]]['autoApply'] = false;
+            } else {
+                ar[nameG][ef[0]]['autoApply'] = true;
+            }
+
+        }
         var selector = '[StartViewEffectsId="' + this.prefix + '_' + nameGroup + '_' + fix + '"]';
         element = element.replace(regexp, '$1 StartViewEffectsId="' + this.prefix + '_' + nameGroup + '_' + fix + '"');
         if (Array.isArray(effects[0])) {
-
+            var i = 0;
+            for ( ; i < effects.length; i++ ){
+                test(nameGroup, effects[i], arrayEffects, selector);
+                /*if(nameGroup in arrayEffects === false){
+                    arrayEffects[nameGroup] = {};
+                }
+                if(nameGroup in  this._effectsAutocomplete === false){
+                    this._effectsAutocomplete[nameGroup] = [];
+                }
+                arrayEffects[nameGroup][effects[i][0]] = {};
+                arrayEffects[nameGroup][effects[i][0]]['func'] = function () {
+                    var res = document.querySelector(selector);
+                    console.log(efe)
+                    //efe[1](res);
+                };*/
+               /* if (effects[i][2] != undefined && effects[i][2] === false) {
+                    arrayEffects[nameGroup][effects[i][0]]['autoApply'] = false;
+                } else {
+                    arrayEffects[nameGroup][effects[i][0]]['autoApply'] = true;
+                }*/
+            }
         } else {
-            arrayEffects[nameGroup] = {};
-            this._effectsAutocomplete[nameGroup] = [];
+            if(nameGroup in arrayEffects === false){
+                arrayEffects[nameGroup] = {};
+            }
+            if(nameGroup in  this._effectsAutocomplete === false){
+                this._effectsAutocomplete[nameGroup] = [];
+            }
+
             arrayEffects[nameGroup][effects[0]] = {};
             arrayEffects[nameGroup][effects[0]]['func'] = function () {
                 var res = document.querySelector(selector);

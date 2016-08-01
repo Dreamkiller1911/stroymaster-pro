@@ -21,7 +21,10 @@ function ImgServiceView() {
                     '<a href="' + model.url + '" rel="gallery" title="' + model.description + '">' +
                     '<img src="' + model.simple_url + '">' +
                     '</a>',
-                    ['fancybox', this.setFancy, true]
+                    [
+                        ['fancybox', this.setFancy, true],
+                        ['op04', function(element){$(element).stop().animate({'opacity':0.3},400)}, false],
+                        ['op01', function(element){$(element).stop().animate({'opacity':1},400)}, false]]
                 ) +
                 '</div>' +
                 '</div>' +

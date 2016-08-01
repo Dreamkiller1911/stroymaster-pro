@@ -76,6 +76,8 @@ function ServiceController() {
                         _this.timeIterator ++;
                         setTimeout(function(){
                             result.if.append(place);
+                            result.if.bind('imgBlock', 'onmouseover', function(){result.if.effects.imgBlock.op04()});
+                            result.if.bind('imgBlock', 'onmouseleave', function(){result.if.effects.imgBlock.op01()});
                             _this.start.init('ImgService', 'delete');
                         }, 150 * _this.timeIterator);
                     }).
