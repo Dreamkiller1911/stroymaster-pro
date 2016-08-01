@@ -77,51 +77,51 @@ var DefaultController = {
             'ctrl': renderProperty.ctrl,
             'act': fileName,
             'property': renderProperty.data,
-            'toReturn': function(a,b,c){
+            'toReturn': function (a, b, c) {
                 return self.start.loadActView(a, b, c);
-            } ,
+            },
             status: 'start'
         });
         var startViewQueue = function (self) {
-                if (this._renderTimeInterval) clearInterval(this._renderTimeInterval);
-                this._renderTimeInterval = setInterval(function () {
-                    if (self._queueRender.length < 1) {
+            if (this._renderTimeInterval) clearInterval(this._renderTimeInterval);
+            this._renderTimeInterval = setInterval(function () {
+                if (self._queueRender.length < 1) {
+                    clearInterval(self._renderTimeInterval);
+                    return false;
+                }
+                var i = 0, queue = self._queueRender;
+                for (; i < queue.length; i++) {
+                    if (queue[queue.length - 1].status === 'ready') {
                         clearInterval(self._renderTimeInterval);
-                        return false;
                     }
-                    var i = 0, queue = self._queueRender;
-                    for (; i < queue.length; i++) {
-                        if(queue[queue.length-1].status === 'ready'){
-                            clearInterval(self._renderTimeInterval);
-                        }
-                        if(queue[i].status === 'start'){
-                            queue[i].status = 'load';
-                        }
-                        if(queue[i].status === 'load'){
-                            if (self.start.views.hasOwnProperty(queue[i].ctrl)) {
-                                if (self.start.views[queue[i].ctrl].status === 'ready') {
-                                    queue[i].toReturn(queue[i].ctrl, queue[i].act, queue[i].property);
-                                    queue[i].status = 'ready';
-                                    break;
-                                } else {
-                                    break;
-                                }
+                    if (queue[i].status === 'start') {
+                        queue[i].status = 'load';
+                    }
+                    if (queue[i].status === 'load') {
+                        if (self.start.views.hasOwnProperty(queue[i].ctrl)) {
+                            if (self.start.views[queue[i].ctrl].status === 'ready') {
+                                queue[i].toReturn(queue[i].ctrl, queue[i].act, queue[i].property);
+                                queue[i].status = 'ready';
+                                break;
                             } else {
-                                self.start.includeJSView(queue[i].ctrl);
+                                break;
                             }
-                        }
-                        if(queue[i].status != 'ready'){
-                            break;
+                        } else {
+                            self.start.includeJSView(queue[i].ctrl);
                         }
                     }
-                }, 5)
+                    if (queue[i].status != 'ready') {
+                        break;
+                    }
+                }
+            }, 5)
         };
         startViewQueue(self);
         /*if (this.start.views.hasOwnProperty(renderProperty.ctrl)) {
-            return this.start.loadActView(renderProperty.ctrl, fileName, renderProperty.data);
-        } else {
-            this.start.includeJSView(renderProperty.ctrl || this.ctrlName, fileName, renderProperty.data);
-        }*/
+         return this.start.loadActView(renderProperty.ctrl, fileName, renderProperty.data);
+         } else {
+         this.start.includeJSView(renderProperty.ctrl || this.ctrlName, fileName, renderProperty.data);
+         }*/
     },
 
 };
@@ -426,42 +426,78 @@ var DefaultModel = {
 var DefaultView = {
     prefix: undefined,
 
-    show: function(newNode){
+    show: function (newNode) {
         var tmp = document.createElement('div');
+        var re = [], i = 0, a = this._renderEffects, autoApply = [];
+        for (; i < a.length; i++) {
+            for (var block in a[i]) {
+                re[block] = {};
+                autoApply[block] = {};
+                for (var comp in a[i][block]) {
+                    re[block][comp] = a[i][block][comp].func;
+                    autoApply[block][comp] = a[i][block][comp].autoApply;
+                }
+            }
+        }
+
         tmp.innerHTML = newNode;
+
         var _renderComplete = {
-            _result : 555,
+            result: undefined,
+            _autoApplyList: undefined,
             effects: undefined,
-            append: function(nodeElement){
-                nodeElement.appendChild(this._result);
+            append: function (nodeElement) {
+                nodeElement.appendChild(this.result);
+                this._autoApply();
+            },
+            _autoApply: function () {
+                if (this._autoApplyList === undefined) return false;
+
+                var list = this._autoApplyList;
+
+                for(var block in list){
+                   for(var element in list[block]){
+                       if(list[block][element]){
+                           this.effects[block][element]();
+                       }
+                   }
+                }
             }
         };
-        console.log(this._renderEffects)
-        _renderComplete._result = tmp;
-        //console.log(this._renderComplete)
-        //this._renderResult.push(this._renderComplete);
-        return _renderComplete
+        this._renderEffects.length = 0;
+        _renderComplete.result = tmp;
+        _renderComplete.effects = re;
+        _renderComplete._autoApplyList = autoApply;
+        return _renderComplete;
     },
-    addEffect: function(nameGroup, element, effects){
-        if(!element || element === '') throw new Error('Первый параметр метода "addEffect" объекта "" является обязательным');
-        if(typeof element != 'string') throw new Error('Первый параметр метода "addEffect" объекта "" должен быть строкой');
-        if( !effects || effects.length === 0 || !Array.isArray(effects)) throw new Error('Третий параметр метода "addEffect" объекта "" является обязательным и должен быть массивом');
+    addEffect: function (nameGroup, element, effects) {
+        if (!element || element === '') throw new Error('Первый параметр метода "addEffect" объекта "" является обязательным');
+        if (typeof element != 'string') throw new Error('Первый параметр метода "addEffect" объекта "" должен быть строкой');
+        if (!effects || effects.length === 0 || !Array.isArray(effects)) throw new Error('Третий параметр метода "addEffect" объекта "" является обязательным и должен быть массивом');
         var regexp = /^(<\w+(?=\s+))/;
         var arrayEffects = [];
-        var fix = Math.round(Math.random()*100000);
+        var fix = Math.round(Math.random() * 100000);
         var selector = '[StartViewEffectsId="' + this.prefix + '_' + nameGroup + '_' + fix + '"]';
         element = element.replace(regexp, '$1 StartViewEffectsId="' + this.prefix + '_' + nameGroup + '_' + fix + '"');
-        if(Array.isArray(effects[0])){
+        if (Array.isArray(effects[0])) {
 
-        }else {
+        } else {
             arrayEffects[nameGroup] = {};
-            arrayEffects[nameGroup][effects[0]] = function(){
+            this._effectsAutocomplete[nameGroup] = [];
+            arrayEffects[nameGroup][effects[0]] = {};
+            arrayEffects[nameGroup][effects[0]]['func'] = function () {
                 var res = document.querySelector(selector);
                 effects[1](res);
             };
+            if (effects[2] != undefined && effects[2] === false) {
+                arrayEffects[nameGroup][effects[0]]['autoApply'] = false;
+            } else {
+                arrayEffects[nameGroup][effects[0]]['autoApply'] = true;
+            }
+
         }
 
-        this._renderEffects.push(arrayEffects, true);
+        this._renderEffects.push(arrayEffects);
         return element;
     },
     write: function (body) {

@@ -45,9 +45,8 @@ function ImgServiceController() {
                                     _this.if(function(){
                                         this.render('OneImg', {'data': {'model': model}})
                                     }).then(function (result) {
-                                        place.appendChild(result.if.render);
+                                        result.if.append(place);
                                         _this.start.init('ImgService', 'delete');
-                                        result.if.effects.fansybox();
                                     }).end({'model':result.if[i]})
                                 }
                             }).end({'model':model})

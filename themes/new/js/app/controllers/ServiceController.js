@@ -75,10 +75,9 @@ function ServiceController() {
                         then(function(result){
                         _this.timeIterator ++;
                         setTimeout(function(){
-                            result.if.append(place)
-                        }, 60 * _this.timeIterator);
-                        //place.appendChild(result.if.render);
-                        _this.start.init('ImgService', 'delete');
+                            result.if.append(place);
+                            _this.start.init('ImgService', 'delete');
+                        }, 150 * _this.timeIterator);
                     }).
                         else(function(result){
                         console.log('Рендер завершился неудачей ')
