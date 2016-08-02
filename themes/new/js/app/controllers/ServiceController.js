@@ -67,7 +67,7 @@ function ServiceController() {
             _this.if(function () {
                 model.getAllFromIdService(1);
             }).then(function (result) {
-                var i = 0, res = result.if;
+                var i = 0, res = result.if, imgModel = [];
                 for ( ; i < res.length; i++){
                     _this.if(function(){
                         this.render('OneImg', {ctrl: 'ImgService', data: {'now':89207582615, 'model':model}})
@@ -76,8 +76,9 @@ function ServiceController() {
                         _this.timeIterator ++;
                         setTimeout(function(){
                             result.if.append(place);
-                            result.if.bind('imgBlock', 'onmouseover', function(){result.if.effects.imgBlock.op04()});
-                            result.if.bind('imgBlock', 'onmouseleave', function(){result.if.effects.imgBlock.op01()});
+                            result.if.bind('globalAnimate', 'onmouseover', function(){result.if.effects.globalAnimate.op01()});
+                            result.if.bind('globalAnimate', 'onmouseleave', function(){result.if.effects.globalAnimate.op04()});
+                            setTimeout(function(){result.if.effects.globalAnimate.fadeOut()}, 2000)
                             _this.start.init('ImgService', 'delete');
                         }, 150 * _this.timeIterator);
                     }).

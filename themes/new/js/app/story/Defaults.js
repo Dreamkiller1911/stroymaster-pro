@@ -82,7 +82,7 @@ var DefaultController = {
             },
             status: 'start'
         });
-        var startViewQueue = function (self) {
+        this.startViewQueue = function (self) {
             if (this._renderTimeInterval) clearInterval(this._renderTimeInterval);
             this._renderTimeInterval = setInterval(function () {
                 if (self._queueRender.length < 1) {
@@ -116,7 +116,7 @@ var DefaultController = {
                 }
             }, 5)
         };
-        startViewQueue(self);
+        this.startViewQueue(self);
         /*if (this.start.views.hasOwnProperty(renderProperty.ctrl)) {
          return this.start.loadActView(renderProperty.ctrl, fileName, renderProperty.data);
          } else {
@@ -441,6 +441,9 @@ var DefaultView = {
             }
         }
         tmp.innerHTML = newNode;
+        if(tmp.children.length === 1){
+            tmp = tmp.children[0];
+        }
 
         var _renderComplete = {
             result: tmp,
@@ -487,11 +490,11 @@ var DefaultView = {
         if (!element || element === '') throw new Error('Первый параметр метода "addEffect" объекта "" является обязательным');
         if (typeof element != 'string') throw new Error('Первый параметр метода "addEffect" объекта "" должен быть строкой');
         if (!effects || effects.length === 0 || !Array.isArray(effects)) throw new Error('Третий параметр метода "addEffect" объекта "" является обязательным и должен быть массивом');
-        var regexp = /^(<\w+(?=\s+))/;
+        var regexp = /^(<\w+(?=\s*\>))/;
         var _this = this;
         var arrayEffects = [];
         var fix = Math.round(Math.random() * 100000);
-        var test = function(nameG, ef, ar, sl){
+        this.test = function(nameG, ef, ar, sl){
             if(nameG in ar === false){
                 ar[nameG] = {};
             }
@@ -501,6 +504,7 @@ var DefaultView = {
             ar[nameG][ef[0]] = {};
             ar[nameG][ef[0]]['func'] = function () {
                 var res = document.querySelector(sl);
+                //console.log(res)
                 ef[1](res);
             };
             ar[nameG][ef[0]]['bind'] = selector;
@@ -512,11 +516,12 @@ var DefaultView = {
 
         }
         var selector = '[StartViewEffectsId="' + this.prefix + '_' + nameGroup + '_' + fix + '"]';
+        //console.log(regexp.exec(element));
         element = element.replace(regexp, '$1 StartViewEffectsId="' + this.prefix + '_' + nameGroup + '_' + fix + '"');
         if (Array.isArray(effects[0])) {
             var i = 0;
             for ( ; i < effects.length; i++ ){
-                test(nameGroup, effects[i], arrayEffects, selector);
+                this.test(nameGroup, effects[i], arrayEffects, selector);
                 /*if(nameGroup in arrayEffects === false){
                     arrayEffects[nameGroup] = {};
                 }
@@ -557,6 +562,7 @@ var DefaultView = {
         }
 
         this._renderEffects.push(arrayEffects);
+        //console.log(element)
         return element;
     },
     write: function (body) {

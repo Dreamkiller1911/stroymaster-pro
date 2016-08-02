@@ -53,6 +53,17 @@ class SiteController extends Controller
         $model = new Comments();
         $this->render('settings', array('model'=>$model));
     }
+    public function actionMainMenuGenerate(){
+        $menuData = array(
+            array('label'=>'<span class="glyphicon glyphicon-th"> </span> Заказы', 'url'=>array('/orders/index'), 'encodeLabel'=>false),
+            array('label'=>'<span class="glyphicon glyphicon-plus"> </span> Заказать работы', 'url'=>array('/orders/create'), 'encodeLabel'=>false),
+            array('label'=>'<span class="glyphicon glyphicon-envelope"> </span> Обратная связь', 'url'=>array('site/contact'), 'encodeLabel'=>false),
+            array('label'=>'<span class="glyphicon glyphicon-cog"> </span> Регистрация', 'url'=>array('site/reg'), 'linkOptions'=>array('id'=>'reg'), 'encodeLabel'=>false, 'visible' => Yii::app()->user->isGuest),
+            array('label'=>'<span class="glyphicon glyphicon-user"> </span> Войти', 'url'=>array('/site/login') ,'linkOptions'=>array('id'=>'in'),'encodeLabel'=>false, 'visible'=>Yii::app()->user->isGuest),
+            array('label'=>'<span class="glyphicon glyphicon-off"> </span> Выход', 'url'=>array('site/logout'), 'encodeLabel'=>false, 'visible'=>!Yii::app()->user->isGuest)
+        );
+        echo json_encode($menuData);
+    }
 
     /**
      * Displays the contact page

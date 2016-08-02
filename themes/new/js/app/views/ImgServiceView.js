@@ -23,8 +23,8 @@ function ImgServiceView() {
                     '</a>',
                     [
                         ['fancybox', this.setFancy, true],
-                        ['op04', function(element){$(element).stop().animate({'opacity':0.3},400)}, false],
-                        ['op01', function(element){$(element).stop().animate({'opacity':1},400)}, false]]
+                        ['op01', function(element){$(element).stop().animate({'opacity':0.3},400)}, false],
+                        ['op04', function(element){$(element).stop().animate({'opacity':1},400)}, false]]
                 ) +
                 '</div>' +
                 '</div>' +
@@ -52,7 +52,11 @@ function ImgServiceView() {
                 '</div>' +
                 '<div class="row">&nbsp;</div>' +
                 '</div>',[
-                    'fadeIn', function(element){$(element).css('opacity', 0).animate({'opacity': 1}, 800);}, true
+                    ['fadeIn', function(element){$(element).css('opacity', 0).animate({'opacity': 1}, 800);}, true],
+                    ['fadeOut', function(element){$(element).animate({'opacity': 0}, 800);}, false],
+                    ['op01', function(element){$(element).stop().animate({'opacity':0.3},400)}, false],
+                    ['op04', function(element){$(element).stop().animate({'opacity':1},400)}, false]
+
                 ])
         );
     };

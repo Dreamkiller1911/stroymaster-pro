@@ -27,7 +27,8 @@
                     <a class="navbar-brand" href="/"><span class="glyphicon glyphicon-home"></span> Stroymaster-pro</a>
                 </div>
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                    <?php require_once(__DIR__ . '/menu.php') ?>
+                    <ul class="nav navbar-nav" id="mainmenu"></ul>
+<!--                    --><?php //require_once(__DIR__ . '/menu.php') ?>
                 </div>
             </div>
         </nav>
