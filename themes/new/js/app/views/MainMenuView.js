@@ -12,7 +12,6 @@ function MainMenuView (){
         }
         return this.show(
             this.addEffect('label',
-                '<iframe frameborder="0" src="JavaScript:">Ваш браузер не поддерживает iFrame</iframe>' +
                 '<ul class="nav navbar-nav">' +
                     '<li><a href=""><span class="glyphicon glyphicon-th"> </span> Заказы</a></li>' +
                     '<li><a href=""><span class="glyphicon glyphicon-plus"> </span> Заказать работы</a></li>' +

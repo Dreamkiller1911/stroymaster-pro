@@ -99,7 +99,11 @@ function Start(prop) {
                             var p = _this.queue[i].prop;
 
                             if (_this.ctrls.hasOwnProperty(c) === false) {
-                                _this._includeJSCtrl(c, a, p);
+                                try {
+                                    _this._includeJSCtrl(c, a, p);
+                                } catch (e) {
+                                    console.warn('qqq')
+                                }
                             } else {
                                 if (_this.queue[i].statusC === 'load') {
                                     if (_this.ctrls[c].status === 'ready') {
@@ -261,9 +265,9 @@ function Start(prop) {
                     result = eval('obj[method](' + fulParameters.join(', ') + ')')
                     obj[method] = origin;
                 } catch (e) {
-                    if(_this.debugMode){
+                    if (_this.debugMode) {
                         console.error(e)
-                    }else {
+                    } else {
                         console.warn(_this.ERROR_WARN_MSG)
                     }
                 }
@@ -355,35 +359,46 @@ function Start(prop) {
     };
 
     this._includeJSCtrl = function (scriptName, a, p) {
-        this.ctrls[scriptName] = new Object();
-        var script = document.createElement('script');
-        Object.defineProperty(_this.ctrls[scriptName], 'status', {
-            value: 'load',
-            writable: true
-        });
-        script.onload = function () {
-            var fullCtrl = scriptName + 'Controller';
-            var o = _this.ctrls[scriptName];
-            DefaultController.prototype = Logistic;
-
-            _this._cloningObject(DefaultController, Logistic);
-            window[fullCtrl.toString()].prototype = DefaultController;
-
-
-            Object.defineProperty(o, 'obj', {
-                    value: new window[fullCtrl.toString()](),
-                    writable: true
-                }
-            );
-            Object.defineProperty(o.obj, 'queue', {
-                value: new Array,
+        try {
+            this.ctrls[scriptName] = new Object();
+            var script = document.createElement('script');
+            Object.defineProperty(_this.ctrls[scriptName], 'status', {
+                value: 'load',
+                writable: true
             });
-            o.status = 'ready';
+            script.onload = function () {
+                var fullCtrl = scriptName + 'Controller';
+                var o = _this.ctrls[scriptName];
+                DefaultController.prototype = Logistic;
+                _this._cloningObject(DefaultController, Logistic);
+                window[fullCtrl.toString()].prototype = DefaultController;
+                Object.defineProperty(o, 'obj', {
+                        value: new window[fullCtrl.toString()](),
+                        writable: true
+                    }
+                );
+                Object.defineProperty(o.obj, 'queue', {
+                    value: new Array,
+                });
+                o.status = 'ready';
+            };
+            var url = _this.paths.ctrls + scriptName + 'Controller.js?' + Math.random();
 
-        };
-        script.src = _this.paths.ctrls + scriptName + 'Controller.js?' + Math.random();
-        script.type = 'text/javascript';
-        document.getElementsByTagName('head')[0].appendChild(script);
+            script.src = url;
+            script.type = 'text/javascript';
+            var test = document.createElement('iframe');
+            test.onerror = function(){alert(this)};
+            test.src = url;
+            test.onload = function(){
+                console.dir(this);
+            }
+            document.body.appendChild(test)
+            //console.dir(test)
+            document.getElementsByTagName('head')[0].appendChild(script);
+        } catch (e) {
+            console.log(e)
+        }
+
 
     };
     this._includeJSModel = function (modelName) {

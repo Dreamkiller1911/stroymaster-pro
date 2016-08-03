@@ -22,8 +22,7 @@ function MainMenuController() {
                 }).then(function (result) {
 
                     result.if.append(place);
-                    var frame = document.getElementsByTagName('iframe');
-                    frame[0].onload = function(){alert(444)}
+
                     //console.log(result.if.effects.label.in)
 
                 }).end({'model': result.if})
