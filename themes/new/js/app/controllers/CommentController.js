@@ -7,7 +7,7 @@ function CommentController(){
 
     this.prefix = 'com_';
 
-    this.getAll = function(){
+    this.getAllAction = function(){
         var ctrl = _this.getControls();
         for (var i = 0; i < ctrl.length; i++){
             ctrl[i].onclick = function(){
@@ -19,7 +19,7 @@ function CommentController(){
             }
         }
     };
-    this.getForm = function(){
+    this.getFormAction = function(){
         var ctrl = _this.getControls();
         ctrl[0].onclick = function(){
             _this.startModel('Comment',function(model){
@@ -27,7 +27,7 @@ function CommentController(){
             })
         }
     };
-    this.load = function(){
+    this.loadAction = function(){
         var ctrl = _this.getControls();
         if(!ctrl){
             return false;

@@ -3,7 +3,7 @@
  */
 function MainMenuController() {
 
-    this.load = function () {
+    this.loadAction = function () {
         var _this = this;
         var place = document.getElementById('bs-example-navbar-collapse-1');
 

@@ -3,9 +3,9 @@
  */
 function Start(prop) {
     var _this = this;
-
+    this.prop = prop;
     this.debugMode = prop != undefined && prop.hasOwnProperty('debugMode') ? prop.debugMode : false;
-    this.appPath = undefined;//Путь к корню приложения
+    this.appPath = undefined;
     this.paths = {models: undefined, views: undefined, ctrls: undefined};
     this.queue = [];
     this.models = {};
@@ -77,91 +77,85 @@ function Start(prop) {
 
     this.init = function (ctrl, act, p) {
         var _this = this;
-
-        try {
-            if (_this.appPath === undefined) {
-                var script = document.getElementById('start');
-                var pattern = new RegExp('start.js', 'i');
-                var sep = pattern.exec(script.src);
-                _this.appPath = script.src.substring(0, sep.index);
-                _this.paths.ctrls = _this.appPath + 'controllers/';
-                _this.paths.models = _this.appPath + 'models/';
-                _this.paths.views = _this.appPath + 'views/';
+        this._setProperties()
+        if (_this.appPath === undefined) {
+            var script = document.getElementById('start');
+            var pattern = new RegExp('start.js', 'i');
+            var sep = pattern.exec(script.src);
+            _this.appPath = script.src.substring(0, sep.index);
+            _this.paths.ctrls = _this.appPath + 'controllers/';
+            _this.paths.models = _this.appPath + 'models/';
+            _this.paths.views = _this.appPath + 'views/';
+        }
+        var startInit = function (ctrl, act, prop) {
+            if(_this._urlInit){
             }
-            var startInit = function (ctrl, act, prop) {
-                _this.queue.push({ctrl: ctrl, act: act, prop: prop, statusC: 'load', statusA: false});
-                var iLoadTimer = setInterval(function () {
-                    if (_this.queue[_this.queue.length - 1].statusC === 'load') {
-                        for (var i = 0; i < _this.queue.length; i++) {
-
-                            var c = _this.queue[i].ctrl;
-                            var a = _this.queue[i].act;
-                            var p = _this.queue[i].prop;
-
-                            if (_this.ctrls.hasOwnProperty(c) === false) {
-                                try {
-                                    _this._includeJSCtrl(c, a, p);
-                                } catch (e) {
-                                    console.warn('qqq')
+            _this.queue.push({ctrl: ctrl, act: act, prop: prop, statusC: 'load', statusA: false});
+            var iLoadTimer = setInterval(function () {
+                if (_this.queue[_this.queue.length - 1].statusC === 'load') {
+                    for (var i = 0; i < _this.queue.length; i++) {
+                        var c = _this.queue[i].ctrl;
+                        var a = _this.queue[i].act;
+                        var p = _this.queue[i].prop;
+                        if (_this.ctrls.hasOwnProperty(c) === false) {
+                            _this._includeJSCtrl(c, a, p);
+                        } else {
+                            if (_this.queue[i].statusC === 'load') {
+                                if (_this.ctrls[c].status === 'error') {
+                                    delete _this.ctrls[c];
+                                    _this.queue.splice(i, 1);
+                                    break;
                                 }
-                            } else {
-                                if (_this.queue[i].statusC === 'load') {
-                                    if (_this.ctrls[c].status === 'ready') {
-                                        if (p) {
-                                            if ('properties' in _this.ctrls[c].obj === false) {
-                                                Object.defineProperty(_this.ctrls[c].obj, 'properties', {
-                                                    value: new Object(),
-                                                });
-                                            }
-                                            if (_this.ctrls[c.toString()].obj.properties.hasOwnProperty(a.toString())) {
-                                                delete _this.ctrls[c.toString()].obj.properties[a.toString()]
-                                            }
-                                            Object.defineProperty(_this.ctrls[c].obj['properties'], a, {
-                                                value: p,
-                                                writable: true,
-                                                configurable: true
-                                            });
-                                        }
-                                        if (_this.loadAct(c, a, p)) {
-                                            _this.queue[i].statusC = 'ready';
-                                        } else {
-                                            _this.queue[i].statusC = 'error';
-                                            throw new Error('Метод объекта уже обявлен и не является функцией');
-                                        }
-
-
-                                    } else {
-                                        break;
+                                if (_this.ctrls[c].status === 'load') {
+                                    break;
+                                }
+                                if (p) {
+                                    if ('properties' in _this.ctrls[c].obj === false) {
+                                        Object.defineProperty(_this.ctrls[c].obj, 'properties', {
+                                            value: new Object(),
+                                        });
                                     }
+                                    if (_this.ctrls[c.toString()].obj.properties.hasOwnProperty(a.toString())) {
+                                        delete _this.ctrls[c.toString()].obj.properties[a.toString()]
+                                    }
+                                    Object.defineProperty(_this.ctrls[c].obj['properties'], a, {
+                                        value: p,
+                                        writable: true,
+                                        configurable: true
+                                    });
                                 }
-                            }
-                        }
-                    } else {
-                        clearInterval(iLoadTimer);
-                    }
-                }, 100);
-            };
-            if (typeof ctrl === 'object') {
-                for (var c in ctrl) {
-                    if (typeof ctrl[c] === 'string') {
-                        if (typeof act === 'object') {
+                                if (_this.loadAct(c, a, p)) {
+                                    _this.queue[i].statusC = 'ready';
+                                } else {
+                                    _this.queue[i].statusC = 'error';
+                                    //throw new Error('Метод объекта уже обявлен и не является функцией');
+                                }
 
-                        }
-                        startInit(c, ctrl[c], p);
-                    } else {
-                        for (var i = 0; i < ctrl[c].length; i++) {
-                            if (typeof act === 'object') {
-                                var prop = act[ctrl[c][i]];
                             }
-                            startInit(c, ctrl[c][i], prop);
                         }
+                    }
+                } else {
+                    clearInterval(iLoadTimer);
+                }
+            }, 10);
+        };
+        if (typeof ctrl === 'object') {
+            for (var c in ctrl) {
+                if (typeof ctrl[c] === 'string') {
+                    if (typeof act === 'object') {
+                    }
+                    startInit(c, ctrl[c], p);
+                } else {
+                    for (var i = 0; i < ctrl[c].length; i++) {
+                        if (typeof act === 'object') {
+                            var prop = act[ctrl[c][i]];
+                        }
+                        startInit(c, ctrl[c][i], prop);
                     }
                 }
-            } else {
-                startInit(ctrl, act, p);
             }
-        } catch (e) {
-            console.warn(e)
+        } else {
+            startInit(ctrl, act, p);
         }
     };
     this.loadAct = function (ctrl, act, p) {
@@ -184,20 +178,22 @@ function Start(prop) {
              });
 
              }*/
-            if (ctrlN.hasOwnProperty(act.toString())) {
+            if (ctrlN.hasOwnProperty(act.toString() + 'Action')) {
                 ctrlN.ctrlName = ctrl;
                 ctrlN.actName = act;
                 ctrlN.start = _this;
-                if (ctrlN[act] instanceof Function === false) {
+                if (ctrlN[act + 'Action'] instanceof Function === false) {
                     return false;
                 }
-                ctrlN[act]();
+                ctrlN[act+'Action']();
                 return true;
             } else {
-                console.info('В объекте \'' + ctrl + 'Controller\' не найдена функция с именем \'' + act + '\'');
+                if(this._debugMode){
+                    console.warn('В объекте \'' + ctrl + 'Controller\' не найдена функция с именем \'' + act + '\'');
+                }
             }
         } else {
-            console.info('Функция с именем \'' + ctrl + 'Controller.js\' не найдена, и не может  быть объявлена. Полный путь \''
+            console.warn('Функция с именем \'' + ctrl + 'Controller.js\' не найдена, и не может  быть объявлена. Полный путь \''
                 + _this.paths.ctrls + ctrl + 'Controller.js\'');
         }
     };
@@ -359,46 +355,47 @@ function Start(prop) {
     };
 
     this._includeJSCtrl = function (scriptName, a, p) {
-        try {
-            this.ctrls[scriptName] = new Object();
-            var script = document.createElement('script');
-            Object.defineProperty(_this.ctrls[scriptName], 'status', {
-                value: 'load',
-                writable: true
+        var _this = this;
+        this.ctrls[scriptName] = new Object();
+        var script = document.createElement('script');
+        var head = document.getElementsByTagName('head')[0];
+        var fullCtrlName = scriptName + 'Controller';
+        var obj = _this.ctrls[scriptName];
+        var url = _this.paths.ctrls + fullCtrlName + '.js?' + Math.random();
+        Object.defineProperty(_this.ctrls[scriptName], 'status', {
+            value: 'load',
+            writable: true
+        });
+        var isLoadReady = function () {
+            DefaultController.prototype = Logistic;
+            _this._cloningObject(DefaultController, Logistic);
+            window[fullCtrlName.toString()].prototype = DefaultController;
+            Object.defineProperty(obj, 'obj', {
+                    value: new window[fullCtrlName.toString()](),
+                    writable: true
+                }
+            );
+            Object.defineProperty(obj.obj, 'queue', {
+                value: new Array,
             });
-            script.onload = function () {
-                var fullCtrl = scriptName + 'Controller';
-                var o = _this.ctrls[scriptName];
-                DefaultController.prototype = Logistic;
-                _this._cloningObject(DefaultController, Logistic);
-                window[fullCtrl.toString()].prototype = DefaultController;
-                Object.defineProperty(o, 'obj', {
-                        value: new window[fullCtrl.toString()](),
-                        writable: true
-                    }
-                );
-                Object.defineProperty(o.obj, 'queue', {
-                    value: new Array,
-                });
-                o.status = 'ready';
-            };
-            var url = _this.paths.ctrls + scriptName + 'Controller.js?' + Math.random();
-
-            script.src = url;
-            script.type = 'text/javascript';
-            var test = document.createElement('iframe');
-            test.onerror = function(){alert(this)};
-            test.src = url;
-            test.onload = function(){
-                console.dir(this);
+            obj.status = 'ready';
+        };
+        script.onerror = function () {
+            if (_this.debugMode) {
+                console.warn('Файл контроллера "' + fullCtrlName + '.js" не был подключен \r\n Путь до файла "' + url + '"')
             }
-            document.body.appendChild(test)
-            //console.dir(test)
-            document.getElementsByTagName('head')[0].appendChild(script);
-        } catch (e) {
-            console.log(e)
-        }
-
+            head.removeChild(this);
+            obj.status = 'error';
+        };
+        script.onload = function () {
+            if (!this.executed) {
+                this.executed = true;
+                isLoadReady();
+            }
+        };
+        script.src = url;
+        script.type = 'text/javascript';
+        head.appendChild(script);
 
     };
     this._includeJSModel = function (modelName) {
@@ -573,11 +570,46 @@ function Start(prop) {
 
 
     };
+    this._setProperties = function(params){
+        var defaultParams = {
+            debugMode: false,
+            urlInit: false
+
+        };
+        if(!this.prop) return false;
+        if(this.prop === 'startParamsCompleteSets') return true;
+        if(this.prop != 'startParamsCompleteSets' && typeof this.prop != 'object') {
+            console.warn('Параметры объекта "Start" должны быть объектом (параметр:значение)');
+            return false;
+        }
+        for (var p in this.prop){
+            if(!defaultParams.hasOwnProperty(p)){
+                console.warn('Не существующее свойство "' + p  +'" объекта "Start" ');
+                continue;
+            }
+            defaultParams[p] = this.prop[p];
+        }
+        for (var nP in defaultParams){
+            this['_'+nP] = defaultParams[nP];
+        }
+        this.prop = 'startParamsCompleteSets';
+    };
     this._cloningObject = function (a, b) {
         for (var i in b) {
             if (a.hasOwnProperty(i) || i in a) break;
             a[i] = b[i];
         }
+    }
+    if(prop && prop.urlInit){
+        var path = window.location.pathname;
+        var regExp = /^(?:\/)([\w\-\!]+)(?:\/)?([\w\-\!]+)?/;
+        if(!regExp.test(path)) return;
+        var res = regExp.exec(path);
+        var ctrl = res[1].slice(0,1).toUpperCase() + res[1].slice(1).toLowerCase();
+        var act = 'index';
+        if(res[2]) act = res[2].toLowerCase();
+
+        this.init(ctrl, act);
     }
 
 

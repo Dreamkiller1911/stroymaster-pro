@@ -8,10 +8,10 @@ function ImgServiceController() {
     this.testThen = 0;
     this.testElse = 0;
 
-    this.init = function(){
+    this.initAction = function(){
 
     };
-    this.testView = function(){
+    this.testViewAction = function(){
         var ctrl = this.getControls()
         for (var i = 0 ; i < ctrl.length; i++){
             ctrl[i].onclick = function(event){
@@ -25,7 +25,7 @@ function ImgServiceController() {
             }
         }
     };
-    this.uploadAll = function () {
+    this.uploadAllAction = function () {
         var ctrl = _this.getControls();
         var place = document.getElementById('imgList');
         if (!ctrl) return false;
@@ -64,7 +64,7 @@ function ImgServiceController() {
             });
         }
     };
-    this.delete = function(){
+    this.deleteAction = function(){
         var ctrl = _this.getControls();
 
         for(var i = 0; i < ctrl.length; i++){

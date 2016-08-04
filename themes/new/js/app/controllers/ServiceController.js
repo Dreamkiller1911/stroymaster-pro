@@ -10,7 +10,7 @@ function ServiceController() {
         console.log('t')
         return 'qwe';
     }
-    this.viewModal = function () {
+    this.viewModalAction = function () {
         var ctrl = _this.getControls();
         for (var i = 0; i < ctrl.length; i++) {
             ctrl[i].onclick = function () {
@@ -21,7 +21,7 @@ function ServiceController() {
             }
         }
     };
-    this.indexLoad = function () {
+    this.indexLoadAction = function () {
         var getPosition = function (elem) {
             var rect = elem.getBoundingClientRect();
             var docMarginTop = getComputedStyle(document.body).marginTop.replace(new RegExp('[a-z]+', 'i'), '');
