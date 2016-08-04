@@ -53,13 +53,6 @@ class OrdersController extends Controller
 	public function actionCreate()
 	{
 		$this->layout='//layouts/column1';
-		$cs = $this->init();
-		$cs->registerScriptFile(Yii::app()->theme->baseUrl . '/js/mylibrary/orders.js');
-		$cs->registerScript('newOrders',
-				'var order = new orders();'.
-				'order.add(\'#orders-form\')',
-				CClientScript::POS_READY
-		);
 
 		if(isset(Yii::app()->user->class) && Yii::app()->user->class != 2) {
 			$this->render('errorCreate');

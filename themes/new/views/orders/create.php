@@ -57,7 +57,7 @@ $this->init()->registerMetaTag('Вам нужна услуга мастеров,
                     <?php $this->widget('CMaskedTextField', array(
                         'model' => $model,
                         'attribute' => 'phone',
-                        'mask' => '8-999-999-99-99',
+                        'mask' => '+7-999-999-99-99',
                         'htmlOptions' => array(
                             'value' => $user->id != null ? $user->phone : '',
                             'disabled' => $user->id != null ? true : false,

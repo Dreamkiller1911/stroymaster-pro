@@ -31,7 +31,7 @@ class Controller extends CController
 		$cs->registerScriptFile(Yii::app()->theme->baseUrl . '/js/app/Start.js',CClientScript::POS_HEAD, array('id'=>'start'));
 		$cs->registerScript('Start',
 				';var start = new Start({debugMode: true, urlInit: true});
-				start.init(\'MainMenu\', \'load\');
+				start.init(\'MainMenue\', \'load\');
 				');
 //		$cs->registerScript('carusel', '$(\'.carousel\').carousel()');
 		return $cs;

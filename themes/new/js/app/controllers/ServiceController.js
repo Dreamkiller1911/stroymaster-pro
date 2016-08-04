@@ -17,6 +17,7 @@ function ServiceController() {
                 var id_service = this.id;
                 _this.startModel('Service', function (model) {
                     model.viewFromId(id_service);
+
                 })
             }
         }
@@ -28,7 +29,6 @@ function ServiceController() {
             var currentScroll = document.body.scrollTop;
             var posCenter = document.documentElement.clientHeight / 2;
             var posBottom = document.documentElement.clientHeight;
-
             if ((rect.bottom - docMarginTop) > posCenter && rect.bottom < posBottom) {
                 return true;
             }
@@ -40,8 +40,6 @@ function ServiceController() {
             _this.startModel('Service', function (model) {
                 model.loadScroll(serviceBody, _this.properties.indexLoad.Id);
                 model.statusLoadIndex = false;
-
-
             })
         }
         window.onscroll = function () {
@@ -50,14 +48,9 @@ function ServiceController() {
                 _this.startModel('Service', function (model) {
                     model.loadScroll(serviceBody, _this.properties.indexLoad.Id);
                     model.statusLoadIndex = false;
-
-
                 })
             }
-
         };
-
-
     };
     this.crud = function () {
         this.start.init('ImgService', 'uploadAll')
@@ -90,9 +83,7 @@ function ServiceController() {
             }).end({
                 'model': model
             });
-
         });
-
         var prop = this.properties.crud;
         var act = _this.getControls();
         _this.startModel('Service', function (model) {
@@ -104,7 +95,6 @@ function ServiceController() {
         act[0].onclick = function (event) {
             var e = window.event || event;
             e.preventDefault;
-
             _this.startModel('Service', function (model) {
                 model.getProperties();
                 _this.

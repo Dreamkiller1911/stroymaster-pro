@@ -5,17 +5,17 @@ var DefaultController = {
     ctrlName: undefined,
     actName: undefined,
     prefix: undefined,
-    getControls: function () {
+    getControls: function (actionName) {
         if (this.prefix === undefined) this.prefix = this.ctrlName.replace(/Controller/i, '') + '_';
         var ctrl = undefined;
-        var tmpElements = document.querySelectorAll('[StartCtrl="' + this.prefix + this.actName + '"]');
+
+        var tmpElements = document.querySelectorAll('[StartCtrl="' + this.prefix + actionName || this.actName + '"]');
         if (tmpElements.length < 1) {
-            console.warn('По селектору [StartCtrl="' + this.prefix + this.actName + '"] - DOM объект не найден');
+            console.warn('По селектору [StartCtrl="' + this.prefix + actionName || this.actName + '"] - DOM объект не найден');
             return false;
         } else {
             return tmpElements;
         }
-        return ctrl;
     },
     startModel: function (modelName, bodyScript) {
         if (typeof arguments[arguments.length - 1] === 'object') {
@@ -441,7 +441,7 @@ var DefaultView = {
             }
         }
         tmp.innerHTML = newNode;
-        if(tmp.children.length === 1){
+        if (tmp.children.length === 1) {
             tmp = tmp.children[0];
         }
 
@@ -449,18 +449,18 @@ var DefaultView = {
             result: tmp,
             effects: re,
             _autoApplyList: autoApply,
-            _bindList : bin,
+            _bindList: bin,
             append: function (nodeElement) {
                 nodeElement.appendChild(this.result);
                 this._autoApply();
             },
-            bind: function(group, event, action){
-                if(this._bindList.hasOwnProperty(group) === false) {
+            bind: function (group, event, action) {
+                if (this._bindList.hasOwnProperty(group) === false) {
                     console.log('error')
                 }
                 var selector = this._bindList[group];
                 var element = document.querySelector(selector);
-                if(!selector){
+                if (!selector) {
                     console.log('Нет элементов');
                 }
                 element[event] = action;
@@ -470,19 +470,19 @@ var DefaultView = {
 
                 var list = this._autoApplyList;
 
-                for(var block in list){
-                   for(var element in list[block]){
-                       if(list[block][element] === true){
-                           this.effects[block][element]();
-                       }
-                   }
+                for (var block in list) {
+                    for (var element in list[block]) {
+                        if (list[block][element] === true) {
+                            this.effects[block][element]();
+                        }
+                    }
                 }
             }
         };
         this._renderEffects.length = 0;
         /*_renderComplete.result = tmp;
-        _renderComplete.effects = re;
-        _renderComplete._autoApplyList = autoApply;*/
+         _renderComplete.effects = re;
+         _renderComplete._autoApplyList = autoApply;*/
 
         return _renderComplete;
     },
@@ -490,15 +490,34 @@ var DefaultView = {
         if (!element || element === '') throw new Error('Первый параметр метода "addEffect" объекта "" является обязательным');
         if (typeof element != 'string') throw new Error('Первый параметр метода "addEffect" объекта "" должен быть строкой');
         if (!effects || effects.length === 0 || !Array.isArray(effects)) throw new Error('Третий параметр метода "addEffect" объекта "" является обязательным и должен быть массивом');
-        var regexp = /^(<\w+(?=\s*\>))/;
         var _this = this;
-        var arrayEffects = [];
+        var regexp = /^(<\w+(?:[^\>])*(?=\>)\1)/;
+        var tmpBlock = document.createElement('div');
+        tmpBlock.innerHTML = element;
+        var resElem = tmpBlock.children;
         var fix = Math.round(Math.random() * 100000);
-        this.test = function(nameG, ef, ar, sl){
-            if(nameG in ar === false){
+        var selector = '[StartViewEffectsId="' + this.prefix + nameGroup + '_' + fix + '"]';
+        var arrayEffects = [];
+        if (resElem.length > 1) {
+            var i = 0;
+            var data = [];
+            for (; i < resElem.length; i++) {
+                data.push(resElem[i].outerHTML.replace(regexp, '$1 StartViewEffectsId="' + this.prefix + nameGroup + '_' + fix + '"'));
+            }
+           element = data.join('\r\n')
+        }else {
+            element = element.replace(regexp, '$1 StartViewEffectsId="' + this.prefix + nameGroup + '_' + fix + '"');
+        }
+
+
+
+
+        var prefix = this.prefix[this.prefix.length - 1] === '_' ? this.prefix : this.prefix + '_';
+        this.test = function (nameG, ef, ar, sl) {
+            if (nameG in ar === false) {
                 ar[nameG] = {};
             }
-            if(nameG in  _this._effectsAutocomplete === false){
+            if (nameG in _this._effectsAutocomplete === false) {
                 _this._effectsAutocomplete[nameG] = [];
             }
             ar[nameG][ef[0]] = {};
@@ -513,44 +532,45 @@ var DefaultView = {
             } else {
                 ar[nameG][ef[0]]['autoApply'] = true;
             }
+        };
 
-        }
-        var selector = '[StartViewEffectsId="' + this.prefix + '_' + nameGroup + '_' + fix + '"]';
         //console.log(regexp.exec(element));
-        element = element.replace(regexp, '$1 StartViewEffectsId="' + this.prefix + '_' + nameGroup + '_' + fix + '"');
+
+        //console.log(element)
         if (Array.isArray(effects[0])) {
             var i = 0;
-            for ( ; i < effects.length; i++ ){
+            for (; i < effects.length; i++) {
                 this.test(nameGroup, effects[i], arrayEffects, selector);
                 /*if(nameGroup in arrayEffects === false){
-                    arrayEffects[nameGroup] = {};
-                }
-                if(nameGroup in  this._effectsAutocomplete === false){
-                    this._effectsAutocomplete[nameGroup] = [];
-                }
-                arrayEffects[nameGroup][effects[i][0]] = {};
-                arrayEffects[nameGroup][effects[i][0]]['func'] = function () {
-                    var res = document.querySelector(selector);
-                    console.log(efe)
-                    //efe[1](res);
-                };*/
-               /* if (effects[i][2] != undefined && effects[i][2] === false) {
-                    arrayEffects[nameGroup][effects[i][0]]['autoApply'] = false;
-                } else {
-                    arrayEffects[nameGroup][effects[i][0]]['autoApply'] = true;
-                }*/
+                 arrayEffects[nameGroup] = {};
+                 }
+                 if(nameGroup in  this._effectsAutocomplete === false){
+                 this._effectsAutocomplete[nameGroup] = [];
+                 }
+                 arrayEffects[nameGroup][effects[i][0]] = {};
+                 arrayEffects[nameGroup][effects[i][0]]['func'] = function () {
+                 var res = document.querySelector(selector);
+                 console.log(efe)
+                 //efe[1](res);
+                 };*/
+                /* if (effects[i][2] != undefined && effects[i][2] === false) {
+                 arrayEffects[nameGroup][effects[i][0]]['autoApply'] = false;
+                 } else {
+                 arrayEffects[nameGroup][effects[i][0]]['autoApply'] = true;
+                 }*/
             }
         } else {
-            if(nameGroup in arrayEffects === false){
+            if (nameGroup in arrayEffects === false) {
                 arrayEffects[nameGroup] = {};
             }
-            if(nameGroup in  this._effectsAutocomplete === false){
+            if (nameGroup in this._effectsAutocomplete === false) {
                 this._effectsAutocomplete[nameGroup] = [];
             }
 
             arrayEffects[nameGroup][effects[0]] = {};
             arrayEffects[nameGroup][effects[0]]['func'] = function () {
-                var res = document.querySelector(selector);
+                var res = document.querySelectorAll(selector);
+                if (res.length === 1) res = res[0];
                 effects[1](res);
             };
             if (effects[2] != undefined && effects[2] === false) {

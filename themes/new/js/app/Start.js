@@ -448,6 +448,11 @@ function Start(prop) {
                 'start': {
                     value: _this
                 },
+                'prefix': {
+                    value: fileName + '_',
+                    writable: true,
+                    enumerable: true
+                },
                 '_renderEffects': {
                     value: []
                 },
