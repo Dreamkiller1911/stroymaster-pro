@@ -522,9 +522,10 @@ var DefaultView = {
             }
             ar[nameG][ef[0]] = {};
             ar[nameG][ef[0]]['func'] = function () {
-                var res = document.querySelector(sl);
-                //console.log(res)
+                var res = document.querySelectorAll(sl);
+                if (res.length === 1) res = res[0];
                 ef[1](res);
+                return this;
             };
             ar[nameG][ef[0]]['bind'] = selector;
             if (ef[2] != undefined && ef[2] === false) {
@@ -538,8 +539,8 @@ var DefaultView = {
 
         //console.log(element)
         if (Array.isArray(effects[0])) {
-            var i = 0;
-            for (; i < effects.length; i++) {
+            for ( i = 0; i < effects.length; i++ ) {
+                if(effects[i].length === 0) continue;
                 this.test(nameGroup, effects[i], arrayEffects, selector);
                 /*if(nameGroup in arrayEffects === false){
                  arrayEffects[nameGroup] = {};
@@ -560,7 +561,8 @@ var DefaultView = {
                  }*/
             }
         } else {
-            if (nameGroup in arrayEffects === false) {
+            this.test(nameGroup, effects, arrayEffects, selector);
+            /*if (nameGroup in arrayEffects === false) {
                 arrayEffects[nameGroup] = {};
             }
             if (nameGroup in this._effectsAutocomplete === false) {
@@ -577,7 +579,7 @@ var DefaultView = {
                 arrayEffects[nameGroup][effects[0]]['autoApply'] = false;
             } else {
                 arrayEffects[nameGroup][effects[0]]['autoApply'] = true;
-            }
+            }*/
 
         }
 
@@ -632,7 +634,7 @@ var Logistic = {
                 'method': /^(?:\w+\.?)(\w+)/,
                 'commentLine': /\/\/.*/g,
                 'commentBlock': /(?:\/\*)(?:([\w\s\S]*(?=\*\/)\1))(\*\/)/gm,
-                'function': /^(?:[\s]*)((\w+)(?:((?:\.\w+(?:\(.*\))?(?=\.))*)(?:(?:\.)(\w+))?)?)\s*(?:\()(.*)(?:\))(?!\s*[\{\.])/gm,
+                'function': /^(?:[\s]*)((\w+)(?:((?:\.[\w\[\]\'\"\+\-]+(?:\(.*\))?(?=\.))*)(?:(?:\.)([\w\[\]\+\-]+))?)?)\s*(?:\()(.*)(?:\))(?!\s*[\{\.])/gm,
                 'true': /((\s*)return\s*true)/gm,
                 'false': /((\s*)return\s*false)/gm,
                 'returnData': /(?:(?:\s*return\s*)(?!startIfComplete\.resultIF)([^_;]+)*)(?:(?:;)|(?:\r\n))/g,
@@ -650,6 +652,7 @@ var Logistic = {
                 func = func.substr(0, ret.index) + compliteReturn + func.substr(ret.index + ret[0].length);
             }
             glob: while (res = reg.function.exec(func)) {
+                console.log(res[1]);
                 var fullName = res[1], obj = res[2], lastMethod = res[4], val = res[5];
                 for (var i = 0; i < commentPosition.length; i++) {
                     if (res.index > commentPosition[i].a && res.index < commentPosition[i].b) {
