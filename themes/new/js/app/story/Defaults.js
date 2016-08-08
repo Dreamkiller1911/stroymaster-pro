@@ -428,7 +428,7 @@ var DefaultView = {
 
     show: function (newNode) {
         var tmp = document.createElement('div');
-        var re = [], i = 0, a = this._renderEffects, autoApply = [], bin = {};
+        var re = [], el = {}, i = 0, a = this._renderEffects, autoApply = [], bin = {};
         for (; i < a.length; i++) {
             for (var block in a[i]) {
                 re[block] = {};
@@ -436,6 +436,7 @@ var DefaultView = {
                 for (var comp in a[i][block]) {
                     re[block][comp] = a[i][block][comp].func;
                     bin[block] = a[i][block][comp].bind;
+                    el[block] = a[i][block][comp].element;
                     autoApply[block][comp] = a[i][block][comp].autoApply;
                 }
             }
@@ -444,7 +445,6 @@ var DefaultView = {
         if (tmp.children.length === 1) {
             tmp = tmp.children[0];
         }
-
         var _renderComplete = {
             result: tmp,
             effects: re,
@@ -467,23 +467,18 @@ var DefaultView = {
             },
             _autoApply: function () {
                 if (this._autoApplyList === undefined) return false;
-
                 var list = this._autoApplyList;
-
                 for (var block in list) {
                     for (var element in list[block]) {
                         if (list[block][element] === true) {
-                            this.effects[block][element]();
+                            console.dir(this._bindList);
+                            this.effects[block][element](this._bindList[block]);
                         }
                     }
                 }
             }
         };
         this._renderEffects.length = 0;
-        /*_renderComplete.result = tmp;
-         _renderComplete.effects = re;
-         _renderComplete._autoApplyList = autoApply;*/
-
         return _renderComplete;
     },
     addEffect: function (nameGroup, element, effects) {
@@ -508,11 +503,6 @@ var DefaultView = {
         }else {
             element = element.replace(regexp, '$1 StartViewEffectsId="' + this.prefix + nameGroup + '_' + fix + '"');
         }
-
-
-
-
-        var prefix = this.prefix[this.prefix.length - 1] === '_' ? this.prefix : this.prefix + '_';
         this.test = function (nameG, ef, ar, sl) {
             if (nameG in ar === false) {
                 ar[nameG] = {};
@@ -521,8 +511,10 @@ var DefaultView = {
                 _this._effectsAutocomplete[nameG] = [];
             }
             ar[nameG][ef[0]] = {};
-            ar[nameG][ef[0]]['func'] = function () {
-                var res = document.querySelectorAll(sl);
+            ar[nameG][ef[0]]['selector'] = sl;
+            ar[nameG][ef[0]]['func'] = function (tmpr) {
+                //console.log(tmpr, sl)
+                var res = document.querySelectorAll(tmpr);
                 if (res.length === 1) res = res[0];
                 ef[1](res);
                 return this;
@@ -534,52 +526,13 @@ var DefaultView = {
                 ar[nameG][ef[0]]['autoApply'] = true;
             }
         };
-
-        //console.log(regexp.exec(element));
-
-        //console.log(element)
         if (Array.isArray(effects[0])) {
             for ( i = 0; i < effects.length; i++ ) {
                 if(effects[i].length === 0) continue;
                 this.test(nameGroup, effects[i], arrayEffects, selector);
-                /*if(nameGroup in arrayEffects === false){
-                 arrayEffects[nameGroup] = {};
-                 }
-                 if(nameGroup in  this._effectsAutocomplete === false){
-                 this._effectsAutocomplete[nameGroup] = [];
-                 }
-                 arrayEffects[nameGroup][effects[i][0]] = {};
-                 arrayEffects[nameGroup][effects[i][0]]['func'] = function () {
-                 var res = document.querySelector(selector);
-                 console.log(efe)
-                 //efe[1](res);
-                 };*/
-                /* if (effects[i][2] != undefined && effects[i][2] === false) {
-                 arrayEffects[nameGroup][effects[i][0]]['autoApply'] = false;
-                 } else {
-                 arrayEffects[nameGroup][effects[i][0]]['autoApply'] = true;
-                 }*/
             }
         } else {
             this.test(nameGroup, effects, arrayEffects, selector);
-            /*if (nameGroup in arrayEffects === false) {
-                arrayEffects[nameGroup] = {};
-            }
-            if (nameGroup in this._effectsAutocomplete === false) {
-                this._effectsAutocomplete[nameGroup] = [];
-            }
-
-            arrayEffects[nameGroup][effects[0]] = {};
-            arrayEffects[nameGroup][effects[0]]['func'] = function () {
-                var res = document.querySelectorAll(selector);
-                if (res.length === 1) res = res[0];
-                effects[1](res);
-            };
-            if (effects[2] != undefined && effects[2] === false) {
-                arrayEffects[nameGroup][effects[0]]['autoApply'] = false;
-            } else {
-                arrayEffects[nameGroup][effects[0]]['autoApply'] = true;
-            }*/
 
         }
 
@@ -652,7 +605,7 @@ var Logistic = {
                 func = func.substr(0, ret.index) + compliteReturn + func.substr(ret.index + ret[0].length);
             }
             glob: while (res = reg.function.exec(func)) {
-                console.log(res[1]);
+                //console.log(res[1]);
                 var fullName = res[1], obj = res[2], lastMethod = res[4], val = res[5];
                 for (var i = 0; i < commentPosition.length; i++) {
                     if (res.index > commentPosition[i].a && res.index < commentPosition[i].b) {
