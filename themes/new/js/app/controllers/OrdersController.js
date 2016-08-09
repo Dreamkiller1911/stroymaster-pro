@@ -46,7 +46,9 @@ function OrdersController(){
                             var a = count, b = count + ret;
                             _this.if(function(){
                                 console.log(4);
+                                console.log( render.effects['inputElements'+a].slideOffRight);
                                 render.effects['inputElements'+a].slideOffRight();
+
                             }).then(function(){
                                 console.log('Render');
                             }).end({

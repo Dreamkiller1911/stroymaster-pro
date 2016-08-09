@@ -68,7 +68,7 @@ function OrdersView() {
                 '<br>' +
                 '<div class="row">' +
                 '<div class="col-sm-12">' +
-                '<label class="label label-default">Контактный номпер телефона</label>' +
+                '<label class="label label-default">Контактный номер телефона</label>' +
                 '<input class="form-control" type="text" placeholder="Иван Иванов">' +
                 '</div>' +
                 '</div>' +

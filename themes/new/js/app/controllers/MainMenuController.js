@@ -20,11 +20,7 @@ function MainMenuController() {
                     this.render('Menu', {'data': {ctrl: '', 'model': model}})
 
                 }).then(function (result) {
-
                     result.if.append(place);
-
-                    //console.log(result.if.effects.label.in)
-
                 }).end({'model': result.if})
             }).else(function () {
                 console.log('Меню не рендериться')

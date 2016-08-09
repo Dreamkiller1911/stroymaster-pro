@@ -428,7 +428,13 @@ var DefaultView = {
 
     show: function (newNode) {
         var tmp = document.createElement('div');
-        var re = [], el = {}, i = 0, a = this._renderEffects, autoApply = [], bin = {};
+        var re = [], i = 0, a = this._renderEffects, autoApply = [], bin = {};
+        var effectsRun = function (effect, selector) {
+            var res = document.querySelectorAll(selector);
+            if (res.length === 1) res = res[0];
+            effect(res);
+            return this;
+        };
         for (; i < a.length; i++) {
             for (var block in a[i]) {
                 re[block] = {};
@@ -436,7 +442,6 @@ var DefaultView = {
                 for (var comp in a[i][block]) {
                     re[block][comp] = a[i][block][comp].func;
                     bin[block] = a[i][block][comp].bind;
-                    el[block] = a[i][block][comp].element;
                     autoApply[block][comp] = a[i][block][comp].autoApply;
                 }
             }
@@ -471,11 +476,16 @@ var DefaultView = {
                 for (var block in list) {
                     for (var element in list[block]) {
                         if (list[block][element] === true) {
-                            console.dir(this._bindList);
-                            this.effects[block][element](this._bindList[block]);
+                            this.effects[block][element][0]();
                         }
                     }
                 }
+            },
+            _effectRun: function (effect, selector) {
+                var res = document.querySelectorAll(selector);
+                if (res.length === 1) res = res[0];
+                effect(res);
+                return this;
             }
         };
         this._renderEffects.length = 0;
@@ -499,8 +509,8 @@ var DefaultView = {
             for (; i < resElem.length; i++) {
                 data.push(resElem[i].outerHTML.replace(regexp, '$1 StartViewEffectsId="' + this.prefix + nameGroup + '_' + fix + '"'));
             }
-           element = data.join('\r\n')
-        }else {
+            element = data.join('\r\n')
+        } else {
             element = element.replace(regexp, '$1 StartViewEffectsId="' + this.prefix + nameGroup + '_' + fix + '"');
         }
         this.test = function (nameG, ef, ar, sl) {
@@ -512,13 +522,16 @@ var DefaultView = {
             }
             ar[nameG][ef[0]] = {};
             ar[nameG][ef[0]]['selector'] = sl;
-            ar[nameG][ef[0]]['func'] = function (tmpr) {
-                //console.log(tmpr, sl)
-                var res = document.querySelectorAll(tmpr);
+            ar[nameG][ef[0]]['func'] = {0:function(){
+                console.log(this.rrr)
+                var res = document.querySelectorAll(this.rrr);
                 if (res.length === 1) res = res[0];
-                ef[1](res);
+                //ef[1](res);
                 return this;
-            };
+            }, get rrr() {
+                console.log(this)
+                return sl;
+            }};
             ar[nameG][ef[0]]['bind'] = selector;
             if (ef[2] != undefined && ef[2] === false) {
                 ar[nameG][ef[0]]['autoApply'] = false;
@@ -527,8 +540,8 @@ var DefaultView = {
             }
         };
         if (Array.isArray(effects[0])) {
-            for ( i = 0; i < effects.length; i++ ) {
-                if(effects[i].length === 0) continue;
+            for (i = 0; i < effects.length; i++) {
+                if (effects[i].length === 0) continue;
                 this.test(nameGroup, effects[i], arrayEffects, selector);
             }
         } else {
@@ -540,12 +553,7 @@ var DefaultView = {
         //console.log(element)
         return element;
     },
-    write: function (body) {
-        if (body === undefined || body === '') return false;
-        this.components.push(body);
-        return this
-    },
-};
+}
 var Logistic = {
     if: function (body) {
         this.queue.push({'if': body, 'statusIF': 'started', 'resultIF': 'startNullResultIF', 'params': false});
