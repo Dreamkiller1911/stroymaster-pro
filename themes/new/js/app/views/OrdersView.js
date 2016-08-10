@@ -47,7 +47,7 @@ function OrdersView() {
                     t++;
                     if(t === l){
                         setTimeout(function(){
-                            return 'Вторая фаза рендеринга'
+                            return 'Вторая фаза рендеринга';
                         }, 120)
                     }
                 });
@@ -81,7 +81,7 @@ function OrdersView() {
                     }, false]
                 ]) +
             '<br>' +
-            '<div class="col-sm-5">' +
+            '<div class="col-sm-8">' +
             this.addEffect('inputElements1',
                 '<div class="row">' +
                 '<div class="col-sm-12">' +
@@ -110,7 +110,7 @@ function OrdersView() {
             this.addEffect('inputElements2',
                 '<div class="row">' +
                 '<div class="col-sm-12">' +
-                '<label class="label label-default">Тип требуемых работы</label>' +
+                '<label class="label label-default">Опишите Ваши требования</label>' +
                 '<textarea class="form-control"></textarea>' +
                 '</div>' +
                 '</div>' +
@@ -128,7 +128,7 @@ function OrdersView() {
                 ]
             ) +
             '</div>' +
-            '<div class="col-sm-7">' +
+            '<div class="col-sm-4">' +
             '<div class="row">' +
             this.addEffect('nextButton', '<input count="1" class="btn btn-default" type="button" value="Далее">', [
                 ['preSlide', function (element) {

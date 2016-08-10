@@ -22,7 +22,14 @@ function OrdersController(){
             this.render('FormCreate');
         })
             .then(function(result){
-                var slide = function(){
+                var slide = function(e){
+                    if(Number(this.getAttribute('count')) === 1){
+                        _this.if(function(){
+                            this.start.init('User', 'login');
+                        }).then(function(resUser){
+                            console.log(resUser);
+                        }).else(function(res){console.log(res)}).end();
+                    }
                     result.if.effects.nextButton.slideOffBottom.apply();
                     var count = Number(this.getAttribute('count'));
                     var ret = -1;
@@ -33,10 +40,11 @@ function OrdersController(){
                         this.value = 'Далее';
                     }
                     var a = count, b = count + ret;
-                    console.log(b)
+
                     _this.if(function(){
                         render.effects['inputElements'+a].slideOffRight.apply();
                     }).then(function(){
+                        window.location.hash = 'stage' + b;
                         result.if.effects['inputElements' + b].slideOnLeft.apply();
                         result.if.effects.nextButton.slideOnLeft.apply();
                     }).else(function(){console.log('Failed test')}).end({
@@ -45,22 +53,21 @@ function OrdersController(){
                     //result.if.effects['inputElements' + b].slideOnLeft.apply();
                     this.setAttribute('count', b);
                 };
-                if(getPosition(content) && triger){
+                var begin = function(){
                     result.if.append(content);
                     result.if.bind('nextButton', 'onclick', slide);
                     triger = false
+                    var count = _this._getStage()
                     result.if.effects.headForm.startIn.apply();
-                    result.if.effects.inputElements1.slideOnLeft.apply();
-                    result.if.effects.nextButton.slideOnLeft.apply();
+                    result.if.effects['inputElements'+count].slideOnLeft.apply();
+                    result.if.effects.nextButton.slideOnLeft.apply(function(element){$(element).prop('count', count)});
+                };
+                if(getPosition(content) && triger){
+                    begin()
                 }
                 window.onscroll = function(){
                     if(getPosition(content) && triger){
-                        result.if.append(content);
-                        result.if.bind('nextButton', 'onclick', slide);
-                        triger = false
-                        result.if.effects.headForm.startIn.apply();
-                        result.if.effects.inputElements1.slideOnLeft.apply();
-                        result.if.effects.nextButton.slideOnLeft.apply();
+                        begin();
                     }
                 }
             })
@@ -68,5 +75,11 @@ function OrdersController(){
     };
     this.indexAction = function(){
         alert('грузим index')
+    }
+
+    this._getStage = function(){
+        var pattern = /stage(\d)/;
+        var res = pattern.exec(window.location.hash);
+        return res != undefined ? res[1] : 1;
     }
 }

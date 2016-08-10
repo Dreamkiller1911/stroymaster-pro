@@ -12,5 +12,14 @@ function User(){
                 document.getElementById('com').innerHTML = data;
             }
         });
-    }
+    };
+    this.login = function(){
+        _this.ajax({
+            type: "POST",
+            url: '/user/login/',
+            success: function(data){
+                document.getElementById('com').innerHTML = data;
+            }
+        });
+    };
 }

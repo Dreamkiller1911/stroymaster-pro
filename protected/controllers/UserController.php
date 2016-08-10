@@ -188,6 +188,9 @@ class UserController extends Controller
             Yii::app()->end();
         }
     }
+    public function actionLogin(){
+        var_dump($_POST);
+    }
 
     protected function loadUser()
     {

@@ -556,6 +556,7 @@ var Logistic = {
         return this;
     },
     end: function (params) {
+        //console.log(params)
         if (this.hasOwnProperty('startSetIntervalEnd')) clearInterval(this.startSetIntervalEnd);
         var q = this.queue;
         q[q.length - 1].params = params;
@@ -594,6 +595,7 @@ var Logistic = {
                 commentPosition.push({'a': resCom.index, 'b': resCom.index + resCom[0].length})
             }
             while (ret = reg.returnData.exec(func)) {
+                console.log(ret[1])
                 var compliteReturn = '\r\n;startIfComplete.resultIF=' + ret[1] + ';\r\n' + 'return startIfComplete.resultIF;\r\n';
                 reg.returnData.lastIndex = ret.index + compliteReturn.length;
                 func = func.substr(0, ret.index) + compliteReturn + func.substr(ret.index + ret[0].length);
@@ -628,6 +630,7 @@ var Logistic = {
                     continue;
                 }
                 if (obj === 'startModFunction') continue;
+                //console.log(res[1]);
                 var value = val != undefined && val != '' ? ', ' + val : '';
                 var r = (val + '').split(',');
                 if (r[0] === '' || r[0] == 'undefined') {
@@ -639,7 +642,7 @@ var Logistic = {
                     'var startLastArguments = startModFunction(' + fullName + ', true);\r\n' +
                     'var startNewFunctionArguments = startLastArguments != undefined ? \'startIfComplete ,startModFunction, \' + startLastArguments : \'startIfComplete ,startModFunction \'   ;\r\n' +
                     fullName + ' = new Function(startNewFunctionArguments, startResultPreFunction.f);\r\n' +
-                        //'console.log(' + fullName +');\r\n'+
+                        //'console.log(String(' + fullName +'));\r\n'+
                     fullName + '(startIfComplete, startModFunction ' + value + ');\r\n' +
                     fullName + ' = startOriginFunction;';
                 var r = new RegExp('(' + fullName + ')(' + fullName + ')' + '(\\()(.+)?(\\))');
@@ -674,7 +677,34 @@ var Logistic = {
         };
         this.startSetIntervalEnd = setInterval(function () {
             for (var i = 0; i < q.length; i++) {
-                if ((q[i].resultIF) && q[i].resultIF != 'startNullResultIF' && q[i].end === true) {
+                if (q[i].hasOwnProperty('statusIF') && q[i].statusIF === 'started' && q[i].end === true) {
+                    q[i].statusIF = 'load';
+                    var func = String(q[i]['if']);
+                    var result = searchFunc(preFunc(func));
+                    var args = startModFunction(func, true);
+                    var nArgs;
+                    if (q[i].params) {
+                        var args = '';
+                        for (var p in q[i].params) {
+                            args += ', ' + p;
+                        }
+                        nArgs = 'startIfComplete, startModFunction' + args;
+                    } else nArgs = 'startIfComplete, startModFunction';
+                    var runFunction = function () {
+                        var args = new Object();
+                        var val = new Array;
+                        var res;
+                        for (res in q[i].params) {
+                            args[res] = q[i].params[res];
+                            val.push('args.' + res);
+                        }
+                        var completeArguments = val.length > 0 ? ', ' + val.join(', ') : '';
+                        var completeFunc = 'q[i]["if"]' + '(q[i], startModFunction ' + completeArguments + ')';
+                        eval(completeFunc);
+                    };
+                    q[i]["if"] = new Function(nArgs, result.f).bind(_this);
+                    runFunction();
+                }else if ((q[i].resultIF) && q[i].resultIF != 'startNullResultIF' && q[i].end === true) {
                     try {
                         if (q[i].hasOwnProperty('then')) {
                             var result = {'if': q[i].resultIF};
@@ -689,7 +719,7 @@ var Logistic = {
                         }
                     } finally {
                         q.splice(i, 1);
-                        continue;
+                        break;
                     }
                 } else if ((q[i].resultIF === false || q[i].resultIF === undefined) && q[i].resultIF != 'startNullResultIF' && q[i].end === true) {
                     try {
@@ -706,36 +736,8 @@ var Logistic = {
                         }
                     } finally {
                         q.splice(i, 1)
-                        continue;
+                        break;
                     }
-                } else if (q[i].hasOwnProperty('statusIF') && q[i].statusIF === 'started' && q[i].end === true) {
-                    q[i].statusIF = 'load';
-                    var func = String(q[i]['if']);
-                    var result = searchFunc(preFunc(func));
-                    var args = startModFunction(func, true);
-                    var nArgs;
-                    if (q[i].params) {
-                        var args = '';
-                        for (var p in params) {
-                            args += ', ' + p;
-                        }
-                        nArgs = 'startIfComplete, startModFunction' + args;
-                    } else nArgs = 'startIfComplete, startModFunction';
-                    var runFunction = function (func, prop) {
-                        var args = new Object();
-                        var val = new Array;
-                        var res;
-                        for (res in prop) {
-                            args[res] = prop[res];
-                            val.push('args.' + res);
-                        }
-                        var completeArguments = val.length > 0 ? ', ' + val.join(', ') : '';
-                        var completeFunc = func + '(q[i], startModFunction ' + completeArguments + ')';
-                        eval(completeFunc);
-
-                    };
-                    q[i]["if"] = new Function(nArgs, result.f).bind(_this);
-                    runFunction('q[i]["if"]', q[i].params);
                 }
                 if (q.length < 1) {
                     clearInterval(_this.startSetIntervalEnd)

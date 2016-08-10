@@ -16,4 +16,7 @@ function UserController()
         };
 
     }
+    this.loginAction = function(){
+
+    }
 }
