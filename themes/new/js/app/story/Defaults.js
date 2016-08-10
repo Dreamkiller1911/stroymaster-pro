@@ -7,11 +7,9 @@ var DefaultController = {
     prefix: undefined,
     getControls: function (actionName) {
         if (this.prefix === undefined) this.prefix = this.ctrlName.replace(/Controller/i, '') + '_';
-        var ctrl = undefined;
-
-        var tmpElements = document.querySelectorAll('[StartCtrl="' + this.prefix + actionName || this.actName + '"]');
+        var tmpElements = document.querySelectorAll('[StartCtrl="' + this.prefix + this.actName + '"]');
         if (tmpElements.length < 1) {
-            console.warn('По селектору [StartCtrl="' + this.prefix + actionName || this.actName + '"] - DOM объект не найден');
+            console.warn('По селектору [StartCtrl="' + this.prefix + this.actName + '"] - DOM объект не найден');
             return false;
         } else {
             return tmpElements;
@@ -429,18 +427,22 @@ var DefaultView = {
     show: function (newNode) {
         var tmp = document.createElement('div');
         var re = [], i = 0, a = this._renderEffects, autoApply = [], bin = {};
-        var effectsRun = function (effect, selector) {
-            var res = document.querySelectorAll(selector);
-            if (res.length === 1) res = res[0];
-            effect(res);
-            return this;
-        };
         for (; i < a.length; i++) {
             for (var block in a[i]) {
                 re[block] = {};
                 autoApply[block] = {};
                 for (var comp in a[i][block]) {
-                    re[block][comp] = a[i][block][comp].func;
+                    re[block][comp] = {};
+                    re[block][comp]['func'] = a[i][block][comp].func;
+                    re[block][comp]['_bind'] = a[i][block][comp].bind;
+                    re[block][comp]['parent'] = a[i][block][comp].parent;
+                    re[block][comp]['apply'] = function(){
+                        var _this = this, func = this._func;
+                        var res = document.querySelectorAll(this._bind);
+                        if (res.length === 1) res = res[0];
+                        _this.func(res, this.parent);
+                        return _this;
+                    };
                     bin[block] = a[i][block][comp].bind;
                     autoApply[block][comp] = a[i][block][comp].autoApply;
                 }
@@ -476,16 +478,10 @@ var DefaultView = {
                 for (var block in list) {
                     for (var element in list[block]) {
                         if (list[block][element] === true) {
-                            this.effects[block][element][0]();
+                            this.effects[block][element].apply();
                         }
                     }
                 }
-            },
-            _effectRun: function (effect, selector) {
-                var res = document.querySelectorAll(selector);
-                if (res.length === 1) res = res[0];
-                effect(res);
-                return this;
             }
         };
         this._renderEffects.length = 0;
@@ -522,16 +518,8 @@ var DefaultView = {
             }
             ar[nameG][ef[0]] = {};
             ar[nameG][ef[0]]['selector'] = sl;
-            ar[nameG][ef[0]]['func'] = {0:function(){
-                console.log(this.rrr)
-                var res = document.querySelectorAll(this.rrr);
-                if (res.length === 1) res = res[0];
-                //ef[1](res);
-                return this;
-            }, get rrr() {
-                console.log(this)
-                return sl;
-            }};
+            ar[nameG][ef[0]]['func'] = ef[1];
+            ar[nameG][ef[0]]['parent'] = _this;
             ar[nameG][ef[0]]['bind'] = selector;
             if (ef[2] != undefined && ef[2] === false) {
                 ar[nameG][ef[0]]['autoApply'] = false;
@@ -548,9 +536,7 @@ var DefaultView = {
             this.test(nameGroup, effects, arrayEffects, selector);
 
         }
-
         this._renderEffects.push(arrayEffects);
-        //console.log(element)
         return element;
     },
 }
@@ -652,8 +638,8 @@ var Logistic = {
                     'var startResultPreFunction  = startModFunction('.concat(fullName + ');\r\n') +
                     'var startLastArguments = startModFunction(' + fullName + ', true);\r\n' +
                     'var startNewFunctionArguments = startLastArguments != undefined ? \'startIfComplete ,startModFunction, \' + startLastArguments : \'startIfComplete ,startModFunction \'   ;\r\n' +
-                        //'console.log(startLastArguments);\r\n'+
                     fullName + ' = new Function(startNewFunctionArguments, startResultPreFunction.f);\r\n' +
+                        //'console.log(' + fullName +');\r\n'+
                     fullName + '(startIfComplete, startModFunction ' + value + ');\r\n' +
                     fullName + ' = startOriginFunction;';
                 var r = new RegExp('(' + fullName + ')(' + fullName + ')' + '(\\()(.+)?(\\))');

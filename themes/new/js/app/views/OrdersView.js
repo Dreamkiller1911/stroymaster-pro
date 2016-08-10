@@ -6,8 +6,9 @@ function OrdersView() {
     var self = this;
     this.triger = false;
     this.lastHeight = false;
-    this.slideOnRight = function (element) {
+    this.slideOnLeft = function (element) {
         var _this = this, t = 0;
+        _this.formLInterval = 0;
         var main = element[0].parentNode.parentNode.parentNode;
         var currentHeight = '';
         self.lastHeight = !self.lastHeight ? currentHeight = window.getComputedStyle(main).height : self.lastHeight;
@@ -31,6 +32,29 @@ function OrdersView() {
                     if(t === element.length) return true;
                 });
             }, 100 * _this.formLInterval);
+        })
+    };
+    this.slideOffRight = function (element) {
+        var _this = this, t = 1, l = element.length;
+        this.formLInterval = 1;
+        $(element).each(function () {
+            var self = this;
+            _this.formLInterval++;
+            setTimeout(function () {
+                $(self).css({'position': 'relative'}).
+                animate({'margin-left': 500, 'opacity': 0}, 500, function () {
+                    $(this).css('display', 'none');
+                    t++;
+                    if(t === l){
+                        setTimeout(function(){
+                            return 'Вторая фаза рендеринга'
+                        }, 120)
+                    }
+                });
+
+
+            }, 110 * _this.formLInterval);
+
         })
     };
 
@@ -71,13 +95,6 @@ function OrdersView() {
                 '<label class="label label-default">Контактный номер телефона</label>' +
                 '<input class="form-control" type="text" placeholder="Иван Иванов">' +
                 '</div>' +
-                '</div>' +
-                '<br>' +
-                '<div class="row">' +
-                '<div class="col-sm-12">' +
-                '<label class="label label-default">Запасное поле</label>' +
-                '<input class="form-control" type="text" placeholder="Reserved input">' +
-                '</div>' +
                 '</div>',
                 [
                     ['preSlide', function (element) {
@@ -85,25 +102,8 @@ function OrdersView() {
                             $(this).css({'opacity': 0, 'display': 'none'})
                         })
                     }, true],
-                    ['slideOffRight', function (element) {
-                        _this.formLInterval = 1;
-                        $(element).each(function () {
-                            var self = this;
-                            _this.formLInterval++;
-                            setTimeout(function () {
-                                $(self).css({'position': 'relative'}).
-                                animate({'margin-left': 500, 'opacity': 0}, 500, function () {
-                                    $(this).css('display', 'none');
-                                });
-
-                            }, 100 * _this.formLInterval);
-                        })
-                    }, false],
-                    ['slideOnLeft', function (element) {
-                        setTimeout(function () {
-                            _this.slideOnRight(element);
-                        }, 1400);
-                    }, false]
+                    ['slideOffRight', this.slideOffRight, false],
+                    ['slideOnLeft', this.slideOnLeft, false]
 
                 ]
             ) +
@@ -111,54 +111,19 @@ function OrdersView() {
                 '<div class="row">' +
                 '<div class="col-sm-12">' +
                 '<label class="label label-default">Тип требуемых работы</label>' +
-                '<input class="form-control" type="text" placeholder="Список">' +
+                '<textarea class="form-control"></textarea>' +
                 '</div>' +
                 '</div>' +
-                '<br>' +
-                '<div class="row">' +
-                '<div class="col-sm-12">' +
-                '<label class="label label-default">Красткое описание</label>' +
-                '<input class="form-control" type="text" placeholder="Иван Иванов">' +
-                '</div>' +
-                '</div>' +
-                '<br>' +
-                '<div class="row">' +
-                '<div class="col-sm-12">' +
-                '<label class="label label-default">Запасное поле</label>' +
-                '<input class="form-control" type="text" placeholder="Reserved input">' +
-                '</div>' +
-                '</div>' +
-                '<br>'+
-                '<div class="row">' +
-                '<div class="col-sm-12">' +
-                '<label class="label label-default">Второе запасное поле</label>' +
-                '<input class="form-control" type="text" placeholder="Reserved input twice">' +
-                '</div>' +
-                '</div>',
+                '<br>'
+                ,
                 [
                     ['preSlide', function (element) {
                         $(element).each(function () {
                             $(this).css({'opacity': 0, 'display': 'none'})
                         })
                     }, true],
-                    ['slideOffRight', function (element) {
-                        _this.formLInterval = 1;
-                        $(element).each(function () {
-                            var self = this;
-                            _this.formLInterval++;
-                            setTimeout(function () {
-                                $(self).animate({'margin-left': 500, 'opacity': 0}, 500, function () {
-                                    $(this).css('display', 'none')
-                                });
-
-                            }, 100 * _this.formLInterval);
-                        })
-                    }, false],
-                    ['slideOnLeft', function (element) {
-                        setTimeout(function () {
-                           _this.slideOnRight(element);
-                        }, 1200);
-                    }, false]
+                    ['slideOffRight', this.slideOffRight, false],
+                    ['slideOnLeft', this.slideOnLeft, false]
 
                 ]
             ) +
@@ -172,6 +137,8 @@ function OrdersView() {
                     })
                 }, true],
                 ['slideOnLeft', function (element) {
+                    var _this = this;
+                    _this.formLInterval = 1;
                     $(element).each(function () {
                         var self = this;
                         $(this).css({'margin-left': 500, 'margin-top': 130, 'opacity': 0});
@@ -181,7 +148,11 @@ function OrdersView() {
 
                         }, 100 * _this.formLInterval);
                     })
-                }, false]]) +
+                }, false],
+                ['slideOffBottom', function(element){
+                    $(element).blur().animate({'margin-top': 100, 'opacity': 0}, 350)
+                }, false]
+            ]) +
             '</div>' +
             '</div>' +
             '</form>' +

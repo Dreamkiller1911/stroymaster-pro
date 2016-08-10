@@ -6,7 +6,6 @@ function OrdersController(){
     this.createAction = function(){
         var _this = this;
         var content = document.getElementById('formCreate');
-        var btnCheck = this.getControls('check');
         var triger = true
         var getPosition = function (elem) {
             var rect = elem.getBoundingClientRect();
@@ -23,45 +22,45 @@ function OrdersController(){
             this.render('FormCreate');
         })
             .then(function(result){
-
+                var slide = function(){
+                    result.if.effects.nextButton.slideOffBottom.apply();
+                    var count = Number(this.getAttribute('count'));
+                    var ret = -1;
+                    if(count != 2){
+                        ret = 1;
+                        this.value = 'Назад';
+                    }else {
+                        this.value = 'Далее';
+                    }
+                    var a = count, b = count + ret;
+                    console.log(b)
+                    _this.if(function(){
+                        render.effects['inputElements'+a].slideOffRight.apply();
+                    }).then(function(){
+                        result.if.effects['inputElements' + b].slideOnLeft.apply();
+                        result.if.effects.nextButton.slideOnLeft.apply();
+                    }).else(function(){console.log('Failed test')}).end({
+                        'render': result.if, 'a':a
+                    });
+                    //result.if.effects['inputElements' + b].slideOnLeft.apply();
+                    this.setAttribute('count', b);
+                };
                 if(getPosition(content) && triger){
-                    result.if.append(content)
+                    result.if.append(content);
+                    result.if.bind('nextButton', 'onclick', slide);
                     triger = false
-                    result.if.effects.headForm.startIn();
-                    result.if.effects.inputElements1.slideOnLeft()
+                    result.if.effects.headForm.startIn.apply();
+                    result.if.effects.inputElements1.slideOnLeft.apply();
+                    result.if.effects.nextButton.slideOnLeft.apply();
                 }
                 window.onscroll = function(){
                     if(getPosition(content) && triger){
                         result.if.append(content);
-                        result.if.bind('nextButton', 'onclick', function(){
-                            var limit = 2;
-                            var count = Number(this.getAttribute('count'));
-                            var ret = -1;
-                            if(count != limit){
-                                ret = 1;
-                                this.value = 'Назад';
-                            }else {
-                                this.value = 'Вперед';
-                            }
-                            var a = count, b = count + ret;
-                            _this.if(function(){
-                                console.log(4);
-                                console.log( render.effects['inputElements'+a].slideOffRight);
-                                render.effects['inputElements'+a].slideOffRight();
-
-                            }).then(function(){
-                                console.log('Render');
-                            }).end({
-                                'render': result.if, 'a':a
-                            });
-                            result.if.effects['inputElements' + b].slideOnLeft();
-                            this.setAttribute('count', b);
-                        });
-                        var inp = document.getElementById('');
+                        result.if.bind('nextButton', 'onclick', slide);
                         triger = false
-                        result.if.effects.headForm.startIn();
-                        result.if.effects.inputElements1.slideOnLeft()
-                        result.if.effects.nextButton.slideOnLeft()
+                        result.if.effects.headForm.startIn.apply();
+                        result.if.effects.inputElements1.slideOnLeft.apply();
+                        result.if.effects.nextButton.slideOnLeft.apply();
                     }
                 }
             })
