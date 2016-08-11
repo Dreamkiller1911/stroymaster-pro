@@ -161,7 +161,7 @@ function Start(prop) {
         var _this = this;
         this.queue.push({ctrl: ctrl, act: act, prop: prop, statusC: 'load', statusA: false});
         this.ctrlLoadTimer = setInterval(function(){
-            _this.scanQueue()
+            _this.scanQueue();
         }, 10);
     };
     this.scanQueue = function () {
@@ -171,7 +171,6 @@ function Start(prop) {
                 var a = this.queue[i].act;
                 var p = this.queue[i].prop;
                 if (this.ctrls.hasOwnProperty(c) === false) {
-                    console.log(4);
                     this.includeJSCtrl(c, a, p);
                 } else {
                     if (this.queue[i].statusC === 'load') {
@@ -215,19 +214,19 @@ function Start(prop) {
         }
     };
     this.loadAct = function (ctrl, act, par) {
-
         if (this.ctrls.hasOwnProperty(ctrl)) {
             var ctrlN = this.ctrls[ctrl.toString()].obj;
             if (ctrlN.hasOwnProperty(act.toString() + 'Action')) {
                 ctrlN.ctrlName = ctrl;
                 ctrlN.actName = act;
-                ctrlN.start = _this;
+                ctrlN.start = this;
                 if (ctrlN[act + 'Action'] instanceof Function === false) {
                     par.status = false;
                     return false;
                 }
                 ctrlN[act + 'Action']();
                 par.status = true;
+                console.log('true');
                 return true;
             } else {
                 if (this._debugMode) {
@@ -236,7 +235,7 @@ function Start(prop) {
             }
         } else {
             console.warn('Функция с именем \'' + ctrl + 'Controller.js\' не найдена, и не может  быть объявлена. Полный путь \''
-                + _this.paths.ctrls + ctrl + 'Controller.js\'');
+                + this.paths.ctrls + ctrl + 'Controller.js\'');
         }
     };
     this.loadActView = function (fileName, view, params) {
@@ -397,20 +396,20 @@ function Start(prop) {
     };
 
     this.includeJSCtrl = function (scriptName, a, p) {
-        var _this = this;
+        var self = this;
         this.ctrls[scriptName] = new Object();
         var script = document.createElement('script');
         var head = document.getElementsByTagName('head')[0];
         var fullCtrlName = scriptName + 'Controller';
-        var obj = _this.ctrls[scriptName];
-        var url = _this.paths.ctrls + fullCtrlName + '.js?' + Math.random();
-        Object.defineProperty(_this.ctrls[scriptName], 'status', {
+        var obj = this.ctrls[scriptName];
+        var url = this.paths.ctrls + fullCtrlName + '.js?' + Math.random();
+        Object.defineProperty(this.ctrls[scriptName], 'status', {
             value: 'load',
             writable: true
         });
-        var isLoadReady = function () {
+        var isLoadReady = function (self) {
             DefaultController.prototype = Logistic;
-            _this._cloningObject(DefaultController, Logistic);
+            self._cloningObject(DefaultController, Logistic);
             window[fullCtrlName.toString()].prototype = DefaultController;
             Object.defineProperty(obj, 'obj', {
                     value: new window[fullCtrlName.toString()](),
@@ -424,7 +423,7 @@ function Start(prop) {
             return '2414';
         };
         script.onerror = function () {
-            if (_this.debugMode) {
+            if (this.debugMode) {
                 console.warn('Файл контроллера "' + fullCtrlName + '.js" не был подключен \r\n Путь до файла "' + url + '"')
             }
             head.removeChild(this);
@@ -433,7 +432,7 @@ function Start(prop) {
         script.onload = function () {
             if (!this.executed) {
                 this.executed = true;
-                isLoadReady();
+                isLoadReady(self);
             }
         };
         script.src = url;

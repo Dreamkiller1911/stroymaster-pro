@@ -30,6 +30,7 @@ function OrdersController(){
                             console.log(resUser);
                         }).else(function(res){console.log(res)}).end();
                     }
+                    return false;
                     result.if.effects.nextButton.slideOffBottom.apply();
                     var count = Number(this.getAttribute('count'));
                     var ret = -1;

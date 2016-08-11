@@ -595,7 +595,7 @@ var Logistic = {
                 commentPosition.push({'a': resCom.index, 'b': resCom.index + resCom[0].length})
             }
             while (ret = reg.returnData.exec(func)) {
-                console.log(ret[1])
+                //console.log(ret[1])
                 var compliteReturn = '\r\n;startIfComplete.resultIF=' + ret[1] + ';\r\n' + 'return startIfComplete.resultIF;\r\n';
                 reg.returnData.lastIndex = ret.index + compliteReturn.length;
                 func = func.substr(0, ret.index) + compliteReturn + func.substr(ret.index + ret[0].length);
@@ -642,7 +642,7 @@ var Logistic = {
                     'var startLastArguments = startModFunction(' + fullName + ', true);\r\n' +
                     'var startNewFunctionArguments = startLastArguments != undefined ? \'startIfComplete ,startModFunction, \' + startLastArguments : \'startIfComplete ,startModFunction \'   ;\r\n' +
                     fullName + ' = new Function(startNewFunctionArguments, startResultPreFunction.f);\r\n' +
-                        //'console.log(String(' + fullName +'));\r\n'+
+                        'console.log(String(' + fullName +'));\r\n'+
                     fullName + '(startIfComplete, startModFunction ' + value + ');\r\n' +
                     fullName + ' = startOriginFunction;';
                 var r = new RegExp('(' + fullName + ')(' + fullName + ')' + '(\\()(.+)?(\\))');
@@ -719,7 +719,7 @@ var Logistic = {
                         }
                     } finally {
                         q.splice(i, 1);
-                        break;
+                        continue;
                     }
                 } else if ((q[i].resultIF === false || q[i].resultIF === undefined) && q[i].resultIF != 'startNullResultIF' && q[i].end === true) {
                     try {
@@ -736,7 +736,7 @@ var Logistic = {
                         }
                     } finally {
                         q.splice(i, 1)
-                        break;
+                        continue;
                     }
                 }
                 if (q.length < 1) {
