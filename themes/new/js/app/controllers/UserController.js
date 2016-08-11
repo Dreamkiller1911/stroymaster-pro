@@ -15,8 +15,17 @@ function UserController()
             })
         };
 
-    }
+    };
     this.loginAction = function(){
+
+    };
+    this.getUserInfoAction = function(){
+        this.startModel('User', function(model){
+            model.getProperties();
+            var phone = model.p.phone.value;
+            phone = phone.replace(/\-/gm, '');
+            model.getUserInfo(phone);
+        });
 
     }
 }

@@ -25,9 +25,9 @@ function OrdersController(){
                 var slide = function(e){
                     if(Number(this.getAttribute('count')) === 1){
                         _this.if(function(){
-                            this.start.init('User', 'login');
+                            this.start.init('User', 'getUserInfo');
                         }).then(function(resUser){
-                            console.log(resUser);
+                            console.log(resUser.if);
                         }).else(function(res){console.log(res)}).end();
                     }
                     return false;

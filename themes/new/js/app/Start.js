@@ -160,58 +160,59 @@ function Start(prop) {
     this.startInit = function (ctrl, act, prop) {
         var _this = this;
         this.queue.push({ctrl: ctrl, act: act, prop: prop, statusC: 'load', statusA: false});
-        this.ctrlLoadTimer = setInterval(function(){
-            _this.scanQueue();
+        var timer = ctrlLoadTimer = setInterval(function () {
+            if (_this.queue[_this.queue.length - 1].statusC === 'load') {
+                _this.scanQueue();
+            } else {
+                clearInterval(timer);
+            }
         }, 10);
     };
     this.scanQueue = function () {
-        if (this.queue[this.queue.length - 1].statusC === 'load') {
-            for (var i = 0; i < this.queue.length; i++) {
-                var c = this.queue[i].ctrl;
-                var a = this.queue[i].act;
-                var p = this.queue[i].prop;
-                if (this.ctrls.hasOwnProperty(c) === false) {
-                    this.includeJSCtrl(c, a, p);
-                } else {
-                    if (this.queue[i].statusC === 'load') {
-                        if (this.ctrls[c].status === 'error') {
-                            delete this.ctrls[c];
-                            this.queue.splice(i, 1);
-                            break;
-                        }
-                        if (this.ctrls[c].status === 'load') {
-                            break;
-                        }
-                        if (p) {
-                            if ('properties' in this.ctrls[c].obj === false) {
-                                Object.defineProperty(this.ctrls[c].obj, 'properties', {
-                                    value: new Object(),
-                                });
-                            }
-                            if (this.ctrls[c.toString()].obj.properties.hasOwnProperty(a.toString())) {
-                                delete this.ctrls[c.toString()].obj.properties[a.toString()]
-                            }
-                            Object.defineProperty(this.ctrls[c].obj['properties'], a, {
-                                value: p,
-                                writable: true,
-                                configurable: true
+        for (var i = 0; i < this.queue.length; i++) {
+            var c = this.queue[i].ctrl;
+            var a = this.queue[i].act;
+            var p = this.queue[i].prop;
+            if (this.ctrls.hasOwnProperty(c) === false) {
+                this._includeJSCtrl(c, a, p);
+            } else {
+                if (this.queue[i].statusC === 'load') {
+                    if (this.ctrls[c].status === 'error') {
+                        delete this.ctrls[c];
+                        this.queue.splice(i, 1);
+                        break;
+                    }
+                    if (this.ctrls[c].status === 'load') {
+                        break;
+                    }
+                    if (p) {
+                        if ('properties' in this.ctrls[c].obj === false) {
+                            Object.defineProperty(this.ctrls[c].obj, 'properties', {
+                                value: new Object(),
                             });
                         }
-                        var test = {'status':false};
-                        this.loadAct(c, a, test);
-                        if (test.status) {
-                            this.queue[i].statusC = 'ready';
-                        } else {
-                            this.queue[i].statusC = 'error';
-                            //throw new Error('Метод объекта уже обявлен и не является функцией');
+                        if (this.ctrls[c.toString()].obj.properties.hasOwnProperty(a.toString())) {
+                            delete this.ctrls[c.toString()].obj.properties[a.toString()]
                         }
-
+                        Object.defineProperty(this.ctrls[c].obj['properties'], a, {
+                            value: p,
+                            writable: true,
+                            configurable: true
+                        });
                     }
+                    var test = {'status': false};
+                    this.loadAct(c, a, test);
+                    if (test.status) {
+                        this.queue[i].statusC = 'ready';
+                    } else {
+                        this.queue[i].statusC = 'error';
+                        //throw new Error('Метод объекта уже обявлен и не является функцией');
+                    }
+
                 }
             }
-        } else {
-            clearInterval(this.ctrlLoadTimer);
         }
+
     };
     this.loadAct = function (ctrl, act, par) {
         if (this.ctrls.hasOwnProperty(ctrl)) {
@@ -220,14 +221,11 @@ function Start(prop) {
                 ctrlN.ctrlName = ctrl;
                 ctrlN.actName = act;
                 ctrlN.start = this;
-                if (ctrlN[act + 'Action'] instanceof Function === false) {
+                if (ctrlN[act+'Action'] instanceof Function === false) {
                     par.status = false;
-                    return false;
                 }
-                ctrlN[act + 'Action']();
+                ctrlN[act+"Action"]();
                 par.status = true;
-                console.log('true');
-                return true;
             } else {
                 if (this._debugMode) {
                     console.warn('В объекте \'' + ctrl + 'Controller\' не найдена функция с именем \'' + act + '\'');
@@ -395,7 +393,7 @@ function Start(prop) {
         return data;
     };
 
-    this.includeJSCtrl = function (scriptName, a, p) {
+    this._includeJSCtrl = function (scriptName, a, p) {
         var self = this;
         this.ctrls[scriptName] = new Object();
         var script = document.createElement('script');
@@ -420,7 +418,7 @@ function Start(prop) {
                 value: new Array,
             });
             obj.status = 'ready';
-            return '2414';
+
         };
         script.onerror = function () {
             if (this.debugMode) {

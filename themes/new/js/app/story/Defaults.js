@@ -577,12 +577,13 @@ var Logistic = {
             return result;
         };
         var searchFunc = function (func) {
+            //console.log(func);
             var reg = {
                 'object': /^(\w+)/,
                 'method': /^(?:\w+\.?)(\w+)/,
                 'commentLine': /\/\/.*/g,
                 'commentBlock': /(?:\/\*)(?:([\w\s\S]*(?=\*\/)\1))(\*\/)/gm,
-                'function': /^(?:[\s]*)((\w+)(?:((?:\.[\w\[\]\'\"\+\-]+(?:\(.*\))?(?=\.))*)(?:(?:\.)([\w\[\]\+\-]+))?)?)\s*(?:\()(.*)(?:\))(?!\s*[\{\.])/gm,
+                'function': /^(?:[\s]*)(([\w\[\]\'\"\+\-]+)(?:((?:\.[\w\[\]\'\"\+\-]+(?:\(.*\))?(?=\.))*)(?:(?:\.)([\w\[\]\+\-]+))?)?)\s*(?:\()(.*)(?:\))(?!\s*[\{\.])/gm,
                 'true': /((\s*)return\s*true)/gm,
                 'false': /((\s*)return\s*false)/gm,
                 'returnData': /(?:(?:\s*return\s*)(?!startIfComplete\.resultIF)([^_;]+)*)(?:(?:;)|(?:\r\n))/g,
@@ -642,7 +643,7 @@ var Logistic = {
                     'var startLastArguments = startModFunction(' + fullName + ', true);\r\n' +
                     'var startNewFunctionArguments = startLastArguments != undefined ? \'startIfComplete ,startModFunction, \' + startLastArguments : \'startIfComplete ,startModFunction \'   ;\r\n' +
                     fullName + ' = new Function(startNewFunctionArguments, startResultPreFunction.f);\r\n' +
-                        'console.log(String(' + fullName +'));\r\n'+
+                    //'console.log(String(' + fullName +'));\r\n'+
                     fullName + '(startIfComplete, startModFunction ' + value + ');\r\n' +
                     fullName + ' = startOriginFunction;';
                 var r = new RegExp('(' + fullName + ')(' + fullName + ')' + '(\\()(.+)?(\\))');
