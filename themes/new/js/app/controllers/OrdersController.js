@@ -23,15 +23,6 @@ function OrdersController(){
         })
             .then(function(result){
                 var slide = function(e){
-                    if(Number(this.getAttribute('count')) === 1){
-                        _this.if(function(){
-                            this.start.init('User', 'getUserInfo');
-                        }).then(function(resUser){
-                            console.log(resUser.if);
-                        }).else(function(res){console.log(res)}).end();
-                    }
-                    return false;
-                    result.if.effects.nextButton.slideOffBottom.apply();
                     var count = Number(this.getAttribute('count'));
                     var ret = -1;
                     if(count != 2){
@@ -41,18 +32,27 @@ function OrdersController(){
                         this.value = 'Далее';
                     }
                     var a = count, b = count + ret;
-
-                    _this.if(function(){
-                        render.effects['inputElements'+a].slideOffRight.apply();
-                    }).then(function(){
-                        window.location.hash = 'stage' + b;
-                        result.if.effects['inputElements' + b].slideOnLeft.apply();
-                        result.if.effects.nextButton.slideOnLeft.apply();
-                    }).else(function(){console.log('Failed test')}).end({
-                        'render': result.if, 'a':a
-                    });
-                    //result.if.effects['inputElements' + b].slideOnLeft.apply();
+                    if(Number(this.getAttribute('count')) === 1){
+                        _this.if(function(){
+                            this.start.init('User', 'getUserInfo');
+                        }).then(function(resUser){
+                            result.if.effects.nextButton.slideOffBottom.apply();
+                            _this.if(function(){
+                                render.effects['inputElements'+a].slideOffRight.apply();
+                            }).then(function(){
+                                window.location.hash = 'stage' + b;
+                                result.if.effects['inputElements' + b].slideOnLeft.apply();
+                                result.if.effects.nextButton.slideOnLeft.apply();
+                            }).else(function(){console.log('Failed test')}).end({
+                                'render': result.if, 'a':a
+                            });
+                        }).else(function(res){
+                            console.log(res)
+                        }).end();
+                    }
                     this.setAttribute('count', b);
+                    //result.if.effects['inputElements' + b].slideOnLeft.apply();
+
                 };
                 var begin = function(){
                     result.if.append(content);
