@@ -496,6 +496,9 @@ function Start(prop) {
                 '_renderEffects': {
                     value: []
                 },
+                '_groupNames': {
+                    value: {}
+                },
                 '_effectsAutocomplete': {
                     value: []
                 }

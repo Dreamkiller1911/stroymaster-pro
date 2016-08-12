@@ -496,9 +496,11 @@ var DefaultView = {
         var tmpBlock = document.createElement('div');
         tmpBlock.innerHTML = element;
         var resElem = tmpBlock.children;
-        var fix = Math.round(Math.random() * 100000);
-        var selector = '[StartViewEffectsId="' + this.prefix + nameGroup + '_' + fix + '"]';
+        var fix =  Math.round(Math.random() * 100000);;
         var arrayEffects = [];
+        if(_this._groupNames.hasOwnProperty(nameGroup))fix = _this._groupNames[nameGroup];
+        this._groupNames[nameGroup] = fix;
+        var selector = '[StartViewEffectsId="' + this.prefix + nameGroup + '_' + fix + '"]';
         if (resElem.length > 1) {
             var i = 0;
             var data = [];
@@ -509,14 +511,14 @@ var DefaultView = {
         } else {
             element = element.replace(regexp, '$1 StartViewEffectsId="' + this.prefix + nameGroup + '_' + fix + '"');
         }
-        this.test = function (nameG, ef, ar, sl) {
+        this.test = function (nameG, ef, ar, sl, fix) {
             if (nameG in ar === false) {
                 ar[nameG] = {};
             }
             if (nameG in _this._effectsAutocomplete === false) {
                 _this._effectsAutocomplete[nameG] = [];
             }
-            ar[nameG][ef[0]] = {};
+            ar[nameG][ef[0]] = {'fix':fix};
             ar[nameG][ef[0]]['selector'] = sl;
             ar[nameG][ef[0]]['func'] = ef[1];
             ar[nameG][ef[0]]['parent'] = _this;
@@ -530,10 +532,10 @@ var DefaultView = {
         if (Array.isArray(effects[0])) {
             for (i = 0; i < effects.length; i++) {
                 if (effects[i].length === 0) continue;
-                this.test(nameGroup, effects[i], arrayEffects, selector);
+                this.test(nameGroup, effects[i], arrayEffects, selector, fix);
             }
         } else {
-            this.test(nameGroup, effects, arrayEffects, selector);
+            this.test(nameGroup, effects, arrayEffects, selector, fix);
 
         }
         this._renderEffects.push(arrayEffects);
