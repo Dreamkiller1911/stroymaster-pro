@@ -106,7 +106,7 @@ class ServicesController extends Controller
 
     public function actionIndex()
     {
-        if (isset($_POST['ajax']) && $_POST['ajax'] === 'load') {
+        /*if (isset($_POST['ajax']) && $_POST['ajax'] === 'load') {
             $id = $this->getThreeService($_POST['id']);
             $model = Services::model()->findAll('id=' . implode(' XOR id=', $id['popId']));
             $data = array();
@@ -115,22 +115,56 @@ class ServicesController extends Controller
             }
             echo json_encode(array('nextId' => $id['oldArr'], 'data' => $data, 'complete' => true));
             Yii::app()->end();
-        }
-        $criteria = new CDbCriteria(array(
-            'select' => 'id',
-            'condition' => 'status=1',
-        ));
-        $dataId = Services::model()->findAll($criteria);
-        $data = array();
+        }*/
+
+
+        /*$data = array();
         foreach ($dataId as $key) {
             array_push($data, $key->id);
         }
         $id = $this->getThreeService($data);
+        $model = Services::model()->findAll('id=' . implode(' XOR id=', $id['popId']));*/
+        $this->render('index');
+    }
+
+    public function actionAjaxLoad()
+    {
+        $toLoad = true;
+        $data = array();
+        if(isset($_POST['id']) && $_POST['id'] === 'new'){
+            $criteria = new CDbCriteria(array(
+                'select' => 'id',
+                'condition' => 'status=1',
+            ));
+            $dataId = Services::model()->findAll($criteria);
+            foreach ($dataId as $key) {
+                array_push($data, $key->id);
+            }
+
+        }else{
+            $data = $_POST['id'];
+        }
+        $id = $this->getThreeService($data);
+        $data = array('result'=>array(), 'oldArr'=>array(), 'status'=>$toLoad);
         $model = Services::model()->findAll('id=' . implode(' XOR id=', $id['popId']));
-        $this->render('index', array(
-            'model' => $model,
-            'id' => $id
-        ));
+        foreach($model as $key){
+            $tmp = array('service'=>$key->attributes);
+            $userCriteria = new CDbCriteria(array(
+                'select'=>'class, date_registration, email , email_valid, first_name,
+                            id, phone, phone_read, phone_read_date, phone_valid, profile,
+                            second_name, sms_notification, sms_notification_date'
+            ));
+            $user = User::model()->findByPk($key->id_user, $userCriteria);
+            $images = array();
+            $dataImg = $key->imgServices;
+            foreach($dataImg as $elem){
+                array_push($images, $elem->attributes);
+            }
+            $tmp += array('images' => $images) + array('user'=>$user->attributes);
+            array_push($data['result'], $tmp);
+        }
+        array_push($data['oldArr'], $id['oldArr']);
+        echo json_encode($data);
     }
 
     public function actionAdmin()
