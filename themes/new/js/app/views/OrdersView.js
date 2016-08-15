@@ -155,7 +155,6 @@ function OrdersView() {
 
                     var _this = this;
                     _this.formLInterval = 1;
-
                     $(element).each(function () {
                         var self = this;
                         console.log(this)
