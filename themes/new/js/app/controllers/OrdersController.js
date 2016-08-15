@@ -18,6 +18,7 @@ function OrdersController() {
             }
             return false;
         }
+<<<<<<< HEAD
         this.if(function () {
                 this.render('FormCreate');
             })
@@ -78,7 +79,43 @@ function OrdersController() {
                     return false;
 
                     //result.if.effects['inputElements' + b].slideOnLeft.apply();
+=======
+        this.if(function(){
+            this.render('FormCreate');
+        })
+            .then(function(result){
+                var slide = function(e){
+                    var count = Number(this.getAttribute('count'));
+                    var ret = -1;
+                    if(count != 2){
+                        ret = 1;
+                        this.value = 'Назад';
+                    }else {
+                        this.value = 'Далее';
+                    }
+                    var a = count, b = count + ret;
+                    if(Number(this.getAttribute('count')) === 1){
+                        _this.if(function(){
+                            this.start.init('User', 'getUserInfo');
+                        }).then(function(resUser){
+                            result.if.effects.nextButton.slideOffBottom.apply();
+                            _this.if(function(){
+                                render.effects['inputElements'+a].slideOffRight.apply();
+                            }).then(function(){
+                                window.location.hash = 'stage' + b;
+                                result.if.effects['inputElements' + b].slideOnLeft.apply();
+                                result.if.effects.nextButton.slideOnLeft.apply();
+                            }).else(function(){console.log('Failed test')}).end({
+                                'render': result.if, 'a':a
+                            });
+                        }).else(function(res){
+                            console.log(res)
+                        }).end();
+                    }
+>>>>>>> ce886f25adf79b7162d4a17178a6f165857d6f1a
                     this.setAttribute('count', b);
+                    //result.if.effects['inputElements' + b].slideOnLeft.apply();
+
                 };
                 var begin = function () {
                     result.if.append(content);

@@ -5,11 +5,13 @@ function ServiceController() {
     var _this = this;
     this.timeIterator = 0;
     this.statusLoadIndex = true;
+    this.scrollTo = undefined;
+    this.oldArr = '';
 
     this.t = function (per) {
         console.log('t')
         return 'qwe';
-    }
+    };
     this.viewModalAction = function () {
         var ctrl = _this.getControls();
         for (var i = 0; i < ctrl.length; i++) {
@@ -23,6 +25,8 @@ function ServiceController() {
         }
     };
     this.indexLoadAction = function () {
+        var _this = this;
+        var serviceBody = document.querySelector('[rel="services"]');
         var getPosition = function (elem) {
             var rect = elem.getBoundingClientRect();
             var docMarginTop = getComputedStyle(document.body).marginTop.replace(new RegExp('[a-z]+', 'i'), '');
@@ -33,23 +37,66 @@ function ServiceController() {
                 return true;
             }
             return false;
-        }
-        var serviceBody = document.querySelector('[rel="services"]');
-        if (getPosition(serviceBody) && _this.statusLoadIndex) {
-            _this.statusLoadIndex = false;
-            _this.startModel('Service', function (model) {
-                model.loadScroll(serviceBody, _this.properties.indexLoad.Id);
-                model.statusLoadIndex = false;
-            })
-        }
-        window.onscroll = function () {
-            if (getPosition(serviceBody) && _this.statusLoadIndex) {
-                _this.statusLoadIndex = false;
-                _this.startModel('Service', function (model) {
-                    model.loadScroll(serviceBody, _this.properties.indexLoad.Id);
-                    model.statusLoadIndex = false;
-                })
+        };
+        var setOldId = function(dataId){
+            var _result = 'new';
+            if(!dataId[0]) return _result;
+            if(dataId[0].length > 0){
+                _result = dataId[0];
+            }else{
+                _result = false;
             }
+            return _result;
+        };
+        this.if(function(){
+            this.startModel('Service', function(model){
+                model.loadData('new')
+            });
+        }).then(function(data){
+            _this.oldArr = setOldId(data.if.oldArr);
+            var i = 0;
+            for ( ; i < data.if.result.length; i++){
+                _this.if(function(){
+                    this.render('Service',{'data':{'model': model, 'user': user, 'images': images}})
+
+                }).then(function(render){
+                    render.if.append(serviceBody);
+                }).end({'model': data.if.result[i].service, 'user': data.if.result[i].user, 'images': data.if.result[i].images});
+            }
+        }).end();
+        window.onscroll = function(e){
+           if(getPosition(serviceBody) && _this.statusLoadIndex){
+               if(_this.scrollTo != undefined && _this.scrollTo != window.scrollY){
+                   return false
+               }else {
+                   _this.scrollTo = window.scrollY;
+               }
+               _this.statusLoadIndex = false;
+               _this.if(function(){
+                   this.startModel('Service', function(model){
+                       model.loadData(id)
+                   })
+               }).then(function(res){
+                   _this.oldArr = setOldId(res.if.oldArr);
+                   var i = 0;
+                   for ( ; i < res.if.result.length; i++){
+                       _this.if(function(){
+                           this.render('Service',{'data':{'model': model, 'user': user, 'images': images}})
+
+                       }).then(function(render){
+                           render.if.append(serviceBody);
+                           //if(i === res.if.result.length) console.log(i);
+                       }).end({'model': res.if.result[i].service, 'user': res.if.result[i].user, 'images': res.if.result[i].images});
+
+                       if(i === res.if.result.length -1){
+                           _this.statusLoadIndex = true;
+                           _this.scrollTo = undefined;
+                       }
+                   }
+               }).else(function(){
+                   console.log('Рендерим финальный блок');
+               }).end({'id': _this.oldArr})
+           }
         };
     };
     this.crud = function () {

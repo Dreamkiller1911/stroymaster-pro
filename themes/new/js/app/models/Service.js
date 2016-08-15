@@ -26,24 +26,20 @@ function Service(){
             }
         });
     };
-    this.loadScroll = function (place, idList){
-      _this.ajax({
+    this.loadData = function (idList){
+        if(idList === false){
+            return false;
+        }
+      this.ajax({
           type: "POST",
-          url: "/services/index/",
-          data: {ajax: 'load', id: idList},
+          url: "/services/AjaxLoad/",
+          data: {ajax: 'load', 'id': idList},
           dataType: 'json',
           success: function (data) {
-              var newData = document.createElement('div');
-              newData.innerHTML = data.data.join('');
-              if(place.appendChild(newData)){
-                  if(data.nextId.length > 0){
-                      _this.ctrl.statusLoadIndex = true;
-                      _this.start.init('Service', 'indexLoad', {Id:data.nextId});
-                  }
-                  _this.start.init('Service', 'viewModal');
+              if(data.result === false){
+                  return false;
               }
-
-
+              return data;
           }
       });
     };

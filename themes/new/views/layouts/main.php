@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?php echo $this->pageTitle ?></title>
-    <link href="<?php echo Yii::app()->theme->baseUrl?>/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="<?php echo Yii::app()->theme->baseUrl?>/css/main.css" rel="stylesheet">
-    <link href="<?php echo Yii::app()->theme->baseUrl?>/css/form.css" rel="stylesheet">
+    <link href="<?php echo Yii::app()->theme->baseUrl ?>/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="<?php echo Yii::app()->theme->baseUrl ?>/css/main.css" rel="stylesheet">
+    <link href="<?php echo Yii::app()->theme->baseUrl ?>/css/form.css" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
@@ -27,8 +27,6 @@
                     <a class="navbar-brand" href="/"><span class="glyphicon glyphicon-home"></span> Stroymaster-pro</a>
                 </div>
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-
-<!--                    --><?php //require_once(__DIR__ . '/menu.php') ?>
                 </div>
             </div>
         </nav>
@@ -95,22 +93,23 @@
 
 <!-- Блок меню контент начло-->
 <div class="container-fluid">
-        <?php echo $content ?>
+    <?php echo $content ?>
 </div>
 <!-- Блок меню контент конец-->
 <br><br>
+
 <div class="container-fluid">
     <div class="row footer small">
         <div class="col-sm-4 col-sm-offset-4 text-center">
-            Авторские права &copy; <?php /*echo date('Y'); */?> Stroymaster-pro.<br/>
-            <?php /*echo Yii::powered(); */?><br>
+            Авторские права &copy; <?php /*echo date('Y'); */ ?> Stroymaster-pro.<br/>
+            <?php /*echo Yii::powered(); */ ?><br>
             Разработчик <br>
             Дизайн
         </div>
     </div>
 </div>
 
-<script src="<?php echo Yii::app()->theme->baseUrl?>/js/main.js"></script>
-<script src="<?php echo Yii::app()->theme->baseUrl?>/bootstrap/js/bootstrap.js"></script>
+<script src="<?php echo Yii::app()->theme->baseUrl ?>/js/main.js"></script>
+<script src="<?php echo Yii::app()->theme->baseUrl ?>/bootstrap/js/bootstrap.js"></script>
 </body>
 </html>

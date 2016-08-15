@@ -13,11 +13,7 @@ $this->pageTitle = Yii::app()->name . ' - Главная';
 $this->init()->registerMetaTag('ремонт ефремов, ремонт квартир в ефремове, мастер ремонта квартир', 'keywords');
 $this->init()->registerMetaTag('Мы предлагаем вам список мастеров. Вы можете ознакомиться с анкетами и работами каждого мастера' .
     'и получить контактную информцию', 'description');
-$this->init()->registerScript('service', 'start.init({
-    \'Service\': [
-    \'viewModal\',
-     \'indexLoad\']}, {\'indexLoad\':' .
-    json_encode(array('Id'=>$id["oldArr"])) . '})');
+$this->init()->registerScript('service', 'start.init(\'Service\', \'indexLoad\')');
 
 ?>
 <div id="myModal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog"
@@ -37,12 +33,11 @@ $this->init()->registerScript('service', 'start.init({
 <h4 class="hidden-sm hidden-md hidden-lg">Ниже представлен полный список мастеров города Ефремов</h4>
 
 <div class="col-sm-12" rel="services">
-    <?php
-    foreach ($model as $key) {
+    <?php/*    foreach ($model as $key) {
         $this->renderPartial('_view', array('service' => $key));
     }
 
-    ?>
+    */?>
 </div>
 
 
