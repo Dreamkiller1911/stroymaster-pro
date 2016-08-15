@@ -18,7 +18,6 @@ function OrdersController() {
             }
             return false;
         }
-<<<<<<< HEAD
         this.if(function () {
                 this.render('FormCreate');
             })
@@ -77,9 +76,8 @@ function OrdersController() {
                     }
 
                     return false;
-
                     //result.if.effects['inputElements' + b].slideOnLeft.apply();
-=======
+/*
         this.if(function(){
             this.render('FormCreate');
         })
@@ -112,8 +110,7 @@ function OrdersController() {
                             console.log(res)
                         }).end();
                     }
->>>>>>> ce886f25adf79b7162d4a17178a6f165857d6f1a
-                    this.setAttribute('count', b);
+                    this.setAttribute('count', b);*/
                     //result.if.effects['inputElements' + b].slideOnLeft.apply();
 
                 };

@@ -4,3 +4,5 @@ requirements
 .idea/
 img/*
 !img/**/.gitignore
+themes\new\js\app\Start.js
+themes\new\js\app\story\
