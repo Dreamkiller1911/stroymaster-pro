@@ -4,7 +4,8 @@
 function OrdersView() {
 
     var self = this;
-    this.triger = false;
+    this.tic = 1;
+    this.trigers = {'label': false};
     this.lastHeight = false;
     this.slideOnLeft = function (element) {
         var _this = this, t = 0;
@@ -85,14 +86,25 @@ function OrdersView() {
             this.addEffect('inputElements1',
                 '<div class="row">' +
                 '<div class="col-sm-12">' +
-                '<label class="label label-default">Ваше имя и фамилия</label>' +
+                this.addEffect('label', '<label class="label label-default"><span>Ваше имя и фамилия</span></label>',[
+                    ['pre', function(element){$(element).css('opacity', 0)}, true],
+                ]) +
                 '<input class="form-control" type="text" placeholder="Иван Иванов">' +
                 '</div>' +
                 '</div>' +
                 '<br>' +
                 '<div class="row">' +
                 '<div class="col-sm-12">' +
-                '<label class="label label-default">Контактный номер телефона</label>' +
+                this.addEffect('label', '<label class="label label-default"><span>Контактный номер телефона</span></label>',[
+                    ['pre', function(element){$(element).css('opacity', 0)}, true],
+                    ['show', function(element){
+                       $(element).each(function(){
+                           _this.tic++;
+                           var elem = this;
+                           setTimeout(function(){$(elem).animate({'opacity':1}, 200)}, 350 * _this.tic);
+                       })
+                    }, true]
+                ]) +
                 '<input StartModel="user_phone" class="form-control" type="text" placeholder="Иван Иванов">' +
                 '</div>' +
                 '</div>',
@@ -137,10 +149,15 @@ function OrdersView() {
                     })
                 }, true],
                 ['slideOnLeft', function (element) {
+                    var pattern = /stage(\d)/;
+                    var res = pattern.exec(window.location.hash);
+                    res != undefined ? res[1] : 1;
+
                     var _this = this;
                     _this.formLInterval = 1;
                     $(element).each(function () {
                         var self = this;
+                        console.log(this)
                         $(this).css({'margin-left': 500, 'margin-top': 130, 'opacity': 0});
                         _this.formLInterval++;
                         setTimeout(function () {
@@ -148,6 +165,9 @@ function OrdersView() {
 
                         }, 100 * _this.formLInterval);
                     })
+                }, false],
+                ['progress', function (element) {
+                    $(element).val('Гружусь').addClass('disabled');
                 }, false],
                 ['slideOffBottom', function(element){
                     $(element).blur().animate({'margin-top': 100, 'opacity': 0}, 350)

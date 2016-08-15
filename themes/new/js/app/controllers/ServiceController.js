@@ -82,19 +82,23 @@ function ServiceController() {
                    for ( ; i < res.if.result.length; i++){
                        _this.if(function(){
                            this.render('Service',{'data':{'model': model, 'user': user, 'images': images}})
-
                        }).then(function(render){
                            render.if.append(serviceBody);
                            //if(i === res.if.result.length) console.log(i);
                        }).end({'model': res.if.result[i].service, 'user': res.if.result[i].user, 'images': res.if.result[i].images});
-
                        if(i === res.if.result.length -1){
                            _this.statusLoadIndex = true;
                            _this.scrollTo = undefined;
                        }
                    }
                }).else(function(){
-                   console.log('Рендерим финальный блок');
+                   _this.if(function(){
+                       this.render('FinalBlock');
+                   }).then(function(res){
+                       setTimeout(function(){
+                           res.if.append(serviceBody);
+                       }, 800);
+                   }).end();
                }).end({'id': _this.oldArr})
            }
         };

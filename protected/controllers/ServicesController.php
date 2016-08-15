@@ -276,7 +276,7 @@ class ServicesController extends Controller
     {
         $c = count($arr);
         $tmpArr = array();
-        for ($i = 0; $i < 3; $i++) {
+        for ($i = 0; $i < 6 && $i < $c; $i++) {
             shuffle($arr);
             array_push($tmpArr, array_pop($arr));
         }
