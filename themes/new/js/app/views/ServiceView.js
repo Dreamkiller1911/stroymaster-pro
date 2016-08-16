@@ -5,6 +5,7 @@ function ServiceView() {
     this.tic = 0;
     this.ticImg = 0;
     this.btnMoreLeaveTimeou = undefined;
+    this.toScroll = 0;
 
     this.viewService = function (model, user, images) {
         var _this = this;
@@ -27,7 +28,7 @@ function ServiceView() {
                 }, true],
                 ['show', function (element) {
                     _this.tic++;
-                    if(_this.tic > 6) _this.tic = 1;
+                    if (_this.tic > 6) _this.tic = 1;
                     setTimeout(function () {
                         $(element).css('opacity', 0).animate({'opacity': 1, 'margin-left': 0}, 250)
                     }, 100 * _this.tic)
@@ -40,33 +41,66 @@ function ServiceView() {
             '<p>' + model.note + '</p>' +
             '</div>' +
             this.addEffect('textBlock', '<div class="text"><p>' + model.description + '</p></div>', [
-                ['listen', function(element){
-                    $(element).mouseenter(function(){
-                        var block = window.getComputedStyle(element);
-                        var parent = window.getComputedStyle($(element).parent()[0]);
-                        var imgBlock = window.getComputedStyle($(element).next()[0]);
-                        var h1 = Number(block.height.replace(/px/i, ''));
-                        var h2 = Number(parent.height.replace(/px/i, '')) - Number(imgBlock.height.replace(/px/i, ''))
-                       if(h1 < h2) return false;
-                        //$(document.body).css('overflow', 'hidden');
-                        //$(this).parent().css('overflow', 'hidden');
-                       $(this).css({'position': 'absolute', 'top': -100});
-                    });
+                ['listen', function (element) {
+                    var onWheel = function (e) {
+                        e = e || window.event;
+                        var delta = e.deltaY || e.detail || e.wheelDelta;
+                        var toScroll = 0;
+                        var hText = Number($(this).css('height').replace(/px/i, ''));
+                        var hBlock = Number($(this).parent().css('height').replace(/px/i, ''));
+                        var hImg = Number($(this).next().css('height').replace(/px/i, ''));
+                        var numScroll = hText - (hBlock - hImg);
+                        var hTmp = Number($(this).css('top').replace(/px/i, ''));
+                        if(numScroll < 0) return false;
+
+                        hTmp = isNaN(hTmp) ? -delta: hTmp + -delta;
+                        console.log(hTmp, -numScroll, hTmp < -numScroll && hTmp > -numScroll - 100);
+                        console.log(hTmp < -numScroll, hTmp === -numScroll - 100);
+
+                        if(hTmp < -numScroll && hTmp > -numScroll - 100){
+                            hTmp = -numScroll;
+                        }
+                        //console.log(_this.toScroll, numScroll)
+                        $(this).css({'position': 'absolute'}).animate({'top': hTmp});
+                        e.preventDefault ? e.preventDefault() : (e.returnValue = false);
+                    };
+                    if (element.addEventListener) {
+                        if ('onwheel' in document) {
+                            element.addEventListener("wheel", onWheel);
+                        } else if ('onmousewheel' in document) {
+                            element.addEventListener("mousewheel", onWheel);
+                        } else {
+                            element.addEventListener("MozMousePixelScroll", onWheel);
+                        }
+                    } else {
+                        element.attachEvent("onmousewheel", onWheel);
+                    }
+                    /*$(element).onmousewheel(function(){
+                     var block = window.getComputedStyle(element);
+                     var parent = window.getComputedStyle($(element).parent()[0]);
+                     var imgBlock = window.getComputedStyle($(element).next()[0]);
+                     var h1 = Number(block.height.replace(/px/i, ''));
+                     var h2 = Number(parent.height.replace(/px/i, '')) - Number(imgBlock.height.replace(/px/i, ''))
+                     if(h1 < h2) return false;
+                     //$(document.body).css('overflow', 'hidden');
+                     //$(this).parent().css('overflow', 'hidden');
+                     //$(this).css({'position': 'absolute', 'top': -100});
+                     });*/
                 }, true]
-            ] ) +
-            this.addEffect('imgBlock', '<div class="imgList">' , [
-                'showImg', function(element){
+            ]) +
+            this.addEffect('imgBlock', '<div class="imgList">', [
+                'showImg', function (element) {
                     var el = window.getComputedStyle($(element).children(0)[0]);
-                    $(element).mouseenter(function(){
+                    $(element).mouseenter(function () {
                         var h = Number(el.height.replace(/px/i, '')) + 15 + 'px';
                         $(this).stop().animate({'max-height': h}, 400)
                     });
-                    $(element).mouseleave(function(){
+                    $(element).mouseleave(function () {
                         $(this).stop().animate({'max-height': 60}, 400)
                     });
                 }, true
             ]) +
-            '<div style="overflow: hidden; bottom: 0; position: static">'+
+            '<div style="overflow: hidden; bottom: 0; position: static">' +
             this.addEffect('imgList', imgList, [
                 ['init', function (element) {
                     $(element).each(function () {
@@ -127,20 +161,20 @@ function ServiceView() {
             '</div>'
         );
     }
-    this.viewFinalBlock = function(){
+    this.viewFinalBlock = function () {
         return this.show(
             '<div class="col-sm-12">' +
-                this.addEffect('finalText', '<p>Благодарим вас за просмотр данного ресурса! Enjoy ;)</p>',[
-                    ['init', function(element){
-                        $(element).parent().css('position', 'relative');
-                        $(element).css({'position': 'absolute', 'opacity': 0, 'left': -200}).
-                            animate({'opacity': 1, 'left': 30}, 280, function(){
-                            $(this).animate({'left': -10}, 80, function(){
-                                $(this).animate({'left': 0}, 20)
-                            })
-                        });
-                    }, true]
-                ]) +
+            this.addEffect('finalText', '<p>Благодарим вас за просмотр данного ресурса! Enjoy ;)</p>', [
+                ['init', function (element) {
+                    $(element).parent().css('position', 'relative');
+                    $(element).css({'position': 'absolute', 'opacity': 0, 'left': -200}).
+                    animate({'opacity': 1, 'left': 30}, 280, function () {
+                        $(this).animate({'left': -10}, 80, function () {
+                            $(this).animate({'left': 0}, 20)
+                        })
+                    });
+                }, true]
+            ]) +
             '</div>'
         );
     };
