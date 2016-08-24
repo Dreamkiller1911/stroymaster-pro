@@ -26,7 +26,7 @@ function ServiceController() {
     };
     this.indexLoadAction = function () {
         var _this = this;
-        var serviceBody = document.querySelector('[rel="services"]');
+        var serviceBody = document.querySelector('[rel="services"]'); //Блок для вставки результата рендера профилей пользователей
         var getPosition = function (elem) {
             var rect = elem.getBoundingClientRect();
             var docMarginTop = getComputedStyle(document.body).marginTop.replace(new RegExp('[a-z]+', 'i'), '');
@@ -57,7 +57,13 @@ function ServiceController() {
             var i = 0;
             for ( ; i < data.if.result.length; i++){
                 _this.if(function(){
-                    this.render('Service',{'data':{'model': model, 'user': user, 'images': images}})
+                    this.render('Service',{
+                        'data':{
+                            'model': model,
+                            'user': user,
+                            'images': images},
+                        UID: model.id
+                    })
 
                 }).then(function(render){
                     render.if.append(serviceBody);

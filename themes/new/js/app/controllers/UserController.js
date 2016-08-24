@@ -17,7 +17,20 @@ function UserController()
 
     };
     this.loginAction = function(){
-
+        var _this = this;
+        var ctrl = this.getControls();
+        this.startModel('User', function(model){
+            model.getProperties();
+           _this.if(function(){
+               model.logIn();
+           }).then(function(){
+               var currentIdServices = Object.keys(_this.start.views.Service.Service);
+               console.log(_this.ctrl);
+               return true;
+           }).else(function(){
+               alert('Не вошел');
+           }).end({'model': model})
+        });
     };
     this.getUserInfoAction = function(){
         this.startModel('User', function(model){

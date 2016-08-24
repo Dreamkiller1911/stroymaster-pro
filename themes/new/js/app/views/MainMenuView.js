@@ -11,31 +11,27 @@ function MainMenuView() {
             return false
         }
         return this.show(
-            this.addEffect('label',
-                '<ul class="nav navbar-nav">' +
+            '<ul class="nav navbar-nav">' +
+            this.addEffect(
+                'menuItem',
                 '<li><a href=""><span class="glyphicon glyphicon-th"> </span> Заказы</a></li>' +
                 '<li><a href="/orders/create"><span class="glyphicon glyphicon-plus"> </span> Заказать работы</a></li>' +
                 '<li><a href=""><span class="glyphicon glyphicon-envelope"> </span> Обратная связь</a></li>' +
-                '<li><a href=""><span class="glyphicon glyphicon-cog"> </span> Регистрация</a></li>' +
-                this.addEffect('login',
-                    '<li><a href=""><span class="glyphicon glyphicon-user"> </span> Войти</a></li>',
-                    ['in', function (element, e) {
-                        $(element).click(function (event) {
-                            var e = window.event || event;
-                            e.preventDefault();
-                            console.log(window.location.pathname = 'site/login')
-                            alert(555)
-                        })
-                    }, true]) +
-                '<li><a href=""><span class="glyphicon glyphicon-off"> </span> Выход</a></li>' +
-                '</ul>',
-                [
-                    ['in', function (element) {
-                        $(element).css('opacity', 0).stop();
-                        $(element).animate({'opacity': 1}, 100);
+                //'<li><a href=""><span class="glyphicon glyphicon-cog"> </span> Регистрация</a></li>' +
+                (function(){if(!model.user) return '<li><a href="/site/login"><span class="glyphicon glyphicon-user"> </span> Войти</a></li>'}()) +
+                (function(){if(model.user) return '<li><a href="/site/logout/"><span class="glyphicon glyphicon-off"> </span> Выход</a></li>'}()), [
+                    ['show', function (element) {
+                        $(element).each(function () {
+                            $(this).addClass('mainMenu-stage-a');
+                        });
+                        $(element).each(function () {
+                            $(this).removeClass('mainMenu-stage-a').addClass('mainMenu-stage-b');
+                        });
+
                     }, true]
                 ]
-            )
+            ) +
+            '</ul>'
         )
     }
 }

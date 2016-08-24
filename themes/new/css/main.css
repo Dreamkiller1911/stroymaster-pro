@@ -39,7 +39,7 @@ body:before {
 .BlockData .body div:last-child, #userMenu ul, .content .userInfo,
 .content .body .note, .content .body .imgList, .footer,
 .breadcrumbs a{
-    background: rgb(175, 222, 182);
+    background: rgb(162, 207, 189);
 }
 
 .nav, a, #userClassText, .BlockData .body div:first-child, .BlockData .body div:last-child, #homeBar a {
@@ -149,11 +149,22 @@ body:before {
 
 }
 
+.mainMenu-stage-a {
+    transform: scale(0.2);
+    opacity: 1;
+}
+
+.mainMenu-stage-b {
+    transform: rotate(360deg) scale(1);
+    opacity: 1;
+    transition: all 300ms ;
+}
+
 .form-control {
     margin-top: 3px;
 }
 
-#loginForm {
+#login-block {
     position: fixed;
     top: 45px;
     height: 0;
@@ -161,7 +172,7 @@ body:before {
     box-shadow: 2px 2px 3px black;
     border: 2px solid lightslategray;
     border-radius: 0 0 20px 20px;
-    z-index: 5;
+    z-index: 150;
 }
 
 .form-shadow {
@@ -232,6 +243,7 @@ body:before {
     cursor: pointer;
     position: relative;
     height: 50px;
+    box-shadow: 0 1px 4px black;
 }
 
 .content .body .imgList {

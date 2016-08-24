@@ -5,7 +5,7 @@ function ServiceView() {
     this.tic = 0;
     this.ticImg = 0;
     this.btnMoreLeaveTimeou = undefined;
-    this.toScroll = 0;
+    this.toScroll = true;
 
     this.viewService = function (model, user, images) {
         var _this = this;
@@ -45,23 +45,27 @@ function ServiceView() {
                     var onWheel = function (e) {
                         e = e || window.event;
                         var delta = e.deltaY || e.detail || e.wheelDelta;
-                        var toScroll = 0;
                         var hText = Number($(this).css('height').replace(/px/i, ''));
+                        var hHead = Number($(this).prev().css('height').replace(/px/i, ''));
                         var hBlock = Number($(this).parent().css('height').replace(/px/i, ''));
                         var hImg = Number($(this).next().css('height').replace(/px/i, ''));
                         var numScroll = hText - (hBlock - hImg);
                         var hTmp = Number($(this).css('top').replace(/px/i, ''));
+                        var value = delta > 0 ? 100 : -100;
                         if(numScroll < 0) return false;
-
-                        hTmp = isNaN(hTmp) ? -delta: hTmp + -delta;
-                        console.log(hTmp, -numScroll, hTmp < -numScroll && hTmp > -numScroll - 100);
-                        console.log(hTmp < -numScroll, hTmp === -numScroll - 100);
-
-                        if(hTmp < -numScroll && hTmp > -numScroll - 100){
+                        hTmp = isNaN(hTmp) ? -value: hTmp + -value;
+                        if((hHead) - hTmp < 0){
+                            hTmp = hHead;
+                        }
+                        if(hTmp < -numScroll && hTmp > -numScroll - 200){
                             hTmp = -numScroll;
                         }
-                        //console.log(_this.toScroll, numScroll)
-                        $(this).css({'position': 'absolute'}).animate({'top': hTmp});
+                       if(_this.toScroll){
+                           _this.toScroll = false;
+                           $(this).css({'position': 'absolute'}).animate({'top': hTmp}, 300, function(){
+                               _this.toScroll = true;
+                           });
+                       }
                         e.preventDefault ? e.preventDefault() : (e.returnValue = false);
                     };
                     if (element.addEventListener) {
@@ -75,17 +79,6 @@ function ServiceView() {
                     } else {
                         element.attachEvent("onmousewheel", onWheel);
                     }
-                    /*$(element).onmousewheel(function(){
-                     var block = window.getComputedStyle(element);
-                     var parent = window.getComputedStyle($(element).parent()[0]);
-                     var imgBlock = window.getComputedStyle($(element).next()[0]);
-                     var h1 = Number(block.height.replace(/px/i, ''));
-                     var h2 = Number(parent.height.replace(/px/i, '')) - Number(imgBlock.height.replace(/px/i, ''))
-                     if(h1 < h2) return false;
-                     //$(document.body).css('overflow', 'hidden');
-                     //$(this).parent().css('overflow', 'hidden');
-                     //$(this).css({'position': 'absolute', 'top': -100});
-                     });*/
                 }, true]
             ]) +
             this.addEffect('imgBlock', '<div class="imgList">', [

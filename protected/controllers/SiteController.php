@@ -54,15 +54,9 @@ class SiteController extends Controller
         $this->render('settings', array('model'=>$model));
     }
     public function actionMainMenuGenerate(){
-        $menuData = array(
-            array('label'=>'<span class="glyphicon glyphicon-th"> </span> Заказы', 'url'=>array('#orders/index'), 'encodeLabel'=>false),
-            array('label'=>'<span class="glyphicon glyphicon-plus"> </span> Заказать работы', 'url'=>array('#orders/create'), 'encodeLabel'=>false),
-            array('label'=>'<span class="glyphicon glyphicon-envelope"> </span> Обратная связь', 'url'=>array('#site/contact'), 'encodeLabel'=>false),
-            array('label'=>'<span class="glyphicon glyphicon-cog"> </span> Регистрация', 'url'=>array('#site/reg'), 'linkOptions'=>array('id'=>'reg'), 'encodeLabel'=>false, 'visible' => Yii::app()->user->isGuest),
-            array('label'=>'<span class="glyphicon glyphicon-user"> </span> Войти', 'url'=>array('#site/login') ,'linkOptions'=>array('id'=>'in'),'encodeLabel'=>false, 'visible'=>Yii::app()->user->isGuest),
-            array('label'=>'<span class="glyphicon glyphicon-off"> </span> Выход', 'url'=>array('#site/logout'), 'encodeLabel'=>false, 'visible'=>!Yii::app()->user->isGuest)
-        );
-        echo json_encode($menuData);
+        $data = [];
+        $data['user'] = Yii::app()->user->isGuest ? false : User::model()->notPassword()->findByPk(Yii::app()->user->id)->attributes;
+        echo json_encode($data);
     }
 
     /**
@@ -121,22 +115,18 @@ class SiteController extends Controller
                 Yii::app()->end();
             }
         }
-        if (isset($_POST['LoginFormA'])) {
-            $email = CHtml::encode(trim(str_replace('-', '', $_POST['LoginFormA']['email'])));
-            $password = CHtml::encode(trim($_POST['LoginFormA']['password']));
+        if (isset($_POST['ajaxLogin'])) {
+            $dataSend = [];
+            $email = CHtml::encode(trim($_POST['ajaxLogin']['login']));
+            $password = CHtml::encode(trim($_POST['ajaxLogin']['password']));
 
             $model->email = $email;
             $model->password = $password;
 
             if ($model->validate() && $model->login()) {
-                ;
-                $data = array();
-                $data['menu'] = $this->renderFile(Yii::getPathOfAlias('application') . '/views/layouts/menu.php', array(), true);
-                $data['usermenu'] = $this->renderFile(Yii::getPathOfAlias('application') . '/views/layouts/usermenu.php', array(), true);
-                $user = User::model()->findByPk(Yii::app()->user->id);
-                $data['userName'] = $user->first_name . ' ' . $user->second_name;
-                echo json_encode($data);
+                $dataSend['complete'] = true;
             }
+            echo json_encode($dataSend);
             Yii::app()->end();
         }
         // display the login form
@@ -195,7 +185,12 @@ class SiteController extends Controller
 
     public function actionLogout()
     {
-        Yii::app()->user->logout();
-        $this->redirect(Yii::app()->homeUrl);
+        if(isset($_POST['ajaxLogout'])){
+            Yii::app()->user->logout();
+            var_dump('Вышел');
+            Yii::app()->end();
+        };
+        /*Yii::app()->user->logout();
+        $this->redirect(Yii::app()->homeUrl);*/
     }
 }
