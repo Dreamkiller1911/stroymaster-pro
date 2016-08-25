@@ -7,8 +7,8 @@ function MainMenuView() {
 
     this.viewMenu = function (model) {
         var _this = this;
-        if (model.visible === false) {
-            return false
+        if(!model) {
+            return 'Не передана модель с данными для рендеринга меню';
         }
         return this.show(
             '<ul class="nav navbar-nav">' +
@@ -28,7 +28,17 @@ function MainMenuView() {
                             $(this).removeClass('mainMenu-stage-a').addClass('mainMenu-stage-b');
                         });
 
-                    }, true]
+                    }, true],
+                    ['flex', function(element){
+                        $(element).each(function(){
+                            $(this).animate({'margin-top': 100}, 50, function(){
+                                $(this).animate({'margin-top': -100}, 25, function(){
+                                    $(this).animate({'margin-top': 0}, 10)
+                                })
+                            })
+                        })
+
+                    }, false]
                 ]
             ) +
             '</ul>'

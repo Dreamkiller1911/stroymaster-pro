@@ -24,8 +24,7 @@ function UserController()
            _this.if(function(){
                model.logIn();
            }).then(function(){
-               var currentIdServices = Object.keys(_this.start.views.Service.Service);
-               console.log(_this.ctrl);
+
                return true;
            }).else(function(){
                alert('Не вошел');

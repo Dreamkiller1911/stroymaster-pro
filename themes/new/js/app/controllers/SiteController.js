@@ -9,6 +9,12 @@ function SiteController ()
 
     this.loginAction = function(){
         var _this = this;
+        var currentIdServices = Object.keys(_this.start.views.Service.Service);
+        var upd = _this.updateView('Menu',{
+            fileName: 'MainMenu',
+            data: {model:{user: true}}
+        });
+        console.log(upd);
         this.if(function(){
             if(isNaN(document.getElementById('login-block'))) {
                 return false

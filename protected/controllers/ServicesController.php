@@ -283,4 +283,10 @@ class ServicesController extends Controller
 
         return array('popId' => $tmpArr, 'oldArr' => $arr);
     }
+    public function actionMainMenuGenerate(){
+        var_dump(555);
+        $data = array();
+        $data['user'] = Yii::app()->user->isGuest ? false : User::model()->notPassword()->findByPk(Yii::app()->user->id)->attributes;
+        echo json_encode($data);
+    }
 }

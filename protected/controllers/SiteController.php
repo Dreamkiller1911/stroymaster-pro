@@ -4,9 +4,6 @@ class SiteController extends Controller
 {
     public $layout = 'column1';
 
-    /**
-     * Declares class-based actions.
-     */
     public function init()
     {
         $cs = parent::init();
@@ -31,9 +28,6 @@ class SiteController extends Controller
         );
     }
 
-    /**
-     * This is the action to handle external exceptions.
-     */
     public function actionError()
     {
         if ($error = Yii::app()->errorHandler->error) {
@@ -54,16 +48,15 @@ class SiteController extends Controller
         $this->render('settings', array('model'=>$model));
     }
     public function actionMainMenuGenerate(){
-        $data = [];
+        $data = array();
         $data['user'] = Yii::app()->user->isGuest ? false : User::model()->notPassword()->findByPk(Yii::app()->user->id)->attributes;
         echo json_encode($data);
     }
 
-    /**
-     * Displays the contact page
-     */
+
     public function actionContact()
     {
+        var_dump(22220);
         $model = new ContactForm;
         if (isset($_POST['ContactForm'])) {
             $model->attributes = $_POST['ContactForm'];
@@ -77,36 +70,26 @@ class SiteController extends Controller
         $this->render('contact', array('model' => $model));
     }
 
-    /**
-     * Displays the login page
-     */
+
     public function actionLogin()
     {
         if (!defined('CRYPT_BLOWFISH') || !CRYPT_BLOWFISH)
             throw new CHttpException(500, "This application requires that PHP was compiled with Blowfish support for crypt().");
 
         $model = new LoginForm;;
-        // if it is ajax validation request
-//		if(isset($_POST['ajax']) && $_POST['ajax']==='login-form')
-//		{
-//			echo CActiveForm::validate($model);
-//			Yii::app()->end();
-//		}
 
-        // collect user input data
         if (isset($_POST['LoginForm'])) {
             $model->attributes = $_POST['LoginForm'];
             $model->phone = preg_replace('-', '', $model->phone);
-            // validate user input and redirect to the previous page if valid
             if ($model->validate() && $model->login())
                 $this->redirect(Yii::app()->user->returnUrl);
         }
 
-        if (isset($_POST['Login'])) {//Вход на сайт Ajax
+        if (isset($_POST['Login'])) {
             $model->attributes = $_POST['Login'];
             if ($model->validate()) {
                 if($model->login()) {
-                    $data['complete'] = 'Добро пожаловать';
+                    $data['complete'] = '?????????? ????????????????????';
                     echo json_encode($data);
                     Yii::app()->end();
                 }
@@ -116,7 +99,7 @@ class SiteController extends Controller
             }
         }
         if (isset($_POST['ajaxLogin'])) {
-            $dataSend = [];
+            $dataSend = array();
             $email = CHtml::encode(trim($_POST['ajaxLogin']['login']));
             $password = CHtml::encode(trim($_POST['ajaxLogin']['password']));
 
@@ -129,13 +112,9 @@ class SiteController extends Controller
             echo json_encode($dataSend);
             Yii::app()->end();
         }
-        // display the login form
         $this->render('login', array('model' => $model));
     }
 
-    /**
-     * Logs out the current user and redirect to homepage.
-     */
     public function actionReg()
     {
         if (!isset(Yii::app()->user->id)) {
@@ -187,7 +166,7 @@ class SiteController extends Controller
     {
         if(isset($_POST['ajaxLogout'])){
             Yii::app()->user->logout();
-            var_dump('Вышел');
+            var_dump('??????????');
             Yii::app()->end();
         };
         /*Yii::app()->user->logout();
