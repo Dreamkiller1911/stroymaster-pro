@@ -53,38 +53,47 @@ class OrdersController extends Controller
 	public function actionCreate()
 	{
 		$this->layout='//layouts/column1';
-
-		if(isset(Yii::app()->user->class) && Yii::app()->user->class != 2) {
+		$model = new Orders;
+		if (isset(Yii::app()->user->class) && Yii::app()->user->class != 2) {
 			$this->render('errorCreate');
-		}else {
-			$model = new Orders;
-			$user = User::model()->findByPk(Yii::app()->user->id);
+		} else {
+			if (isset($_POST['getAjaxData']) && $_POST['getAjaxData'] == true) {
 
-			// Uncomment the following line if AJAX validation is needed
-			$this->performAjaxValidation($model);
+				$user = User::model()->findByPk(Yii::app()->user->id);
 
-			if (isset($_POST['Orders'])) {
+				$this->performAjaxValidation($model);
+				$this->renderPartial('create', array(
+						'model' => $model,
+						'user' => $user,
+				));
+			}else if(isset($_POST['OrdersCreate'])) {
 				try{
 					if (Yii::app()->user->isGuest) {
 						throw new Exception("Для размещения заявки вам необходимо ввести номер телефона и подтвердить его");
 					} else {
-						$model->attributes = $_POST['Orders'];
+						$model->attributes = $_POST['OrdersCreate'];
 						if ($model->validate()) {
 							if ($model->save()) {
 								echo json_encode(array('complete' => true, 'message' => 'Ваша заявка добавленна на сайт. Спасибо!'));
 								Yii::app()->end();
+							}else{
+								throw new Exception ('Не удалось создать новую заявку. ');
 							}
+						}else{
+//							throw new Exception ('Не подходят данные');
 						}
 					}
 				}catch (Exception $e){
-					echo json_encode($e->getMessage());
+					$data = ['complete'=>false, 'message'=>$e->getMessage()];
+					echo json_encode($data);
 				}
+			}else{
+				$this->render('null');
 			}
 
-			$this->render('create', array(
-					'model' => $model,
-					'user' => $user,
-			));
+
+
+
 		}
 	}
 
@@ -107,7 +116,7 @@ class OrdersController extends Controller
 			$data = array();
 			$model->text = CHtml::encode($_POST['text']);
 			$model->date_start = $_POST['date_start'];
-			$model->date_complition = $_POST['date'];
+			$model->date_complete = $_POST['date'];
 			if($model->save()){
 				$data['complete'] = 'Сохранено';
 			}else{
@@ -145,7 +154,7 @@ class OrdersController extends Controller
 		$criteria = new CDbCriteria(array(
 			'order'=>'status DESC, date_create DESC',
 			'with'=>'User',
-			'select'=> 'text, status, date_create, date_start, date_complition ',
+			'select'=> 'text, status, date_create, date_start, date_complete ',
 		));
 
 
@@ -179,7 +188,7 @@ class OrdersController extends Controller
 
 		));
 		$criteria->with = 'User';
-		$criteria->select = 'text, status, date_create, date_complition, date_start';
+		$criteria->select = 'text, status, date_create, date_complete, date_start';
 		$criteria->offset = $_POST['stack']+1;
 		$criteria->limit = '5';
 

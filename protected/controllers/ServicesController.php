@@ -106,24 +106,8 @@ class ServicesController extends Controller
 
     public function actionIndex()
     {
-        /*if (isset($_POST['ajax']) && $_POST['ajax'] === 'load') {
-            $id = $this->getThreeService($_POST['id']);
-            $model = Services::model()->findAll('id=' . implode(' XOR id=', $id['popId']));
-            $data = array();
-            foreach ($model as $service) {
-                $data[] = $this->renderPartial('_view', array('service' => $service), true);
-            }
-            echo json_encode(array('nextId' => $id['oldArr'], 'data' => $data, 'complete' => true));
-            Yii::app()->end();
-        }*/
-
-
-        /*$data = array();
-        foreach ($dataId as $key) {
-            array_push($data, $key->id);
-        }
-        $id = $this->getThreeService($data);
-        $model = Services::model()->findAll('id=' . implode(' XOR id=', $id['popId']));*/
+        $this->init()->registerScript('initServices',
+            'start.init(\'Services\', \'index\')');
         $this->render('index');
     }
 
@@ -145,10 +129,16 @@ class ServicesController extends Controller
             $data = $_POST['id'];
         }
         $id = $this->getThreeService($data);
-        $data = array('result'=>array(), 'oldArr'=>array(), 'status'=>$toLoad);
+        $length = 0;
+        $data = array('oldArr'=>null);
         $model = Services::model()->findAll('id=' . implode(' XOR id=', $id['popId']));
         foreach($model as $key){
-            $tmp = array('service'=>$key->attributes);
+            $length++;
+            $tmpResult = array('id'=>$key->id);
+            $view = $this->renderPartial('_view', array('service'=>$key), true);
+            $tmpResult['view'] = $view;
+            array_push($data, $tmpResult);
+            /*$tmp = array('service'=>$key->attributes);
             $userCriteria = new CDbCriteria(array(
                 'select'=>'class, date_registration, email , email_valid, first_name,
                             id, phone, phone_read, phone_read_date, phone_valid, profile,
@@ -161,9 +151,10 @@ class ServicesController extends Controller
                 array_push($images, $elem->attributes);
             }
             $tmp += array('images' => $images) + array('user'=>$user->attributes);
-            array_push($data['result'], $tmp);
+            array_push($data['result'], $tmp);*/
         }
-        array_push($data['oldArr'], $id['oldArr']);
+        $data['oldArr'] = $id['oldArr'];
+        $data['length'] = $length;
         echo json_encode($data);
     }
 

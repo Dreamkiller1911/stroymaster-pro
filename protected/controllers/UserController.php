@@ -206,15 +206,16 @@ class UserController extends Controller
     public function actionCheckPhone()
     {
         try {
-            /** Если нет POST с параметром Orders , а так-же номер телефона отсутствует, переадресовываем на главную страницу */
-            if (!isset($_POST['Orders']) && $_POST['Orders']['phone'] == "") {
+            /** Если нет POST с параметром OrdersCheckPhone , а так-же номер телефона отсутствует, переадресовываем на главную страницу */
+            if (!isset($_POST['OrdersCheckPhone']) && $_POST['OrdersCheckPhone']['phone'] == "") {
                 $this->redirect('/');
                 Yii::app()->end();
             }
 
-            $phone = CHtml::encode(trim(str_replace('-', '', $_POST['Orders']['phone'])));//Обрабатываем номер телефона
+            $phone = User::phoneCorrector($_POST['OrdersCheckPhone']['phone']);//Обрабатываем номер телефона
+
             if (strlen($phone) != 11) {
-                throw new Exception('Не корректный номер');
+                throw new Exception('Не верный формат номера');
             }
             $criteria = new CDbCriteria();
             $criteria->condition = 'phone=:phone';
@@ -225,9 +226,11 @@ class UserController extends Controller
             if ($user > 0) {
                 $criteria->select = 'class';
                 if (User::model()->find($criteria)->class != User::CLIENT) {
-                    throw new Exception('Данный номер уже зарегестрирован<br>' .
+                    throw new Exception(
+                        'Данный номер уже зарегестрирован<br>' .
                         'Пользователь не является заказчиком<br>' .
-                        'Пожалуйста введите другой номер');
+                        'Пожалуйста введите другой номер'
+                    );
                 } else {
                     $data = array('complete' => true, 'type' => 'userReady', 'login' => $phone, 'message' => 'Вы уже зарегестрированны, пожалуйста войдите');
                     echo json_encode($data);
@@ -289,7 +292,7 @@ class UserController extends Controller
             Yii::app()->end();
         }
         try {
-            $phone = CHtml::encode(trim(str_replace('-', '', $_POST['Orders']['phone'])));
+            $phone = User::phoneCorrector($_POST['OrdersCheckPhone']['phone']);//Обрабатываем номер телефона
             $code = CHtml::encode(trim($_POST['Orders']['code']));
             $name = explode(' ', CHtml::encode(trim($_POST['Orders']['name'])));
 

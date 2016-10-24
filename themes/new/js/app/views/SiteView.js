@@ -4,17 +4,88 @@
 function SiteView() {
 
     this.tic = 0;
+    this.open = false;
+    this.tic = 0;
+    this.tics = 0;
+    this.testS = function(){
+        setTimeout(function(){
+            return true;
+        }, 2000)
+    };
 
 
 
     this.viewLoginBlock = function () {
-        return this.show(
+        var _this = this;
+        var loginEffects = {
+            loginBlock: [
+                ['pre', function(element){
+                    $(element).css({'height': 0, 'opacity': 0})
+                }, true],
+                ['show', function(element){
+                    $(element).css('display', 'block').stop().animate({height: 200, opacity: 1}, 400, function(){
+                        return true;
+                    })
+                }, false],
+                ['close', function(element){
+                    $(element).stop().animate({'height':0, 'opacity': 0}, 400, function(){
+                        $(this).css('display', 'none');
+                        return true;
+                    })
+                }, false]
+            ],
+            blockM: [
+                ['pre', function(element){
+                    $(element).each(function(){
+                        $(this).css('opacity', 0);
+                    })
+                }, true],
+                ['show', function(element){
+                    var self = this.parent;
+                    self.tic = 0;
+                    $(element).each(function(){
+                        self.tic++;
+                        var _this = this;
+                        setTimeout(function(){
+
+                            $(_this).animate({'opacity': 1}, 400, function(){
+                                self.tics++;
+                                if(self.tics === 3){
+                                    return true;
+                                }
+                            });
+                        }, 150 *  self.tic)
+                    })
+                }, false]
+            ],
+            errorBlock: [
+                ['pre', function(element){
+                    var top = $(element).parent().css('top');
+                   $(element).css({'background': 'red', 'position': 'absolute', 'top': top, 'left': 150, 'right': 0, 'z-index': 940})
+                }, true],
+                ['show', function(element){
+                    $(element).stop().animate({'height': 100})
+                }, false]
+            ]
+        };
+        this.if(function(){
+            this.include({
+                path: 'views/site/login.html',
+                effects: loginEffects
+            })
+        }).then(function(res){
+            var a = _this.show(res.if);
+            return a;
+        }).end({'loginEffects': loginEffects})
+        /*return this.show(
             this.addEffect('block',
                 '<div class="container-fluid col-sm-6  col-sm-pull-3 col-md-7 col-xs-12 col-xs-offset-0" id="login-block">' +
 
                 '</div>',
                 [
-                    ['pre', function (element) {}, true],
+                    ['pre', function (element) {
+
+                    }, true],
                     ['show', function (element) {
                         $(element).animate({'height': 200, 'opacity' : 1}, 300, function(){
                             return true;
@@ -26,7 +97,7 @@ function SiteView() {
                         })
                     }, false]
                 ])
-        );
+        );*/
     };
     this.viewLoginForm = function () {
         var _this = this;
@@ -39,9 +110,11 @@ function SiteView() {
                     '<form autocomplete="on">' +
                     '<div class="row text-center">' +
                     '<input StartModel="USER_login" class="form-control" type="text" name="Login[email]" placeholder="E-Mail или телефон">' +
+                    '<span class="error" id="error_email"></span>' +
                     '</div>' +
                     '<div class="row text-center">' +
                     '<input StartModel="USER_password" class="form-control"  type="password" name="Login[password]" placeholder="Пароль">' +
+                    '<span class="error" id="error_password"></span>' +
                     '</div>' +
                     '<div class="row">' +
                     this.toBind('logInBtn',
@@ -73,14 +146,11 @@ function SiteView() {
                 [
                     ['show', function(element){
                         $(element).each(function () {
-                            _this.tic ++;
-                            var item = this;
-                            setTimeout(function(){
-                                $(item).animate({'margin-top': 0}, 900);
-                            }, 100 * _this.tic)
+                            $(this).css('margin-top', 0);
                         })
-                    }, false],
+                    }, true],
                     ['out', function(element){
+                        _this.tic = 0;
                         $(element).each(function () {
                             _this.tic ++;
                             var item = this;

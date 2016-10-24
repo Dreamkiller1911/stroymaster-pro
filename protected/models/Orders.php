@@ -7,7 +7,7 @@
  * @property string $id
  * @property string $text
  * @property integer $date_create
- * @property integer $date_complition
+ * @property integer $date_complete
  */
 class Orders extends CActiveRecord
 {
@@ -53,7 +53,7 @@ class Orders extends CActiveRecord
 			'text' => 'Описание',
 			'date_create' => 'Размещено',
 			'date_start' => 'Начало',
-			'date_complition' => 'Окончание',
+			'date_complete' => 'Окончание',
 		);
 	}
 
@@ -69,7 +69,7 @@ class Orders extends CActiveRecord
 		$criteria->compare('phone2',$this->phone2);
 		$criteria->compare('text',$this->text,true);
 		$criteria->compare('date_create',$this->date_create);
-		$criteria->compare('date_complition',$this->date_complition);
+		$criteria->compare('date_complete',$this->date_complete);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -104,7 +104,7 @@ class Orders extends CActiveRecord
 		$d_str = true;
 		$d_end = true;
 		if($this->date_start == '1970-01-01' || $this->date_start == '0000-00-00') $d_str = false;
-		if($this->date_complition === '1970-01-01' || $this->date_complition === '0000-00-00') $d_end = false;
+		if($this->date_complete === '1970-01-01' || $this->date_complete === '0000-00-00') $d_end = false;
 		if(!$d_str || !$d_end) $del = '';
 		if($type === 'start'){
 			if ($this->date_start == '1970-01-01' || $this->date_start == '0000-00-00') {
@@ -116,10 +116,10 @@ class Orders extends CActiveRecord
 				return $pattern;
 			}
 		}else if($type === 'end') {
-			if ($this->date_complition === '1970-01-01' || $this->date_complition === '0000-00-00') {
+			if ($this->date_complete === '1970-01-01' || $this->date_complete === '0000-00-00') {
 				return '';
 			} else {
-				$pattern = '<span class="curs-help" title="Дата окнчиния работ"> ' . $this->date_complition . ' </span>'.
+				$pattern = '<span class="curs-help" title="Дата окнчиния работ"> ' . $this->date_complete . ' </span>'.
 						' <span  class="glyphicon glyphicon-check"></span>';
 				return $pattern;
 			}

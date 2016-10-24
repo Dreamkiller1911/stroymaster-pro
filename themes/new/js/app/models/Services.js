@@ -1,7 +1,7 @@
 /**
  * Created by tazeb on 25.06.2016.
  */
-function Service(){
+function Services(){
     var _this = this;
     this.properties = ['note', 'description'];
     this.prefix = 'srv_';
@@ -75,4 +75,8 @@ function Service(){
             }
         });
     };
+    this.viewPhone = function() {
+        var pattern = /(\+7)|(8)\-?(\d{3})\-?(\d{3})/
+        console.log(pattern.exec(this.phone));
+    }
 }

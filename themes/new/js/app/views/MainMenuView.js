@@ -3,45 +3,40 @@
  */
 function MainMenuView() {
     this.prefix = 'MM';
-    this.interval = 1;
 
-    this.viewMenu = function (model) {
-        var _this = this;
-        if(!model) {
-            return 'Не передана модель с данными для рендеринга меню';
-        }
-        return this.show(
-            '<ul class="nav navbar-nav">' +
-            this.addEffect(
-                'menuItem',
-                '<li><a href=""><span class="glyphicon glyphicon-th"> </span> Заказы</a></li>' +
-                '<li><a href="/orders/create"><span class="glyphicon glyphicon-plus"> </span> Заказать работы</a></li>' +
-                '<li><a href=""><span class="glyphicon glyphicon-envelope"> </span> Обратная связь</a></li>' +
-                //'<li><a href=""><span class="glyphicon glyphicon-cog"> </span> Регистрация</a></li>' +
-                (function(){if(!model.user) return '<li><a href="/site/login"><span class="glyphicon glyphicon-user"> </span> Войти</a></li>'}()) +
-                (function(){if(model.user) return '<li><a href="/site/logout/"><span class="glyphicon glyphicon-off"> </span> Выход</a></li>'}()), [
-                    ['show', function (element) {
-                        $(element).each(function () {
-                            $(this).addClass('mainMenu-stage-a');
-                        });
-                        $(element).each(function () {
-                            $(this).removeClass('mainMenu-stage-a').addClass('mainMenu-stage-b');
-                        });
+    this.viewMenu = function () {
+        this.if(function(){
+            this.show({effects:{
+                item: [
+                    ['outLeft', function(element){
+                        var self = this.parent;
+                        var res = this.result();
+                        var count = $(element).length;
+                        self.eqOut = 0;
+                        self.eqExitOut = 0;
 
-                    }, true],
-                    ['flex', function(element){
                         $(element).each(function(){
-                            $(this).animate({'margin-top': 100}, 50, function(){
-                                $(this).animate({'margin-top': -100}, 25, function(){
-                                    $(this).animate({'margin-top': 0}, 10)
-                                })
-                            })
+                            var el = this;
+                            var currentWidth = Number($(this).css('width').replace(/px|pt|%/i, ''));
+                            self.eqOut++;
+                            var time = 10 * self.eqOut;
+                            setTimeout(function(){
+                                $(el).animate({'opacity': 0},{'queue': false, 'duration': 80 * self.eqOut});
+                                $(el).animate({'margin-left': -(300 + currentWidth)}, 300 + 160 *  self.eqOut, function(){
+                                    self.eqExitOut++;
+                                    if(self.eqExitOut === count){
+                                        return true;
+                                    }
+                                });
+                            }, time)
                         })
-
-                    }, false]
+                    }, false],
+                    ['showRight', function(element){}, false],
                 ]
-            ) +
-            '</ul>'
-        )
+            }});
+        }).then(function(res){
+            return res.if;
+        }).end();
     }
+
 }

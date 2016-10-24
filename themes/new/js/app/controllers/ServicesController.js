@@ -1,32 +1,49 @@
 /**
  * Created by tazeb on 25.06.2016.
  */
-function ServiceController() {
-    var _this = this;
+function ServicesController() {
     this.timeIterator = 0;
     this.statusLoadIndex = true;
-    this.scrollTo = undefined;
+    this.toScroll = false;
+    this.isLoadScroll = 0;
     this.oldArr = '';
 
-    this.t = function (per) {
-        console.log('t')
-        return 'qwe';
-    };
     this.viewModalAction = function () {
-        var ctrl = _this.getControls();
-        for (var i = 0; i < ctrl.length; i++) {
+        //ОБЯЗАТЕЛЬНО ПЕРЕДЕЛАТЬ
+        var _this = this;
+        var ctrl = this.getControls();
+         for (var i = 0; i < ctrl.length; i++) {
             ctrl[i].onclick = function () {
-                var id_service = this.id;
-                _this.startModel('Service', function (model) {
-                    model.viewFromId(id_service);
 
-                })
+                var id_service = this.id;
+                _this.if(function(){
+                    this.startModel('Services')
+                }).then(function(res){
+                    var model = res.if;
+                    model.viewFromId(id_service)
+                }).end();
             }
         }
     };
-    this.indexLoadAction = function () {
+    this.indexAction = function () {
         var _this = this;
         var serviceBody = document.querySelector('[rel="services"]'); //Блок для вставки результата рендера профилей пользователей
+        this.start.oldContent = {
+            start: _this.start,
+            parent: _this,
+            'element': serviceBody,
+            close: function(){
+                var _this = this.parent;
+                _this.if(function(){
+                    this.start.views.Services.Service.effects.service.closeAll.apply();
+                }).then(function(){
+                    var content = document.getElementById('content');
+                    $(content).stop().animate({'height': 0}, 100, function(){
+                        $(this).css('height', 'auto').text('');
+                        return true;
+                    })
+                }).end()
+            }};
         var getPosition = function (elem) {
             var rect = elem.getBoundingClientRect();
             var docMarginTop = getComputedStyle(document.body).marginTop.replace(new RegExp('[a-z]+', 'i'), '');
@@ -34,80 +51,73 @@ function ServiceController() {
             var posCenter = document.documentElement.clientHeight / 2;
             var posBottom = document.documentElement.clientHeight;
             if ((rect.bottom - docMarginTop) > posCenter && rect.bottom < posBottom) {
-                return true;
+                return false, true;
             }
-            return false;
+            return false, false;
         };
-        var setOldId = function(dataId){
+        this.setOldId = function(dataId){
+            var _this = this;
             var _result = 'new';
-            if(!dataId[0]) return _result;
-            if(dataId[0].length > 0){
-                _result = dataId[0];
+            if(!dataId) return _result;
+            if(dataId.length > 0){
+                _result = dataId;
             }else{
                 _result = false;
             }
-            return _result;
+            return false, _result;
+        };
+        _this.scrollLoad = function (e){
+            if(getPosition(serviceBody) && _this.toScroll){
+                window.removeEventListener('scroll', _this.scrollLoad);
+                _this.if(function(){
+                    this.startModel('Services', function(model, prop){
+                        model.loadData(prop.id)
+                    }, {'id': id})
+                }).then(function(res){
+                    _this.ticService = 0;
+                    var data = res.if;
+                    _this.if(function(){
+                        load(data, this, srb);
+                    }).then(function(){
+                        window.addEventListener('scroll', _this.scrollLoad, false);
+                    }).end({'load': load, 'data':data, 'srb': serviceBody})
+                }).end({'id': _this.oldArr})
+            }
+        };
+        var load = function(data, _this, srb){
+            var od = _this.setOldId(data.oldArr);
+            _this.oldArr = od;
+            var i;
+            for ( i = 0; data[i]; i++){
+                setTimeout(function(){
+                    _this.if(function(){
+                        this.render('Service', {
+                            view: data[this.ticService].view
+                        });
+                        this.ticService++;
+                    }).then(function(render){
+                        _this.isLoadScroll++;
+                        var service = render.if;
+                        service.append(srb || serviceBody);
+                        if(_this.isLoadScroll === data.length){
+                            return true;
+                        }
+                    }).end({'data': data});
+                },120* i);
+            }
+            _this.toScroll = true;
+            return true;
         };
         this.if(function(){
-            this.startModel('Service', function(model){
+            this.startModel('Services', function(model){
                 model.loadData('new')
             });
-        }).then(function(data){
-            _this.oldArr = setOldId(data.if.oldArr);
-            var i = 0;
-            for ( ; i < data.if.result.length; i++){
-                _this.if(function(){
-                    this.render('Service',{
-                        'data':{
-                            'model': model,
-                            'user': user,
-                            'images': images},
-                        UID: model.id
-                    })
-
-                }).then(function(render){
-                    render.if.append(serviceBody);
-                }).end({'model': data.if.result[i].service, 'user': data.if.result[i].user, 'images': data.if.result[i].images});
-            }
+        }).then(function(res){
+            _this.ticService = 0;
+            var data = res.if;
+            load(data, _this);
         }).end();
-        window.onscroll = function(e){
-           if(getPosition(serviceBody) && _this.statusLoadIndex){
-               if(_this.scrollTo != undefined && _this.scrollTo != window.scrollY){
-                   return false
-               }else {
-                   _this.scrollTo = window.scrollY;
-               }
-               _this.statusLoadIndex = false;
-               _this.if(function(){
-                   this.startModel('Service', function(model){
-                       model.loadData(id)
-                   })
-               }).then(function(res){
-                   _this.oldArr = setOldId(res.if.oldArr);
-                   var i = 0;
-                   for ( ; i < res.if.result.length; i++){
-                       _this.if(function(){
-                           this.render('Service',{'data':{'model': model, 'user': user, 'images': images}})
-                       }).then(function(render){
-                           render.if.append(serviceBody);
-                           //if(i === res.if.result.length) console.log(i);
-                       }).end({'model': res.if.result[i].service, 'user': res.if.result[i].user, 'images': res.if.result[i].images});
-                       if(i === res.if.result.length -1){
-                           _this.statusLoadIndex = true;
-                           _this.scrollTo = undefined;
-                       }
-                   }
-               }).else(function(){
-                   _this.if(function(){
-                       this.render('FinalBlock');
-                   }).then(function(res){
-                       setTimeout(function(){
-                           res.if.append(serviceBody);
-                       }, 800);
-                   }).end();
-               }).end({'id': _this.oldArr})
-           }
-        };
+        window.addEventListener('scroll', _this.scrollLoad, false);
     };
     this.crud = function () {
         this.start.init('ImgService', 'uploadAll')

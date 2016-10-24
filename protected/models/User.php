@@ -149,6 +149,7 @@ class User extends CActiveRecord
             }
         }
         $this->phone = str_replace(array('+', '-'), '', $this->phone);
+
         return true;
     }
 
@@ -193,6 +194,12 @@ class User extends CActiveRecord
     {
         $this->confirm_password = $this->password;
         return true;
+    }
+
+    public static function phoneCorrector ($phone){
+        $pattern = array('/\+7/','/(\()|(\))|\s|\-/',);
+        $replacement = array('8','');
+        return preg_replace($pattern, $replacement, $phone);
     }
 
     public static function issetService()

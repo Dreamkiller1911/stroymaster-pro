@@ -13,7 +13,7 @@ $this->pageTitle = Yii::app()->name . ' - Главная';
 $this->init()->registerMetaTag('ремонт ефремов, ремонт квартир в ефремове, мастер ремонта квартир', 'keywords');
 $this->init()->registerMetaTag('Мы предлагаем вам список мастеров. Вы можете ознакомиться с анкетами и работами каждого мастера' .
     'и получить контактную информцию', 'description');
-$this->init()->registerScript('service', 'start.init(\'Service\', \'indexLoad\')');
+
 
 ?>
 <div id="myModal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog"

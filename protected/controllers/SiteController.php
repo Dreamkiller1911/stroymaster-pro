@@ -48,8 +48,7 @@ class SiteController extends Controller
         $this->render('settings', array('model'=>$model));
     }
     public function actionMainMenuGenerate(){
-        $data = array();
-        $data['user'] = Yii::app()->user->isGuest ? false : User::model()->notPassword()->findByPk(Yii::app()->user->id)->attributes;
+        $data = $this->renderPartial('menu', array(), true);
         echo json_encode($data);
     }
 
@@ -99,8 +98,12 @@ class SiteController extends Controller
             }
         }
         if (isset($_POST['ajaxLogin'])) {
+
             $dataSend = array();
             $email = CHtml::encode(trim($_POST['ajaxLogin']['login']));
+            if(!preg_match('/@|\./', $email)){
+                $email = User::phoneCorrector($email);
+            }
             $password = CHtml::encode(trim($_POST['ajaxLogin']['password']));
 
             $model->email = $email;
@@ -108,6 +111,9 @@ class SiteController extends Controller
 
             if ($model->validate() && $model->login()) {
                 $dataSend['complete'] = true;
+            }else{
+                $dataSend['complete'] = false;
+                $dataSend['error'] = json_decode(CActiveForm::validate($model));
             }
             echo json_encode($dataSend);
             Yii::app()->end();

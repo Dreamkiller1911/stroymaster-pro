@@ -77,18 +77,6 @@
         <div class="row-fluid" id="newMenu"></div>
     <?php endif ?>
     <!-- Блок меню пользователя конец-->
-
-    <!-- Блок меню ссылок начло-->
-    <div class="row">
-        <div class="col-sm-12 text-center well-lg">
-            <?php $this->widget('zii.widgets.CBreadcrumbs', array(
-                'links' => $this->breadcrumbs,
-                'separator' => '',
-                'encodeLabel' => false,
-            )); ?><!-- breadcrumbs -->
-        </div>
-    </div>
-    <!-- Блок меню ссылок конец-->
 </div>
 
 <!-- Блок меню контент начло-->
