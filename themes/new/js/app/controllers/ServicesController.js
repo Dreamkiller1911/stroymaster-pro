@@ -14,7 +14,6 @@ function ServicesController() {
         var ctrl = this.getControls();
          for (var i = 0; i < ctrl.length; i++) {
             ctrl[i].onclick = function () {
-
                 var id_service = this.id;
                 _this.if(function(){
                     this.startModel('Services')
@@ -69,6 +68,7 @@ function ServicesController() {
         _this.scrollLoad = function (e){
             if(getPosition(serviceBody) && _this.toScroll){
                 window.removeEventListener('scroll', _this.scrollLoad);
+                _this.toScroll = false;
                 _this.if(function(){
                     this.startModel('Services', function(model, prop){
                         model.loadData(prop.id)
@@ -79,7 +79,7 @@ function ServicesController() {
                     _this.if(function(){
                         load(data, this, srb);
                     }).then(function(){
-                        window.addEventListener('scroll', _this.scrollLoad, false);
+                        window.addEventListener('scroll', _this.scrollLoad);
                     }).end({'load': load, 'data':data, 'srb': serviceBody})
                 }).end({'id': _this.oldArr})
             }
@@ -88,7 +88,7 @@ function ServicesController() {
             var od = _this.setOldId(data.oldArr);
             _this.oldArr = od;
             var i;
-            for ( i = 0; data[i]; i++){
+            for ( i = 0; i < data.length; i++){
                 setTimeout(function(){
                     _this.if(function(){
                         this.render('Service', {
@@ -100,13 +100,18 @@ function ServicesController() {
                         var service = render.if;
                         service.append(srb || serviceBody);
                         if(_this.isLoadScroll === data.length){
-                            return true;
+                            _this.if(function(){
+                                service.effects.service.show.apply();
+                            }).then(function(){
+                                _this.toScroll = true;
+                            }).end({'service': service});
+                        }else {
+                            service.effects.service.show.apply();
                         }
                     }).end({'data': data});
                 },120* i);
             }
-            _this.toScroll = true;
-            return true;
+
         };
         this.if(function(){
             this.startModel('Services', function(model){

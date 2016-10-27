@@ -35,8 +35,12 @@ function SiteController() {
                             _this.loginBlock.result.setAttribute('status', 'close');
                             _this.start.init('MainMenu', 'update');
                         }).else(function (res) {
-                            var errorMSG = res.if;
-                            _this.loginBlock.effects.errorBlock.show.apply();
+                            var data = res.if, i = 0, error;
+                            for (error in data){
+                                i++;
+                                console.log(error);
+                                if(i === 1) break;
+                            }
                         }).end()
                     });
                 }).end()

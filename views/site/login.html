@@ -1,12 +1,11 @@
 <div viewFX="loginBlock" class="container-fluid col-sm-6  col-sm-pull-3 col-md-7 col-xs-12 col-xs-offset-0" id="login-block">
-    <div viewFX="errorBlock"></div>
     <div  class="row-fluid">
         <div viewFX="blockM" class="col-md-4 col-xs-6">
             <div class="row-fluid text-center"><h4>Вход на сайт</h4></div>
             <div class="form">
                 <form autocomplete="on">
                     <div class="row text-center">
-                        <input StartModel="USER_login" class="form-control" type="text" name="Login[email]"
+                        <input viewFX="inpLogin" StartModel="USER_login" class="form-control" type="text" name="Login[email]"
                                placeholder="E-Mail или телефон">
                         <span class="error" id="error_email"></span>
                     </div>
@@ -46,5 +45,8 @@
                 <input class="btn btn-default" type="button" name="RegUser" value="Создать профиль">
             </div>
         </div>
+    </div>
+    <div class="row">
+        <div viewFX="info" class="col-sm-12"></div>
     </div>
 </div>

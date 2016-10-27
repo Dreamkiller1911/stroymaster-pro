@@ -2,12 +2,12 @@
  * Created by tazeb on 25.06.2016.
  */
 function Services(){
-    var _this = this;
     this.properties = ['note', 'description'];
     this.prefix = 'srv_';
     this.labels = [];
 
     this.viewFromId = function (id) {
+        var _this = this;
         _this.ajax({
             type: "POST",
             url: "/user/ShowService",

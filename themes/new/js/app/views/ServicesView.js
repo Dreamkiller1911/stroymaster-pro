@@ -31,9 +31,11 @@ function ServicesView() {
                 _this.tic++;
                 if (_this.tic > 6) _this.tic = 1;
                 setTimeout(function () {
-                    $(element).css('opacity', 0).animate({'opacity': 1, 'margin-left': 0}, 250)
+                    $(element).css('opacity', 0).animate({'opacity': 1, 'margin-left': 0}, 250, function(){
+                        return true;
+                    })
                 }, 100 * _this.tic)
-            }, true],
+            }, false],
             ['closeAll', function (element){
                 var _this = this.parent;
                 var block =$(element).parent().children();
@@ -54,23 +56,25 @@ function ServicesView() {
             ['listen', function (element) {
             var _this = this.parent;
             var onWheel = function (e) {
-                var event = e || window.event;
-                var delta = event.deltaY || event.detail || event.wheelDelta;
-                var hText = Number($(this).css('height').replace(/px/i, ''));
-                var hHead = Number($(this).prev().css('height').replace(/px/i, ''));
-                var hBlock = Number($(this).parent().css('height').replace(/px/i, ''));
-                var hImg = Number($(this).next().css('height').replace(/px/i, ''));
+                var event = window.event || e ;
+                var delta = event.deltaY || event.detail || event.wheelDelta; //Направление скрола 100 или - 100, up or down
+                var hText = Number($(this).css('height').replace(/px/i, ''));//Высота блока текста резюме
+                var hHead = Number($(this).prev().css('height').replace(/px/i, ''));//Высота шапки резюме
+                var hBlock = Number($(this).parent().css('height').replace(/px/i, ''));//Высота родительского блока
+                var hImg = Number($(this).next().css('height').replace(/px/i, ''));//Высота блока с изображением
                 var numScroll = hText - (hBlock - hImg);
-                var hTmp = Number($(this).css('top').replace(/px/i, ''));
+                var oldTop = Number($(this).css('top').replace(/px/i, ''));
+                var hTmp = oldTop;
                 var value = delta > 0 ? 100 : -100;
-                if(numScroll < 0) return false;
+                if(numScroll < 0) return false, false;
                 hTmp = isNaN(hTmp) ? -value: hTmp + -value;
-                if((hHead) - hTmp < 0){
+                if((hHead - hTmp) < 0){
                     hTmp = hHead;
                 }
                 if(hTmp < -numScroll && hTmp > -numScroll - 200){
                     hTmp = -numScroll;
                 }
+                if(hTmp === oldTop) return false, false;
                 if(_this.toScroll){
                     _this.toScroll = false;
                     $(this).css({'position': 'absolute'}).animate({'top': hTmp}, 300, function(){

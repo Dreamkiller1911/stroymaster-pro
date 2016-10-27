@@ -7,97 +7,28 @@ function SiteView() {
     this.open = false;
     this.tic = 0;
     this.tics = 0;
-    this.testS = function(){
-        setTimeout(function(){
-            return true;
-        }, 2000)
+    this.includeMask = function(){
+        if(!document.getElementById('jquery.mask.min.js')){
+            var script = document.createElement('script');
+            var head = document.getElementsByTagName('head')[0];
+            script.src = '/themes/new/js/app/plugins/jQuery-Mask-Plugin-master/dist/jquery.mask.min.js';
+            script.setAttribute('id', 'jquery.mask.min.js');
+            script.onload = function(){ return true;};
+            head.appendChild(script);
+        }
     };
-
-
 
     this.viewLoginBlock = function () {
         var _this = this;
-        var loginEffects = {
-            loginBlock: [
-                ['pre', function(element){
-                    $(element).css({'height': 0, 'opacity': 0})
-                }, true],
-                ['show', function(element){
-                    $(element).css('display', 'block').stop().animate({height: 200, opacity: 1}, 400, function(){
-                        return true;
-                    })
-                }, false],
-                ['close', function(element){
-                    $(element).stop().animate({'height':0, 'opacity': 0}, 400, function(){
-                        $(this).css('display', 'none');
-                        return true;
-                    })
-                }, false]
-            ],
-            blockM: [
-                ['pre', function(element){
-                    $(element).each(function(){
-                        $(this).css('opacity', 0);
-                    })
-                }, true],
-                ['show', function(element){
-                    var self = this.parent;
-                    self.tic = 0;
-                    $(element).each(function(){
-                        self.tic++;
-                        var _this = this;
-                        setTimeout(function(){
-
-                            $(_this).animate({'opacity': 1}, 400, function(){
-                                self.tics++;
-                                if(self.tics === 3){
-                                    return true;
-                                }
-                            });
-                        }, 150 *  self.tic)
-                    })
-                }, false]
-            ],
-            errorBlock: [
-                ['pre', function(element){
-                    var top = $(element).parent().css('top');
-                   $(element).css({'background': 'red', 'position': 'absolute', 'top': top, 'left': 150, 'right': 0, 'z-index': 940})
-                }, true],
-                ['show', function(element){
-                    $(element).stop().animate({'height': 100})
-                }, false]
-            ]
-        };
         this.if(function(){
             this.include({
                 path: 'views/site/login.html',
-                effects: loginEffects
+                effects: this.loginEffects
             })
         }).then(function(res){
             var a = _this.show(res.if);
             return a;
-        }).end({'loginEffects': loginEffects})
-        /*return this.show(
-            this.addEffect('block',
-                '<div class="container-fluid col-sm-6  col-sm-pull-3 col-md-7 col-xs-12 col-xs-offset-0" id="login-block">' +
-
-                '</div>',
-                [
-                    ['pre', function (element) {
-
-                    }, true],
-                    ['show', function (element) {
-                        $(element).animate({'height': 200, 'opacity' : 1}, 300, function(){
-                            return true;
-                        })
-                    }, false],
-                    ['out', function (element) {
-                        $(element).animate({'height': 0, 'opacity': 0}, 300, function(){
-                            return true;
-                        })
-                    }, false]
-                ])
-        );*/
+        }).end();
     };
     this.viewLoginForm = function () {
         var _this = this;
@@ -166,4 +97,75 @@ function SiteView() {
     this.viewRegisterForm = function () {
 
     }
+
+    this.loginEffects = {
+        loginBlock: [
+            ['pre', function(element){
+                $(element).css({'height': 0, 'opacity': 0})
+            }, true],
+            ['show', function(element){
+                $(element).css('display', 'block').stop().animate({height: 240, opacity: 1}, 400, function(){
+                    return true;
+                })
+            }, false],
+            ['close', function(element){
+                $(element).stop().animate({'height':0, 'opacity': 0}, 400, function(){
+                    $(this).css('display', 'none');
+                    return true;
+                })
+            }, false]
+        ],
+        inpLogin: [
+            ['pre', function(){}, true]
+        ],
+        btnLogin: [
+            ['pre', function(element){
+                var pattern = /^((?:\+7)|(?:8))?[\s\-\(]?(\d{3})[\s\-\)]?/;
+                var _this = this.parent;
+                element.onkeydown = function(e){
+                    var event = window.event || e;
+                    //console.dir(event);
+                }
+
+                element.onkeyup = function(){
+                    if(pattern.test(this.value)){
+                        _this.if(function(){
+                            this.includeMask();
+                        }).then(function(){
+                            $(element).mask('+7(000) 000-00-00')
+                        }).end();
+                    }
+                }
+            }, true]
+        ],
+        blockM: [
+            ['pre', function(element){
+                $(element).each(function(){
+                    $(this).css('opacity', 0);
+                })
+            }, true],
+            ['show', function(element){
+                var self = this.parent;
+                self.tic = 0;
+                $(element).each(function(){
+                    self.tic++;
+                    var _this = this;
+                    setTimeout(function(){
+
+                        $(_this).animate({'opacity': 1}, 400, function(){
+                            self.tics++;
+                            if(self.tics === 3){
+                                return true;
+                            }
+                        });
+                    }, 150 *  self.tic)
+                })
+            }, false]
+        ],
+        info: [
+            ['show', function(element){
+                $(element).stop().animate({'height': 100})
+            }, false]
+        ]
+    };
 }
