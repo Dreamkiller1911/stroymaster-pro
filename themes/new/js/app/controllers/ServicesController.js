@@ -35,9 +35,7 @@ function ServicesController() {
             serviceBody.setAttribute('class', 'col-sm-12');
             serviceBody.setAttribute('rel', 'services');
             content.innerHTML = '';
-            content.appendChild(serviceBody);
         }
-
 
         this.start.oldContent = {
             start: _this.start,
@@ -125,7 +123,26 @@ function ServicesController() {
             }
 
         };
+
         this.if(function(){
+            this.startModel('Services');
+        }).then(function(res){
+            var model = res.if;
+            _this.if(function(){
+                model.loadBaseData();
+            }).then(function(res){
+                content.innerHTML = res.if;
+               _this.if(function(){
+                   model.loadData('new')
+               }).then(function(res){
+                   _this.ticService = 0;
+                   var data = res.if;
+                   load(data, _this);
+               }).end({'model': model});
+            }).end({'model': model});
+        }).end();
+
+        /*this.if(function(){
             this.startModel('Services', function(model){
                 model.loadData('new')
             });
@@ -133,7 +150,7 @@ function ServicesController() {
             _this.ticService = 0;
             var data = res.if;
             load(data, _this);
-        }).end();
+        }).end();*/
         window.addEventListener('scroll', _this.scrollLoad, false);
     };
 

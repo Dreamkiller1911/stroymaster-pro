@@ -43,6 +43,16 @@ function Services(){
           }
       });
     };
+    this.loadBaseData = function(){
+        this.ajax({
+            type: "POST",
+            url: '/services/index',
+            data: {getAjaxBase: ''},
+            success: function(data){
+                return data;
+            }
+        })
+    };
     this.save = function (){
         var _this = this;
         this.ajax({

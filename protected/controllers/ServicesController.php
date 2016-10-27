@@ -106,9 +106,14 @@ class ServicesController extends Controller
 
     public function actionIndex()
     {
-        $this->init()->registerScript('initServices',
-            'start.init(\'Services\', \'index\')');
-        $this->render('index');
+        if(isset($_POST['getAjaxBase'])){
+            $this->renderPartial('index');
+        }else{
+            $this->init()->registerScript('initServices',
+                'start.init(\'Services\', \'index\')');
+            $this->render('null');
+        }
+
     }
 
     public function actionAjaxLoad()

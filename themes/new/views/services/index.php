@@ -34,11 +34,7 @@ $this->init()->registerMetaTag('Мы предлагаем вам список м
     <h4 class="hidden-sm hidden-md hidden-lg">Ниже представлен полный список мастеров города Ефремов</h4>
 
     <div class="col-sm-12" rel="services">
-        <?php/*    foreach ($model as $key) {
-        $this->renderPartial('_view', array('service' => $key));
-    }
 
-    */?>
     </div>
 </div>
 
