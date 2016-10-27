@@ -84,16 +84,12 @@ class OrdersController extends Controller
 						}
 					}
 				}catch (Exception $e){
-					$data = ['complete'=>false, 'message'=>$e->getMessage()];
+					$data = array('complete'=>false, 'message'=>$e->getMessage());
 					echo json_encode($data);
 				}
 			}else{
 				$this->render('null');
 			}
-
-
-
-
 		}
 	}
 

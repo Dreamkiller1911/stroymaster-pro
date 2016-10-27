@@ -12,7 +12,7 @@ function Orders (){
             data: {'getAjaxData': true},
             dataType: 'html',
             success: function (data){
-               return data;
+                return data;
             }
         })
     };

@@ -115,10 +115,10 @@ function SiteView() {
                 })
             }, false]
         ],
-        inpLogin: [
+        btnLogin: [
             ['pre', function(){}, true]
         ],
-        btnLogin: [
+        inpLogin: [
             ['pre', function(element){
                 var pattern = /^((?:\+7)|(?:8))?[\s\-\(]?(\d{3})[\s\-\)]?/;
                 var _this = this.parent;

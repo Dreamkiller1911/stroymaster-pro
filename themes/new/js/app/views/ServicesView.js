@@ -7,7 +7,8 @@ function ServicesView() {
     this.ticImg = 0;
     this.toScroll = true;
 
-    this.viewService = function (model, user, images) {
+    this.viewService = function () {
+
         var _this = this;
         this.if(function(){
             this.show({
@@ -23,7 +24,7 @@ function ServicesView() {
         'service': [
             ['init', function (element) {
                 var _this = this.parent;
-                $(element).css({'opacity': 0, 'margin-left': -500});
+                $(element).css({'opacity': 0});
                 _this.start.init('Services', 'viewModal')
             }, true],
             ['show', function (element) {
@@ -31,7 +32,7 @@ function ServicesView() {
                 _this.tic++;
                 if (_this.tic > 6) _this.tic = 1;
                 setTimeout(function () {
-                    $(element).css('opacity', 0).animate({'opacity': 1, 'margin-left': 0}, 250, function(){
+                    $(element).css('opacity', 0).animate({'opacity': 1}, 250, function(){
                         return true;
                     })
                 }, 100 * _this.tic)

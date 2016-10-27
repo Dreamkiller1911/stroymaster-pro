@@ -7,6 +7,7 @@ function ServicesController() {
     this.toScroll = false;
     this.isLoadScroll = 0;
     this.oldArr = '';
+    this.numElements = 0;
 
     this.viewModalAction = function () {
         //ОБЯЗАТЕЛЬНО ПЕРЕДЕЛАТЬ
@@ -26,7 +27,18 @@ function ServicesController() {
     };
     this.indexAction = function () {
         var _this = this;
+        var content = document.getElementById('content');
         var serviceBody = document.querySelector('[rel="services"]'); //Блок для вставки результата рендера профилей пользователей
+
+        if(!serviceBody){
+            serviceBody = document.createElement('div');
+            serviceBody.setAttribute('class', 'col-sm-12');
+            serviceBody.setAttribute('rel', 'services');
+            content.innerHTML = '';
+            content.appendChild(serviceBody);
+        }
+
+
         this.start.oldContent = {
             start: _this.start,
             parent: _this,
@@ -89,27 +101,27 @@ function ServicesController() {
             _this.oldArr = od;
             var i;
             for ( i = 0; i < data.length; i++){
-                setTimeout(function(){
                     _this.if(function(){
                         this.render('Service', {
                             view: data[this.ticService].view
                         });
                         this.ticService++;
-                    }).then(function(render){
+                    }, {'queue': true}).then(function(render){
                         _this.isLoadScroll++;
                         var service = render.if;
                         service.append(srb || serviceBody);
+                        _this.numElements++;
                         if(_this.isLoadScroll === data.length){
                             _this.if(function(){
                                 service.effects.service.show.apply();
                             }).then(function(){
                                 _this.toScroll = true;
+
                             }).end({'service': service});
                         }else {
                             service.effects.service.show.apply();
                         }
                     }).end({'data': data});
-                },120* i);
             }
 
         };
@@ -124,6 +136,7 @@ function ServicesController() {
         }).end();
         window.addEventListener('scroll', _this.scrollLoad, false);
     };
+
     this.crud = function () {
         this.start.init('ImgService', 'uploadAll')
         var _this = this;

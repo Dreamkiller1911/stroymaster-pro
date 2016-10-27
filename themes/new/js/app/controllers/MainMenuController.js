@@ -31,7 +31,7 @@ function MainMenuController() {
                 toUrlPush = false;
             }
             _this.start.setCtrlOfUrl({url: url, urlPush: toUrlPush});
-        }
+        };
 
         this.startModel('MainMenu', function (model) {
             _this.if(function () {
@@ -44,7 +44,8 @@ function MainMenuController() {
                         view: model
                     });
                 }).then(function (result) {
-                   var menu = result.if;
+                    var menu = result.if;
+                    _this.start.init('MainMenu', 'homeLink');
                     menu.append(place);
                     menu.bind('item', 'onclick', _this.listenMenu);
                 }).else(function(res){
@@ -86,5 +87,21 @@ function MainMenuController() {
             }).end({'model': model})
         })
 
+    };
+    this.homeLinkAction = function(){
+        var _this = this;
+        var ctrl = this.getControls();
+        var i = 0;
+        while ( ctrl[i]){
+            ctrl[i].onclick = function(e){
+                var event = window.event || e;
+                var homeCtrl = ['Services', 'index'];
+                var link = event.target.getAttribute('href');
+                event.preventDefault();
+                _this.start.init(homeCtrl[0], homeCtrl[1]);
+
+            }
+            i++;
+        }
     }
 }

@@ -24,7 +24,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="/"><span class="glyphicon glyphicon-home"></span> Stroymaster-pro</a>
+                    <a StartCtrl="MainMenu_homeLink" class="navbar-brand" href="/"><span class="glyphicon glyphicon-home"></span> Stroymaster-pro</a>
                 </div>
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 </div>
