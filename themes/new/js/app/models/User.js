@@ -2,7 +2,8 @@
  * Created by tazeb on 24.06.2016.
  */
 function User(){
-    this.properties = ['id', 'email', 'phone', 'phoneCode', 'login', 'password', 'name'];
+    this.properties = ['id', 'email', 'phone', 'phoneCode', 'login', 'password', 'newPassword', 'confirmPassword',
+        'name', 'first_name', 'second_name', 'class'];
     this.prefix = 'USER_';
 
     this.getAll = function(){

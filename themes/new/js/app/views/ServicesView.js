@@ -6,6 +6,31 @@ function ServicesView() {
     this.ticClose = 0;
     this.ticImg = 0;
     this.toScroll = true;
+    this.includeFuncybox = function(){
+        if(document.getElementById('jquery.fancybox.css')){ return true;}
+        var script = document.createElement('script');
+        var head = document.getElementsByTagName('head')[0];
+        script.src = window.location.origin + '/themes/new/js/app/plugins/fancyapps-fancyBox-18d1712/source/jquery.fancybox.js';
+        script.setAttribute('id', 'jquery.fancybox.js');
+        script.onload = function(){
+            if(document.getElementById('jquery.fancybox.css')){ return true;}
+            var css = document.createElement('link');
+            css.setAttribute('rel', 'stylesheet');
+            css.href = window.location.origin + '/themes/new/js/app/plugins/fancyapps-fancyBox-18d1712/source/jquery.fancybox.css';
+            css.setAttribute('id', 'jquery.fancybox.css');
+            css.onload = function(){
+                return true;
+            };
+            css.onerror = function(){
+                return false;
+            }
+            head.appendChild(css);
+        };
+        script.onerror = function(){
+            return false;
+        }
+        head.appendChild(script);
+    };
 
     this.viewService = function () {
 
@@ -101,9 +126,15 @@ function ServicesView() {
         ],
         'imgList': [
             ['init', function (element) {
-                $(element).each(function () {
-                    $(this).css('opacity', 0).fancybox([]);
-                })
+                var _this = this.parent;
+                _this.if(function(){
+                    this.includeFuncybox();
+                }).then(function(){
+                    $(element).fancybox([]);
+                    $(element).each(function(){
+                        $(this).css('opacity', 0);
+                    })
+                }).end();
             }, true],
             ['show', function (element) {
                 var _this = this.parent;

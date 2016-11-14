@@ -1,52 +1,56 @@
 <div viewFX="loginBlock" class="container-fluid col-sm-6  col-sm-pull-3 col-md-7 col-xs-12 col-xs-offset-0" id="login-block">
-    <div  class="row-fluid">
-        <div viewFX="blockM" class="col-md-4 col-xs-6">
-            <div class="row-fluid text-center"><h4>Вход на сайт</h4></div>
-            <div class="form">
-                <form autocomplete="on">
-                    <div class="row text-center">
-                        <input viewFX="inpLogin" StartModel="USER_login" class="form-control" type="text" name="Login[email]"
-                               placeholder="E-Mail или телефон">
-                        <span class="error" id="error_email"></span>
-                    </div>
-                    <div class="row text-center">
-                        <input StartModel="USER_password" class="form-control" type="password" name="Login[password]"
-                               placeholder="Пароль">
-                        <span class="error" id="error_password"></span>
-                    </div>
-                    <div class="row">
-                        <button viewBind="btnLogin" class="btn btn-default btn-block" name="Login"
-                                type="button"><span class="glyphicon glyphicon-log-in"></span> Войти
+    <div viewFX="loginData" id="login-form">
+        <div  class="row-fluid">
+            <div viewFX="blockM" class="col-md-4 col-xs-6">
+                <div class="row-fluid text-center"><h4>Вход на сайт</h4></div>
+                <div class="form">
+                    <form autocomplete="on">
+                        <div class="row text-center">
+                            <input viewFX="emailInp" StartModel="USER_login" class="form-control" type="text" name="Login[email]"
+                                   placeholder="E-Mail или телефон">
+                            <span class="error" id="error_email"></span>
+                        </div>
+                        <div class="row text-center">
+                            <input viewFX="passwordInp" StartModel="USER_password" class="form-control" type="password" name="Login[password]"
+                                   placeholder="Пароль">
+                            <span class="error" id="error_password"></span>
+                        </div>
+                        <div class="row">
+                            <button viewBind="btnLogin" class="btn btn-default btn-block" name="Login"
+                                    type="button"><span class="glyphicon glyphicon-log-in"></span> Войти
+                            </button>
+                        </div>
+                    </form>
+                    <h5>
+                        <div class="text-center text-warning" id="Login_error"></div>
+                    </h5>
+                </div>
+            </div>
+            <div viewFX="blockM" class="col-md-4 col-xs-6">
+                <div class="row-fluid text-center"><h4>Не можете войти?</h4></div>
+                <form>
+                    <div class="row text-center ">
+                        <label class="small text-info">Укажите телефон от вашей учетной записи или E-Mail</label>
+                        <input class="form-control" type="text" name="Repair[email]" placeholder="E-Mail или телефон">
+                        <label>&nbsp;</label>
+                        <button title="Данная услуга в разработке, обратитесь к администратору"
+                                class="btn btn-default btn-block" type="button">Получить новый пароль
                         </button>
                     </div>
                 </form>
-                <h5>
-                    <div class="text-center text-warning" id="Login_error"></div>
-                </h5>
             </div>
-        </div>
-        <div viewFX="blockM" class="col-md-4 col-xs-6">
-            <div class="row-fluid text-center"><h4>Не можете войти?</h4></div>
-            <form>
-                <div class="row text-center ">
-                    <label class="small text-info">Укажите телефон от вашей учетной записи или E-Mail</label>
-                    <input class="form-control" type="text" name="Repair[email]" placeholder="E-Mail или телефон">
-                    <label>&nbsp;</label>
-                    <button title="Данная услуга в разработке, обратитесь к администратору"
-                            class="btn btn-default btn-block" type="button">Получить новый пароль
-                    </button>
+            <div viewFX="blockM" class="col-md-4 hidden-xs">
+                <div class="row-fluid text-center"><h4>Регистрация</h4></div>
+                <div class="row text-center">
+                    <label class="small text-info">Вы являетесь мастером но у Вас еще нет своего резюме на сайте</label>
+                    <input viewBind="regUser" class="btn btn-default" type="button" name="RegUser" value="Создать профиль">
                 </div>
-            </form>
-        </div>
-        <div viewFX="blockM" class="col-md-4 hidden-xs">
-            <div class="row-fluid text-center"><h4>Регистрация</h4></div>
-            <div class="row text-center">
-                <label class="small text-info">Вы являетесь мастером но у Вас еще нет своего резюме на сайте</label>
-                <input class="btn btn-default" type="button" name="RegUser" value="Создать профиль">
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div viewFX="info" class="col-sm-12"></div>
+        <div class="row-fluid text-center">
+            <div class="col-sm-12">
+                <span viewFX="info" class="info"></span>
+            </div>
+        </div>
     </div>
 </div>

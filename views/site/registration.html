@@ -1,0 +1,60 @@
+<div viewFX="form" class="row form" id="reg-form">
+    <div viewBind="btnBack" class="col-sm-1 btn-left">
+        <div>&nbsp;</div>
+        <div>&nbsp;</div>
+    </div>
+   <div class="col-sm-10">
+       <form name="UserReg">
+           <div class="col-xs-4 ">
+               <div class="row">
+                   <label class="text-center ">Ваша роль на сайте <span class="required">*</span></label>
+                   <br>
+                   <div  data-toggle="buttons" StartModel="USER_class">
+                       <label class="btn btn-default">
+                           <input type="radio" name="UserReg[class]" value="0">Мастер
+                       </label>
+                       <label class="btn btn-default">
+                           <input type="radio" name="UserReg[class]" value="2">Заказчик
+                       </label>
+                       <label class="btn btn-default">
+                           <input type="radio" name="UserReg[class]" value="1">Владелец магазина
+                       </label>
+                   </div>
+               </div>
+           </div>
+           <div class="col-xs-4">
+               <div class="row">
+                   <label>Имя <span class="required">*</span></label>
+                   <input StartModel="USER_first_name" class="form-control input-sm" type="text" name="UserReg[first_name]" placeholder="Иван">
+               </div>
+               <div class="row">
+                   <label>Фамилия <span class="required">*</span></label>
+                   <input StartModel="USER_second_name" class="form-control input-sm" type="text" name="UserReg[second_name]" placeholder="Иванов">
+               </div>
+               <div class="row">
+                   <label>Номер телефона <span class="required">*</span></label>
+                   <input StartModel="USER_phone" class="form-control input-sm" type="text" name="UserReg[phone]" placeholder="8-999-999-99-99">
+               </div>
+           </div>
+           <div class="col-xs-4">
+               <div class="row">
+                   <label>E-Mail <span class="required">*</span></label>
+                   <input StartModel="USER_email" class="form-control input-sm" type="text" name="UserReg[email]" placeholder="Example@email.ru">
+               </div>
+               <div class="row">
+                   <label>Пароль <span class="required">*</span></label>
+                   <input StartModel="USER_newPassword" class="form-control input-sm" type="password" name="UserReg[password]" placeholder="******">
+               </div>
+               <div class="row">
+                   <label>Повторите пароль <span class="required">*</span></label>
+                   <input StartModel="USER_confirmPassword" class="form-control input-sm" type="password" name="UserReg[repeat_password]" placeholder="******">
+               </div>
+           </div>
+
+       </form>
+   </div>
+    <div viewBind="btnReg" class="col-sm-1 btn-right">
+        <div>&nbsp;</div>
+        <div>&nbsp;</div>
+    </div>
+</div>

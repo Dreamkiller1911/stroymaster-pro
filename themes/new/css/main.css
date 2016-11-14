@@ -169,12 +169,109 @@ body:before {
 
 #login-block {
     position: fixed;
+    overflow: hidden;
     top: 45px;
     box-shadow: 2px 2px 3px black;
     border: 2px solid lightslategray;
     border-radius: 0 0 20px 20px;
     z-index: 150;
 }
+
+#login-block .info{
+    position: relative;
+    background: white;
+    font-weight: bold;
+    font-family: Helvetica, Arial, Verdana, Tahoma, sans-serif;
+    opacity: 0;
+    margin-top: 10px;
+    padding: 3px 5px 3px 5px;
+    display: inline-block;
+}
+
+#login-block .info:before {
+    content: '';
+    position: absolute;
+    background: url("components/content-more-item-l.png") no-repeat;
+    background-size: cover ;
+    top: 0; bottom: 0; left: -15px;
+    width: 20px;
+}
+
+#login-block .info:after {
+    content: '';
+    display: inline;
+    position: absolute;
+    background: url("components/content-more-item-r.png") no-repeat;
+    background-size: cover ;
+    top: 0; bottom: 0; right: -15px;
+    width: 20px;
+}
+
+#login-form, #reg-form {
+    display: block;
+    position: absolute;
+}
+#reg-form{
+    opacity: 0;
+    padding-top: 10px;
+}
+#reg-form .btn-left div:first-child, #reg-form .btn-left div:last-child{
+     background: white;
+     width: 40px;
+     height: 110px;
+     margin-left: 5px;
+ }
+#reg-form .btn-left{
+    cursor: pointer;
+}
+#reg-form .btn-left:hover div:first-child{
+    background: linear-gradient(to left, slategray, white);
+    box-shadow: 2px 2px 3px black;
+}
+#reg-form .btn-left:hover div:last-child{
+    background: linear-gradient(to left, slategray, white);
+    box-shadow: 2px 2px 3px black;
+}
+#reg-form .btn-left div:first-child{
+    -webkit-transform: skew(-20deg);
+    -moz-transform: skew(-20deg);
+    -o-transform: skew(-20deg);
+}
+#reg-form .btn-left div:last-child{
+    -webkit-transform: skew(20deg);
+    -moz-transform: skew(20deg);
+    -o-transform: skew(20deg);
+}
+
+#reg-form .btn-right div:first-child, #reg-form .btn-right div:last-child{
+    background: white;
+    width: 40px;
+    height: 110px;
+    margin-left: -20px;
+}
+#reg-form .btn-right{
+    cursor: pointer;
+}
+#reg-form .btn-right:hover div:first-child{
+    background: linear-gradient(to right, slategray, white);
+    box-shadow: -2px 2px 3px black;
+}
+#reg-form .btn-right:hover div:last-child{
+    background: linear-gradient(to right, slategray, white);
+    box-shadow: -2px 2px 3px black;
+}
+#reg-form .btn-right div:first-child{
+    -webkit-transform: skew(20deg);
+    -moz-transform: skew(20deg);
+    -o-transform: skew(20deg);
+}
+#reg-form .btn-right div:last-child{
+    -webkit-transform: skew(-20deg);
+    -moz-transform: skew(-20deg);
+    -o-transform: skew(-20deg);
+}
+
+
 
 .form-shadow {
     padding: 10px;

@@ -94,78 +94,138 @@ function SiteView() {
             '</div>'
         );
     };
-    this.viewRegisterForm = function () {
-
+    this.viewRegForm = function () {
+        var _this = this;
+        this.if(function(){
+            this.include({
+                path: 'views/site/registration.html',
+                effects: this.regEffects
+            })
+        }).then(function(res){
+            var a = _this.show(res.if);
+            return a;
+        }).end();
     }
 
     this.loginEffects = {
         loginBlock: [
-            ['pre', function(element){
+            ['pre', function (element) {
                 $(element).css({'height': 0, 'opacity': 0})
             }, true],
-            ['show', function(element){
-                $(element).css('display', 'block').stop().animate({height: 240, opacity: 1}, 400, function(){
+            ['show', function (element) {
+                $(element).css('display', 'block').stop().animate({height: 240, opacity: 1}, 400, function () {
                     return true;
                 })
             }, false],
-            ['close', function(element){
-                $(element).stop().animate({'height':0, 'opacity': 0}, 400, function(){
+            ['close', function (element) {
+                $(element).stop().animate({'height': 0, 'opacity': 0}, 400, function () {
                     $(this).css('display', 'none');
                     return true;
                 })
+            }, false],
+
+        ],
+        loginData: [
+            ['closeSlideLeft', function (element) {
+                var width = Number($(element).parent().css('width').replace(/px|%|pt/i, ''));
+                $(element).css('width', width);
+                $(element).animate({'left': -( width + 20)}, 400, function(){
+                    $(element).css('display', 'none');
+                })
+            }, false],
+            ['showSlide', function(element){
+                $(element).stop().css({'opacity': 1, 'display': 'block'}).animate({'left': 0});
             }, false]
         ],
         btnLogin: [
-            ['pre', function(){}, true]
+            ['pre', function () {
+            }, true]
         ],
-        inpLogin: [
-            ['pre', function(element){
+        emailInp: [
+            ['pre', function (element) {
                 var pattern = /^((?:\+7)|(?:8))?[\s\-\(]?(\d{3})[\s\-\)]?/;
                 var _this = this.parent;
-                element.onkeydown = function(e){
-                    var event = window.event || e;
-                    //console.dir(event);
-                }
 
-                element.onkeyup = function(){
-                    if(pattern.test(this.value)){
-                        _this.if(function(){
+                element.onkeyup = function () {
+                    if (pattern.test(this.value)) {
+                        _this.if(function () {
                             this.includeMask();
-                        }).then(function(){
+                        }).then(function () {
                             $(element).mask('+7(000) 000-00-00')
                         }).end();
                     }
                 }
-            }, true]
+            }, true],
+            ['error', function (element) {
+                $(element).addClass('error');
+            }, false],
+            ['normal', function (element) {
+                $(element).removeClass('error');
+            }, false]
+        ],
+        passwordInp: [
+            ['error', function (element) {
+                $(element).addClass('error');
+            }, false],
+            ['normal', function (element) {
+                $(element).removeClass('error');
+            }, false]
         ],
         blockM: [
-            ['pre', function(element){
-                $(element).each(function(){
+            ['pre', function (element) {
+                $(element).each(function () {
                     $(this).css('opacity', 0);
                 })
             }, true],
-            ['show', function(element){
+            ['show', function (element) {
                 var self = this.parent;
                 self.tic = 0;
-                $(element).each(function(){
+                $(element).each(function () {
                     self.tic++;
                     var _this = this;
-                    setTimeout(function(){
+                    setTimeout(function () {
 
-                        $(_this).animate({'opacity': 1}, 400, function(){
+                        $(_this).animate({'opacity': 1}, 400, function () {
                             self.tics++;
-                            if(self.tics === 3){
+                            if (self.tics === 3) {
                                 return true;
                             }
                         });
-                    }, 150 *  self.tic)
+                    }, 150 * self.tic)
                 })
             }, false]
         ],
         info: [
-            ['show', function(element){
-                $(element).stop().animate({'height': 100})
+            ['showError', function (element, text) {
+                $(element).css('color', 'red').text(text).animate({'opacity': 1});
             }, false]
         ]
     };
+    this.regEffects = {
+        form:[
+            ['pre', function(element){
+
+                var parentWidth = Number( $(element).parent().css('width').replace(/px|pt|%/i, ''));
+
+                $(element).css({'left': parentWidth, 'width': parentWidth});
+            }, true],
+            ['showSlideLeft', function(element){
+                $(element).css({'opacity': 1, 'display': 'block'}).animate({'left': 0});
+            }, false],
+            ['closeSlideRight', function(element){
+                $(element).stop().animate({'left': $(element).parent().css('width')}, 400, function(){
+                    $(this).css('display', 'none');
+                });
+            }, false]
+        ],
+        blockOne:[
+            ['pre', function(element){}, true]
+        ],
+        blockTwo:[
+            ['pre', function(element){}, true]
+        ],
+        blockThree:[
+            ['pre', function(element){}, true]
+        ]
+    }
 }

@@ -28,31 +28,7 @@ function ServicesController() {
     this.indexAction = function () {
         var _this = this;
         var content = document.getElementById('content');
-        var serviceBody = document.querySelector('[rel="services"]'); //Блок для вставки результата рендера профилей пользователей
 
-        if(!serviceBody){
-            serviceBody = document.createElement('div');
-            serviceBody.setAttribute('class', 'col-sm-12');
-            serviceBody.setAttribute('rel', 'services');
-            content.innerHTML = '';
-        }
-
-        this.start.oldContent = {
-            start: _this.start,
-            parent: _this,
-            'element': serviceBody,
-            close: function(){
-                var _this = this.parent;
-                _this.if(function(){
-                    this.start.views.Services.Service.effects.service.closeAll.apply();
-                }).then(function(){
-                    var content = document.getElementById('content');
-                    $(content).stop().animate({'height': 0}, 100, function(){
-                        $(this).css('height', 'auto').text('');
-                        return true;
-                    })
-                }).end()
-            }};
         var getPosition = function (elem) {
             var rect = elem.getBoundingClientRect();
             var docMarginTop = getComputedStyle(document.body).marginTop.replace(new RegExp('[a-z]+', 'i'), '');
@@ -75,72 +51,75 @@ function ServicesController() {
             }
             return false, _result;
         };
-        _this.scrollLoad = function (e){
-            if(getPosition(serviceBody) && _this.toScroll){
-                window.removeEventListener('scroll', _this.scrollLoad);
-                _this.toScroll = false;
-                _this.if(function(){
-                    this.startModel('Services', function(model, prop){
-                        model.loadData(prop.id)
-                    }, {'id': id})
-                }).then(function(res){
-                    _this.ticService = 0;
-                    var data = res.if;
-                    _this.if(function(){
-                        load(data, this, srb);
-                    }).then(function(){
-                        window.addEventListener('scroll', _this.scrollLoad);
-                    }).end({'load': load, 'data':data, 'srb': serviceBody})
-                }).end({'id': _this.oldArr})
-            }
-        };
-        var load = function(data, _this, srb){
-            var od = _this.setOldId(data.oldArr);
-            _this.oldArr = od;
-            var i;
-            for ( i = 0; i < data.length; i++){
-                    _this.if(function(){
-                        this.render('Service', {
-                            view: data[this.ticService].view
-                        });
-                        this.ticService++;
-                    }, {'queue': true}).then(function(render){
-                        _this.isLoadScroll++;
-                        var service = render.if;
-                        service.append(srb || serviceBody);
-                        _this.numElements++;
-                        if(_this.isLoadScroll === data.length){
-                            _this.if(function(){
-                                service.effects.service.show.apply();
-                            }).then(function(){
-                                _this.toScroll = true;
-
-                            }).end({'service': service});
-                        }else {
-                            service.effects.service.show.apply();
-                        }
-                    }).end({'data': data});
-            }
-
-        };
-
         this.if(function(){
             this.startModel('Services');
         }).then(function(res){
             var model = res.if;
             _this.if(function(){
-                model.loadBaseData();
+                model.loadBaseData();//Загрузка основного каркаса для страницы сервисов
             }).then(function(res){
-                content.innerHTML = res.if;
-               _this.if(function(){
-                   model.loadData('new')
-               }).then(function(res){
-                   _this.ticService = 0;
-                   var data = res.if;
-                   load(data, _this);
-               }).end({'model': model});
+                content.innerHTML = res.if;//В контент добавляем необходимую базу для страницы сервисов
+                var serviceBody = content.querySelector('[rel="services"]');//Повторно получаем блок для вставки сервисов
+                var load = function(data, _this, srb){
+                    var od = _this.setOldId(data.oldArr);
+                    _this.oldArr = od;
+                    var i;
+                    for ( i = 0; i < data.length; i++){
+                        _this.if(function(){
+                            this.render('Service', {
+                                view: data[this.ticService].view
+                            });
+                            this.ticService++;
+                        }, {'queue': true}).then(function(render){
+                            _this.isLoadScroll++;
+                            var service = render.if;
+                            service.append(srb || serviceBody);
+                            _this.numElements++;
+                            if(_this.isLoadScroll === data.length){
+                                _this.if(function(){
+                                    service.effects.service.show.apply();
+                                }).then(function(){
+                                    _this.toScroll = true;
+
+                                }).end({'service': service});
+                            }else {
+                                service.effects.service.show.apply();
+                            }
+                        }).end({'data': data});
+                    }
+
+                };//функция загрузки и вставки сервисов поштучно
+                _this.scrollLoad = function (e){
+                    if(getPosition(serviceBody) && _this.toScroll){
+                        window.removeEventListener('scroll', _this.scrollLoad);
+                        _this.toScroll = false;
+                        _this.if(function(){
+                            this.startModel('Services', function(model, prop){
+                                model.loadData(prop.id)
+                            }, {'id': id})
+                        }).then(function(res){
+                            _this.ticService = 0;
+                            var data = res.if;
+                            _this.if(function(){
+                                load(data, this, srb);
+                            }).then(function(){
+                                window.addEventListener('scroll', _this.scrollLoad);
+                            }).end({'load': load, 'data':data, 'srb': serviceBody})
+                        }).end({'id': _this.oldArr})
+                    }
+                };//функция для скролинга страницы и подгрузки дополнительного контента
+                window.addEventListener('scroll', _this.scrollLoad, false);//добавление функции подгрузки
+                _this.if(function(){
+                    model.loadData('new')//Загрузки первой партии сервисов
+                }).then(function(res){
+                    _this.ticService = 0;
+                    var data = res.if;
+                    load(data, _this);
+                }).end({'model': model});
             }).end({'model': model});
         }).end();
+
+
 
         /*this.if(function(){
             this.startModel('Services', function(model){
@@ -151,7 +130,6 @@ function ServicesController() {
             var data = res.if;
             load(data, _this);
         }).end();*/
-        window.addEventListener('scroll', _this.scrollLoad, false);
     };
 
     this.crud = function () {

@@ -5,10 +5,6 @@
 $this->breadcrumbs = array(
     'Резюме мастеров' => ''
 );
-$this->widget('application.extensions.fancybox.EFancyBox', array(
-        'target' => 'a[rel]',
-    )
-);
 $this->pageTitle = Yii::app()->name . ' - Главная';
 $this->init()->registerMetaTag('ремонт ефремов, ремонт квартир в ефремове, мастер ремонта квартир', 'keywords');
 $this->init()->registerMetaTag('Мы предлагаем вам список мастеров. Вы можете ознакомиться с анкетами и работами каждого мастера' .

@@ -28,6 +28,8 @@ function SiteController() {
                     _this.loginBlock.result.setAttribute('status', 'open');
                     _this.loginBlock.effects.blockM.show.apply();
                     _this.loginBlock.bind('btnLogin', 'onclick', function () {
+                        var btn = this;
+                        btn.setAttribute('disabled', true);
                         _this.if(function () {
                             this.start.init('User', 'login');
                         }).then(function (res) {
@@ -35,13 +37,44 @@ function SiteController() {
                             _this.loginBlock.result.setAttribute('status', 'close');
                             _this.start.init('MainMenu', 'update');
                         }).else(function (res) {
-                            var data = res.if, i = 0, error;
+                            btn.removeAttribute('disabled');
+                            var data = res.if, i = 0, error, fx;
                             for (error in data){
                                 i++;
-                                console.log(error);
+                                fx = error.replace('LoginForm_', '');
+                                if(_this.oldFX){
+                                    _this.loginBlock.effects[_this.oldFX + 'Inp'].normal.apply()
+                                }
+                                _this.oldFX = fx;
+                                _this.loginBlock.effects[fx + 'Inp'].error.apply()
+                                _this.loginBlock.effects.info.showError.apply(data[error][0]);
                                 if(i === 1) break;
                             }
                         }).end()
+                    });
+                    _this.loginBlock.bind('regUser', 'onclick', function(){
+
+                        _this.if(function(){
+                            this.render('RegForm');
+                        }).then(function(res){
+                            _this.RegForm = res.if;
+                            _this.RegForm.append(document.getElementById('login-block'));
+                            setTimeout(function(){
+                                _this.loginBlock.effects.loginData.closeSlideLeft.apply();
+                                _this.RegForm.effects.form.showSlideLeft.apply();
+                                _this.RegForm.bind('btnReg', 'onclick', function(){
+                                    _this.if(function(){
+                                        this.start.init('User', 'register');
+                                    }).then(function(){
+
+                                    }).end();
+                                });
+                                _this.RegForm.bind('btnBack', 'onclick', function(){
+                                    _this.RegForm.effects.form.closeSlideRight.apply();
+                                    _this.loginBlock.effects.loginData.showSlide.apply();
+                                });
+                            },200)
+                        }).end();
                     });
                 }).end()
             }).end();

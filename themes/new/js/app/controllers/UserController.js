@@ -37,6 +37,21 @@ function UserController()
                return res.if;
            }).end()
     };
+    this.registerAction = function(){
+        var _this = this;
+        this.if(function(){
+            this.startModel('User');
+        }).then(function(res){
+            var model = res.if;
+            var data = {};
+            model.getProperties();
+            if(model.p.class.getElementsByClassName('active')){
+                data.class = model.p.class.getElementsByClassName('active')[0].getElementsByTagName('input')[0];
+            }
+
+            console.log(5)
+        }).end();
+    };
     this.getUserInfoAction = function(){
         this.startModel('User', function(model){
             model.getProperties();

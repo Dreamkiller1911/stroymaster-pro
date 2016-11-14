@@ -13,7 +13,6 @@ function MainMenuController() {
 
         this.listenMenu = function(e){
             var event = window.event || e;
-            event.preventDefault();
             if(this.classList.contains('active')){
                 this.classList.remove('active');
 
@@ -28,9 +27,10 @@ function MainMenuController() {
             var toUrlPush = true;
             var noPushReg = /(\/?site\/((login)|(logout)))/i;
             if(noPushReg.test(url)){
-                toUrlPush = false;
+                _this.start.setCtrlOfUrl({url: url});
+                event.preventDefault();
             }
-            _this.start.setCtrlOfUrl({url: url, urlPush: toUrlPush});
+
         };
 
         this.startModel('MainMenu', function (model) {
@@ -45,7 +45,6 @@ function MainMenuController() {
                     });
                 }).then(function (result) {
                     var menu = result.if;
-                    _this.start.init('MainMenu', 'homeLink');
                     menu.append(place);
                     menu.bind('item', 'onclick', _this.listenMenu);
                 }).else(function(res){
